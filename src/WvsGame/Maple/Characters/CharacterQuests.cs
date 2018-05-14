@@ -344,7 +344,7 @@ namespace Destiny.Maple.Characters
             this.Completed.Add(quest.MapleID, DateTime.UtcNow);
 
             CharacterBuffs.ShowLocalUserEffect(this.Parent, CharacterConstants.UserEffect.QuestComplete);
-            CharacterBuffs.ShowRemoteEffect(this.Parent, CharacterConstants.UserEffect.QuestComplete, true);
+            CharacterBuffs.ShowRemoteUserEffect(this.Parent, CharacterConstants.UserEffect.QuestComplete, true);
         }
 
         public void Forfeit(ushort questID)

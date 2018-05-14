@@ -32,7 +32,7 @@ namespace Destiny.Maple.Characters
             return currentMana == characterMaxMana;
         }
 
-        // TODO: abstractify to cover anything that has HP/MP, step further any kind of power && catching/handling of errors...
+        // TODO: abstract to cover anything that has HP/MP, step further any kind of power && catching/handling of errors...
         public static void AddHP(Character character, int quantity)
         {
             if (character == null) return;
@@ -67,6 +67,8 @@ namespace Destiny.Maple.Characters
                     character.Mana = character.MaxMana;
                     Update(character, CharacterConstants.StatisticType.Mana);
                     break;
+
+                // TODO: fill other stats?
             }
         }
 
@@ -549,7 +551,7 @@ namespace Destiny.Maple.Characters
             GainAPOnLeveLUP(character);
             GainSPOnLeveLUP(character);
             // play effect if needed
-            if (PlayEffect) CharacterBuffs.ShowRemoteEffect(character, CharacterConstants.UserEffect.LevelUp);
+            if (PlayEffect) CharacterBuffs.ShowRemoteUserEffect(character, CharacterConstants.UserEffect.LevelUp);
         }
 
         public static void DistributeAP(Character character, CharacterConstants.StatisticType type, short amount = 1)

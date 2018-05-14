@@ -190,7 +190,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.CancelBuff:
-                    this.Character.Buffs.Cancel(iPacket);
+                    this.Character.Buffs.CancelBuffHandler(iPacket);
                     break;
 
                 case ClientOperationCode.MesoDrop:

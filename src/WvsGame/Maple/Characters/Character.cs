@@ -226,7 +226,7 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     CharacterStats.Update(this, CharacterConstants.StatisticType.Job);
-                    CharacterBuffs.ShowRemoteEffect(this, CharacterConstants.UserEffect.JobChanged);
+                    CharacterBuffs.ShowRemoteUserEffect(this, CharacterConstants.UserEffect.JobChanged);
                 }
             }
         }
@@ -1727,7 +1727,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case CharacterConstants.AdminCommandType.DestroyFirstITem:
+                case CharacterConstants.AdminCommandType.DestroyFirstItem:
                     {
                         byte itemType = iPacket.ReadByte();
                         // TODO: remove item from inventory by type
@@ -1797,7 +1797,7 @@ namespace Destiny.Maple.Characters
 
                             if (!this.Buffs.Contains(hideBuff))
                             {
-                                this.Buffs.Add(hideBuff);
+                                this.Buffs.AddBuff(hideBuff);
                             }
                         }
 
@@ -1808,7 +1808,7 @@ namespace Destiny.Maple.Characters
 
                             if (this.Buffs.Contains(hideBuff))
                             {
-                                this.Buffs.Remove(hideBuff);
+                                this.Buffs.RemoveBuff(hideBuff);
                             }
                         }
                     }

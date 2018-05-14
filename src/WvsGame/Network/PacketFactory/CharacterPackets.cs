@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Destiny.Constants;
 using Destiny.Maple;
 using Destiny.Maple.Characters;

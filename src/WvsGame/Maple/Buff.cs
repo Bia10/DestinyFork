@@ -76,7 +76,7 @@ namespace Destiny.Maple
             {
                 if (this.Parent.Contains(this))
                 {
-                    this.Parent.Remove(this);
+                    this.Parent.RemoveBuff(this);
                 }
             }, (int)(this.End - DateTime.Now).TotalMilliseconds);
         }
@@ -101,7 +101,7 @@ namespace Destiny.Maple
             {
                 if (this.Parent.Contains(this))
                 {
-                    this.Parent.Remove(this);
+                    this.Parent.RemoveBuff(this);
                 }
             }, (int)(this.End - DateTime.Now).TotalMilliseconds);
         }

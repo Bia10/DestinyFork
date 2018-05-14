@@ -213,7 +213,7 @@ namespace Destiny.Constants
         public enum AdminCommandType : byte
         {
             CreateItem = 0,
-            DestroyFirstITem = 1,
+            DestroyFirstItem = 1,
             GiveExperience = 2,
             Ban = 3,
             Block = 4,

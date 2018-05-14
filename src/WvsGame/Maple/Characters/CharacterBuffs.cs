@@ -1,10 +1,12 @@
-﻿using Destiny.Data;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+
+using Destiny.Data;
 using Destiny.IO;
 using Destiny.Network;
 using Destiny.Constants;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
@@ -42,7 +44,7 @@ namespace Destiny.Maple.Characters
             {
                 if ((DateTime)datum["End"] > DateTime.Now)
                 {
-                    this.Add(new Buff(this, datum));
+                    this.AddBuff(new Buff(this, datum));
                 }
             }
         }
@@ -80,18 +82,18 @@ namespace Destiny.Maple.Characters
             return false;
         }
 
-        public void Add(Skill skill, int value)
+        public void AddBuffBySkill(Skill skill, int value)
         {
-            this.Add(new Buff(this, skill, value));
+            this.AddBuff(new Buff(this, skill, value));
         }
 
-        public void Add(Buff buff)
+        public void AddBuff(Buff buff)
         {
             foreach (Buff loopBuff in this.Buffs)
             {
                 if (loopBuff.MapleID == buff.MapleID)
                 {
-                    this.Remove(loopBuff);
+                    this.RemoveBuff(loopBuff);
 
                     break;
                 }
@@ -107,12 +109,12 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Remove(int mapleId)
+        public void RemoveBuffByID(int mapleId)
         {
-            this.Remove(this[mapleId]);
+            this.RemoveBuff(this[mapleId]);
         }
 
-        public void Remove(Buff buff)
+        public void RemoveBuff(Buff buff)
         {
             this.Buffs.Remove(buff);
 
@@ -122,16 +124,15 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Cancel(Packet iPacket)
+        public void CancelBuffHandler(Packet inPacket)
         {
-            int mapleID = iPacket.ReadInt();
+            int mapleID = inPacket.ReadInt();
 
             switch (mapleID)
             {
                 // TODO: Handle special skills.
-
                 default:
-                    this.Remove(mapleID);
+                    this.RemoveBuffByID(mapleID);
                     break;
             }
         }
@@ -146,58 +147,24 @@ namespace Destiny.Maple.Characters
             return ((IEnumerable)this.Buffs).GetEnumerator();
         }
 
-        public static void showOwnBuffEffect(Character character, Skill skill)
+        public static void ShowOwnBuffEffect(Character character, Skill skill)
         {
-            using (Packet oPacket = new Packet(ServerOperationCode.Effect))
-            {
-                oPacket
-                    .WriteInt(character.ID)
-                    .WriteInt(skill.MapleID)
-                    .WriteByte(0xA9) //??
-                    .WriteByte(1); //??
-
-                character.Client.Send(oPacket);
-            }
+            character.Client.Send(CharacterBuffsPackets.ShowMineBuffEffect(character, skill));
         }
 
-        public void ShowBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
+        public void ShowRemoteBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
         {
-            direction = 3;
-
-            using (Packet oPacket = new Packet(ServerOperationCode.ShowRemoteEffect))
-            {
-                oPacket
-                    .WriteInt(character.ID)
-                    .WriteByte((byte)effect) //buff level??
-                    .WriteInt(skill.MapleID)
-                    .WriteByte(direction)
-                    .WriteByte((byte)effect)
-                    .WriteByte(1); //??
-
-                character.Map.Broadcast(oPacket, null);
-            }
+            character.Map.Broadcast(CharacterBuffsPackets.ShowRemoteBuffEffect(character, effect, skill, direction), null);
         }
 
         public static void ShowLocalUserEffect(Character character, CharacterConstants.UserEffect effect)
         {
-            using (Packet oPacket = new Packet(ServerOperationCode.Effect))
-            {
-                oPacket.WriteByte((byte)effect);
-
-                character.Client.Send(oPacket);
-            }
+            character.Client.Send(CharacterBuffsPackets.ShowLocalBuffEffect(effect));
         }
 
-        public static void ShowRemoteEffect(Character character, CharacterConstants.UserEffect effect, bool skipSelf = false)
+        public static void ShowRemoteUserEffect(Character character, CharacterConstants.UserEffect effect, bool skipSelf = false)
         {
-            using (Packet oPacket = new Packet(ServerOperationCode.ShowRemoteEffect))
-            {
-                oPacket
-                    .WriteInt(character.ID)
-                    .WriteByte((byte)effect);
-
-                character.Map.Broadcast(oPacket, skipSelf ? character : null);
-            }
+            character.Map.Broadcast(CharacterBuffsPackets.ShowRemoteBuffEffect(effect), skipSelf ? character : null);
         }
 
         // TODO: Refactor this to use actual TwoStateTemporaryStat and not some random values.
@@ -232,7 +199,8 @@ namespace Destiny.Maple.Characters
                     mask |= (long)CharacterConstants.SecondaryBuffStat.ShadowPartner;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
+                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) 
+                    || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.SoulArrow;
                 }
