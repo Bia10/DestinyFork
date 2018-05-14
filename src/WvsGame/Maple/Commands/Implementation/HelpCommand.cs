@@ -36,13 +36,13 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Notify("[Help]");
+                Character.Notify(caller, "[Help]");
 
                 foreach (Command command in CommandFactory.Commands)
                 {
                     if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted && !(command is HelpCommand))
                     {
-                        caller.Notify(string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
+                        Character.Notify(caller, string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
                     }
                 }
             }

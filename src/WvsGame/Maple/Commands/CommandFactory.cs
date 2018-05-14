@@ -12,11 +12,11 @@ namespace Destiny.Maple.Commands
 
         public static void Initialize()
         {
-            CommandFactory.Commands = new Commands();
+            Commands = new Commands();
 
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(Command))))
             {
-                CommandFactory.Commands.Add((Command)Activator.CreateInstance(type));
+                Commands.Add((Command)Activator.CreateInstance(type));
             }
         }
 
@@ -35,9 +35,9 @@ namespace Destiny.Maple.Commands
                 args[i - 1] = splitted[i];
             }
 
-            if (CommandFactory.Commands.Contains(commandName))
+            if (Commands.Contains(commandName))
             {
-                Command command = CommandFactory.Commands[commandName];
+                Command command = Commands[commandName];
 
                 if (!command.IsRestricted || caller.IsMaster)
                 {
@@ -47,7 +47,7 @@ namespace Destiny.Maple.Commands
                     }
                     catch (Exception e)
                     {
-                        caller.Notify("[Command] Unknown error: " + e.Message);
+                        Character.Notify(caller, "[Command] Unknown error: " + e.Message);
 
                         Log.SkipLine();
                         Log.Error("{0} error by {1}: ", e, command.GetType().Name, caller.Name);
@@ -56,12 +56,12 @@ namespace Destiny.Maple.Commands
                 }
                 else
                 {
-                    caller.Notify("[Command] Restricted command.");
+                    Character.Notify(caller, "[Command] Restricted command.");
                 }
             }
             else
             {
-                caller.Notify("[Command] Invalid command.");
+                Character.Notify(caller, "[Command] Invalid command.");
             }
         }
     }

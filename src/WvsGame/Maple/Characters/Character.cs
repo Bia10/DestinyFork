@@ -1,6 +1,8 @@
-﻿using Destiny.Maple.Maps;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
+using Destiny.Maple.Maps;
 using Destiny.Constants;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
@@ -10,7 +12,7 @@ using Destiny.Maple.Interaction;
 using Destiny.Network;
 using Destiny.IO;
 using Destiny.Maple.Scripting;
-using Destiny.Network.PacketFactory.MaplePacketFactory;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
@@ -81,9 +83,9 @@ namespace Destiny.Maple.Characters
                 gender = value;
 
                 if (this.IsInitialized)
-                {   
+                {
                     // TODO: later this should be wrapped by PacketFactoryManager into requestPacket(Packet packetRequested, MapleClient clientWhomRequested, short priority, bool isMaster/Admin, bool checkSpam)
-                    this.Client.Send(MapleCharacterPackets.SetGenderPacket(this.gender));
+                    this.Client.Send(CharacterPackets.SetGenderPacket(this.gender));
                 }
             }
         }
@@ -102,8 +104,8 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this,CharacterConstants.StatisticType.Skin);
-                    this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
+                    CharacterStats.Update(this, CharacterConstants.StatisticType.Skin);
+                    this.Map.Broadcast(CharacterPackets.UpdateApperancePacket(this));
                 }
             }
         }
@@ -124,7 +126,7 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     CharacterStats.Update(this, CharacterConstants.StatisticType.Face);
-                    this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
+                    this.Map.Broadcast(CharacterPackets.UpdateApperancePacket(this));
                 }
             }
         }
@@ -134,7 +136,7 @@ namespace Destiny.Maple.Characters
             get { return hair; }
             set
             {
-                if (this.Gender == CharacterConstants.Gender.Male 
+                if (this.Gender == CharacterConstants.Gender.Male
                     && !DataProvider.Styles.MaleHairs.Contains(value) || this.Gender == CharacterConstants.Gender.Female && !DataProvider.Styles.FemaleHairs.Contains(value))
                 {
                     throw new StyleUnavailableException();
@@ -145,7 +147,7 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     CharacterStats.Update(this, CharacterConstants.StatisticType.Hair);
-                    this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
+                    this.Map.Broadcast(CharacterPackets.UpdateApperancePacket(this));
                 }
             }
         }
@@ -197,7 +199,7 @@ namespace Destiny.Maple.Characters
                     {
                         level = value;
 
-                        CharacterStats.Update(this,CharacterConstants.StatisticType.Level);
+                        CharacterStats.Update(this, CharacterConstants.StatisticType.Level);
                     }
                     else
                     {
@@ -525,7 +527,6 @@ namespace Destiny.Maple.Characters
             set
             {
                 lastQuest = value;
-
                 // TODO: Add checks.
             }
         }
@@ -537,15 +538,7 @@ namespace Destiny.Maple.Characters
             {
                 chalkboard = value;
 
-                using (Packet oPacket = new Packet(ServerOperationCode.Chalkboard))
-                {
-                    oPacket
-                        .WriteInt(this.ID)
-                        .WriteBool(!string.IsNullOrEmpty(this.Chalkboard))
-                        .WriteString(this.Chalkboard);
-
-                    this.Map.Broadcast(oPacket);
-                }
+                this.Map.Broadcast(CharacterPackets.SetChalkboardPacket(this));
             }
         }
 
@@ -626,39 +619,39 @@ namespace Destiny.Maple.Characters
 
             datum.Populate("ID = {0}", this.ID);
 
-            this.ID = (int) datum["ID"];
+            this.ID = (int)datum["ID"];
             this.Assigned = true;
 
-            this.AccountID = (int) datum["AccountID"];
-            this.WorldID = (byte) datum["WorldID"];
-            this.Name = (string) datum["Name"];
-            this.Gender = (CharacterConstants.Gender) datum["Gender"];
-            this.Skin = (byte) datum["Skin"];
-            this.Face = (int) datum["Face"];
-            this.Hair = (int) datum["Hair"];
-            this.Level = (byte) datum["Level"];
-            this.Job = (CharacterConstants.Job) datum["Job"];
-            this.Strength = (short) datum["Strength"];
-            this.Dexterity = (short) datum["Dexterity"];
-            this.Intelligence = (short) datum["Intelligence"];
-            this.Luck = (short) datum["Luck"];
-            this.MaxHealth = (short) datum["MaxHealth"];
-            this.MaxMana = (short) datum["MaxMana"];
-            this.Health = (short) datum["Health"];
-            this.Mana = (short) datum["Mana"];
-            this.AbilityPoints = (short) datum["AbilityPoints"];
-            this.SkillPoints = (short) datum["SkillPoints"];
-            this.Experience = (int) datum["Experience"];
-            this.Fame = (short) datum["Fame"];
-            this.Map = DataProvider.Maps[(int) datum["MapID"]];
-            this.SpawnPoint = (byte) datum["SpawnPoint"];
-            this.Meso = (int) datum["Meso"];
+            this.AccountID = (int)datum["AccountID"];
+            this.WorldID = (byte)datum["WorldID"];
+            this.Name = (string)datum["Name"];
+            this.Gender = (CharacterConstants.Gender)datum["Gender"];
+            this.Skin = (byte)datum["Skin"];
+            this.Face = (int)datum["Face"];
+            this.Hair = (int)datum["Hair"];
+            this.Level = (byte)datum["Level"];
+            this.Job = (CharacterConstants.Job)datum["Job"];
+            this.Strength = (short)datum["Strength"];
+            this.Dexterity = (short)datum["Dexterity"];
+            this.Intelligence = (short)datum["Intelligence"];
+            this.Luck = (short)datum["Luck"];
+            this.MaxHealth = (short)datum["MaxHealth"];
+            this.MaxMana = (short)datum["MaxMana"];
+            this.Health = (short)datum["Health"];
+            this.Mana = (short)datum["Mana"];
+            this.AbilityPoints = (short)datum["AbilityPoints"];
+            this.SkillPoints = (short)datum["SkillPoints"];
+            this.Experience = (int)datum["Experience"];
+            this.Fame = (short)datum["Fame"];
+            this.Map = DataProvider.Maps[(int)datum["MapID"]];
+            this.SpawnPoint = (byte)datum["SpawnPoint"];
+            this.Meso = (int)datum["Meso"];
 
-            this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte) datum["EquipmentSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte) datum["UsableSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Setup] = (byte) datum["SetupSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte) datum["EtceteraSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte) datum["CashSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte)datum["EquipmentSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte)datum["UsableSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Setup] = (byte)datum["SetupSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte)datum["CashSlots"];
 
             this.Items.Load();
             this.Skills.Load();
@@ -682,12 +675,12 @@ namespace Destiny.Maple.Characters
             datum["AccountID"] = this.AccountID;
             datum["WorldID"] = this.WorldID;
             datum["Name"] = this.Name;
-            datum["Gender"] = (byte) this.Gender;
+            datum["Gender"] = (byte)this.Gender;
             datum["Skin"] = this.Skin;
             datum["Face"] = this.Face;
             datum["Hair"] = this.Hair;
             datum["Level"] = this.Level;
-            datum["Job"] = (short) this.Job;
+            datum["Job"] = (short)this.Job;
             datum["Strength"] = this.Strength;
             datum["Dexterity"] = this.Dexterity;
             datum["Intelligence"] = this.Intelligence;
@@ -733,8 +726,8 @@ namespace Destiny.Maple.Characters
 
         public void InitializeCharacter()
         {
-            this.Client.Send(MapleCharacterPackets.InitializeCharacterSetFieldPacket(this));
-            this.Client.Send(MapleCharacterPackets.InitializeCharacterSrvrStatusChng());
+            this.Client.Send(CharacterPackets.InitializeCharacterSetFieldPacket(this));
+            this.Client.Send(CharacterPackets.InitializeCharacterSrvrStatusChng());
 
             this.IsInitialized = true;
             this.Map.Characters.Add(this);
@@ -744,8 +737,8 @@ namespace Destiny.Maple.Characters
 
         public static void InitializeCharacter(Character character)
         {
-            character.Client.Send(MapleCharacterPackets.InitializeCharacterSetFieldPacket(character));
-            character.Client.Send(MapleCharacterPackets.InitializeCharacterSrvrStatusChng());
+            character.Client.Send(CharacterPackets.InitializeCharacterSetFieldPacket(character));
+            character.Client.Send(CharacterPackets.InitializeCharacterSrvrStatusChng());
 
             character.IsInitialized = true;
             character.Map.Characters.Add(character);
@@ -755,7 +748,7 @@ namespace Destiny.Maple.Characters
 
         public static void UpdateApperance(Character character)
         {
-            character.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(character), character);          
+            character.Map.Broadcast(CharacterPackets.UpdateApperancePacket(character), character);
         }
 
         public static void Release(Character character)
@@ -763,183 +756,139 @@ namespace Destiny.Maple.Characters
             CharacterStats.Update(character);
         }
 
-        public void Notify(string message, NoticeType type = NoticeType.PinkText)
+        public static void Notify(Character character, string message, NoticeType type = NoticeType.PinkText)
         {
-            using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
-            {
-                oPacket.WriteByte((byte) type);
-
-                if (type == NoticeType.ScrollingText)
-                {
-                    oPacket.WriteBool(!string.IsNullOrEmpty(message));
-                }
-
-                oPacket.WriteString(message);
-
-                this.Client.Send(oPacket);
-            }
+            character.Client.Send(CharacterPackets.BroadcastMessage(type, message));
         }
 
-        public void ChangeMap(Packet iPacket)
+        public void ChangeMapHandler(Packet inPacket)
         {
-            byte portals = iPacket.ReadByte();
+            byte portals = inPacket.ReadByte();
 
             if (portals != this.Portals)
             {
                 return;
+                //Throw: ChangeMapException occured: wrong portals recieved in packet!
             }
 
-            int mapID = iPacket.ReadInt();
-            string portalLabel = iPacket.ReadString();
-            iPacket.ReadByte(); // NOTE: Unknown.
-            bool wheel = iPacket.ReadBool();
+            int mapID = inPacket.ReadInt(); // TODO: needs to be validated
+            string portalLabel = inPacket.ReadString();
+            inPacket.ReadByte(); // TODO: Unknown, needs to be researched
+            bool wheel = inPacket.ReadBool();
 
             switch (mapID)
             {
                 case 0: // NOTE: Death.
-                {
-                    if (this.IsAlive)
                     {
-                        return;
-                    }
+                        if (this.IsAlive)
+                        {
+                            return;
+                        }
 
-                    this.Health = 50;
-                    this.ChangeMap(this.Map.ReturnMapID);
-                }
+                        this.Health = 50;
+                        this.SendChangeMapRequest(this.Map.ReturnMapID);
+                    }
                     break;
 
                 case -1: // NOTE: Portal.
-                {
-                    Portal portal;
-
-                    try
                     {
-                        portal = this.Map.Portals[portalLabel];
+                        Portal portal;
+
+                        try
+                        {
+                            portal = this.Map.Portals[portalLabel];
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            return;
+                        }
+
+                        // TODO: Validate player and portal position.
+
+                        /*if (this.Level < this.Client.Channel.Maps[portal.DestinationMapID].RequiredLevel)
+                        {
+                            // TODO: Send a force of ground portal message.
+
+                            return;
+                        }*/
+
+                        this.SendChangeMapRequest(portal.DestinationMapID, portal.Link.ID);
                     }
-                    catch (KeyNotFoundException)
-                    {
-                        return;
-                    }
-
-                    // TODO: Validate player and portal position.
-
-                    /*if (this.Level < this.Client.Channel.Maps[portal.DestinationMapID].RequiredLevel)
-                    {
-                        // TODO: Send a force of ground portal message.
-
-                        return;
-                    }*/
-
-                    this.ChangeMap(portal.DestinationMapID, portal.Link.ID);
-                }
                     break;
 
                 default: // NOTE: Admin '/m' command.
-                {
-                    if (!this.IsMaster)
                     {
-                        return;
+                        if (!this.IsMaster)
+                        {
+                            return;
+                        }
+
+                        // TODO: Validate map ID.
+
+                        this.SendChangeMapRequest(mapID);
                     }
-
-                    // TODO: Validate map ID.
-
-                    this.ChangeMap(mapID);
-                }
                     break;
             }
         }
 
-        public void ChangeMap(int mapID, string portalLabel)
+        public void ChangeMapFromPortalLbl(int mapID, string portalLabel)
         {
-            this.ChangeMap(mapID, DataProvider.Maps[mapID].Portals[portalLabel].ID);
+            this.SendChangeMapRequest(mapID, DataProvider.Maps[mapID].Portals[portalLabel].ID);
         }
 
-        public void ChangeMap(int mapID, byte portalID = 0, bool fromPosition = false, Point position = null)
+        public void SendChangeMapRequest(int mapID, byte portalID = 0, bool fromPosition = false, Point position = null)
         {
-            this.Map.Characters.Remove(this);
+            this.Map.Characters.Remove(this); // remove character from current map
 
-            using (Packet oPacket = new Packet(ServerOperationCode.SetField))
-            {
-                oPacket
-                    .WriteInt(WvsGame.ChannelID)
-                    .WriteByte(++this.Portals)
-                    .WriteBool(false)
-                    .WriteShort()
-                    .WriteByte()
-                    .WriteInt(mapID)
-                    .WriteByte(this.SpawnPoint)
-                    .WriteShort(this.Health)
-                    .WriteBool(fromPosition);
+            this.Client.Send(CharacterPackets.ChangeMap(this, mapID, portalID, fromPosition, position)); // actual packet todo: wraper!
 
-                if (fromPosition)
-                {
-                    oPacket
-                        .WriteShort(position.X)
-                        .WriteShort(position.Y);
-                }
-
-                oPacket.WriteDateTime(DateTime.Now);
-
-                this.Client.Send(oPacket);
-            }
-
-            DataProvider.Maps[mapID].Characters.Add(this);
+            DataProvider.Maps[mapID].Characters.Add(this); // add character to map of ID witch was sent to client in packet
         }
 
-        public void Move(Packet iPacket)
+        public void CharMoveHandler(Packet inPacket)
         {
-            byte portals = iPacket.ReadByte();
+            byte portals = inPacket.ReadByte();
 
             if (portals != this.Portals)
             {
                 return;
+                //Throw: MoveHandlerException occured: wrong portals recieved in packet!
             }
 
-            iPacket.ReadInt(); // NOE: Unknown.
+            inPacket.ReadInt(); // NOTE: Unknown.
 
-            Movements movements = Movements.Decode(iPacket);
+            Movements movements = Movements.Decode(inPacket);
 
             this.Position = movements.Position;
             this.Foothold = movements.Foothold;
             this.Stance = movements.Stance;
 
-            using (Packet oPacket = new Packet(ServerOperationCode.Move))
+            this.Map.Broadcast(CharacterPackets.MoveCharacter(this, movements));
+
+            if (this.Foothold == 0) // NOTE: Player is floating in the air.
             {
-                oPacket
-                    .WriteInt(this.ID)
-                    .WriteBytes(movements.ToByteArray());
-
-                this.Map.Broadcast(oPacket, this);
-            }
-
-            if (this.Foothold == 0)
-            {
-                // NOTE: Player is floating in the air.
-                // GMs might be legitimately in this state due to GM fly.
-                // We shouldn't mess with them because they have the tools to get out of falling off the map anyway.
-
-                // TODO: Attempt to find foothold.
-                // If none found, check the player fall counter.
-                // If it's over 3, reset the player's map.
+                if (this.IsMaster)
+                {
+                    // GMs might be legitimately in this state due to GM fly.
+                    // We shouldn't mess with them because they have the tools to get out of falling off the map anyway.
+                }
+                else
+                {
+                    // TODO: Attempt to find foothold.
+                    // If none found, check the player fall counter.
+                    // If it's over 3, reset the player's map.
+                }
             }
         }
 
-        public void Sit(Packet iPacket)
+        public void CharSitHandler(Packet inPacket) // NOTE: SitHandler()
         {
-            short seatID = iPacket.ReadShort();
+            short seatID = inPacket.ReadShort(); // Read chairID to sit on
 
-            if (seatID == -1)
+            if (seatID == -1) // No chair
             {
                 this.Chair = 0;
-
-                using (Packet oPacket = new Packet(ServerOperationCode.SetActiveRemoteChair))
-                {
-                    oPacket
-                        .WriteInt(this.ID)
-                        .WriteInt();
-
-                    this.Map.Broadcast(oPacket, this);
-                }
+                this.Map.Broadcast(CharacterPackets.SitOnChair(this), this);
             }
             else
             {
@@ -959,27 +908,23 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void SitChair(Packet iPacket)
+        public void CharSitOnChairHandler(Packet inPacket)
         {
-            int mapleID = iPacket.ReadInt();
+            int chairMapleID = inPacket.ReadInt();
 
-            if (!this.Items.Contains(mapleID))
+            if (!this.Items.Contains(chairMapleID))
             {
                 return;
+                //Throw: exception occured no chair with mapleID received in packet found in char inventory
             }
 
-            this.Chair = mapleID;
+            this.Chair = chairMapleID;
 
-            using (Packet oPacket = new Packet(ServerOperationCode.SetActiveRemoteChair))
-            {
-                oPacket
-                    .WriteInt(this.ID)
-                    .WriteInt(mapleID);
-
-                this.Map.Broadcast(oPacket, this);
-            }
+            this.Map.Broadcast(CharacterPackets.ShowChair(this, chairMapleID), this);
         }
 
+        // NOTE: AttackHandler
+        // TODO: Separate incoming packet handler from validation and response
         public void Attack(Packet iPacket, CharacterConstants.AttackType type)
         {
             Attack attack = new Attack(iPacket, type);
@@ -1005,9 +950,9 @@ namespace Destiny.Maple.Characters
                     {
                         oPacket
                             .WriteInt(this.ID)
-                            .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte() // NOTE: Unknown.
-                            .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                            .WriteByte(0x5B) // NOTE: Unknown.
+                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -1044,9 +989,9 @@ namespace Destiny.Maple.Characters
                     {
                         oPacket
                             .WriteInt(this.ID)
-                            .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte() // NOTE: Unknown.
-                            .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                            .WriteByte(0x5B) // NOTE: Unknown.
+                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -1083,9 +1028,9 @@ namespace Destiny.Maple.Characters
                     {
                         oPacket
                             .WriteInt(this.ID)
-                            .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte() // NOTE: Unknown.
-                            .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                            .WriteByte(0x5B) // NOTE: Unknown.
+                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -1169,10 +1114,12 @@ namespace Destiny.Maple.Characters
         private const sbyte BumpDamage = -1;
         private const sbyte MapDamage = -2;
 
+        // NOTE: DamageHandler()
+        // TODO: Separate incoming packetHanndler from validation and processing
         public void Damage(Packet iPacket)
         {
             iPacket.Skip(4); // NOTE: Ticks.
-            sbyte type = (sbyte) iPacket.ReadByte();
+            sbyte type = (sbyte)iPacket.ReadByte();
             iPacket.ReadByte(); // NOTE: Elemental type.
             int damage = iPacket.ReadInt();
             bool damageApplied = false;
@@ -1260,12 +1207,12 @@ namespace Destiny.Maple.Characters
                     }
                     else
                     {
-                        this.Health -= (short) damage;
+                        this.Health -= (short)damage;
                     }
 
                     if (mpBurn > 0)
                     {
-                        this.Mana -= (short) mpBurn;
+                        this.Mana -= (short)mpBurn;
                     }
                 }
 
@@ -1281,35 +1228,35 @@ namespace Destiny.Maple.Characters
                 switch (type)
                 {
                     case MapDamage:
-                    {
-                        oPacket
-                            .WriteInt(damage)
-                            .WriteInt(damage);
-                    }
+                        {
+                            oPacket
+                                .WriteInt(damage)
+                                .WriteInt(damage);
+                        }
                         break;
 
                     default:
-                    {
-                        oPacket
-                            .WriteInt(damage) // TODO: ... or PGMR damage.
-                            .WriteInt(mobID)
-                            .WriteByte(hit)
-                            .WriteByte(reduction);
-
-                        if (reduction > 0)
                         {
-                            // TODO: PGMR stuff.
-                        }
+                            oPacket
+                                .WriteInt(damage) // TODO: ... or PGMR damage.
+                                .WriteInt(mobID)
+                                .WriteByte(hit)
+                                .WriteByte(reduction);
 
-                        oPacket
-                            .WriteByte(stance)
-                            .WriteInt(damage);
+                            if (reduction > 0)
+                            {
+                                // TODO: PGMR stuff.
+                            }
 
-                        if (noDamageSkillID > 0)
-                        {
-                            oPacket.WriteInt(noDamageSkillID);
+                            oPacket
+                                .WriteByte(stance)
+                                .WriteInt(damage);
+
+                            if (noDamageSkillID > 0)
+                            {
+                                oPacket.WriteInt(noDamageSkillID);
+                            }
                         }
-                    }
                         break;
                 }
 
@@ -1317,33 +1264,26 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Talk(Packet iPacket)
+        public void CharTalkHandler(Packet inPacket)
         {
-            string text = iPacket.ReadString();
-            bool shout = iPacket.ReadBool(); // NOTE: Used for skill macros.
+            string text = inPacket.ReadString();
+            bool shout = inPacket.ReadBool(); // NOTE: Used for skill macros.
 
-            if (text.StartsWith(Application.CommandIndiciator.ToString()))
+            // Check if text is a command or not
+            if (text.StartsWith(Application.CommandIndiciator.ToString(), StringComparison.Ordinal)) // StringComparison.Ordinal added
             {
                 CommandFactory.Execute(this, text);
             }
-            else
-            {
-                using (Packet oPacket = new Packet(ServerOperationCode.UserChat))
-                {
-                    oPacket
-                        .WriteInt(this.ID)
-                        .WriteBool(this.IsMaster)
-                        .WriteString(text)
-                        .WriteBool(shout);
 
-                    this.Map.Broadcast(oPacket);
-                }
+            else //not a command just send it to userChat
+            {
+                this.Map.Broadcast(CharacterPackets.TalkToCharacter(this, text, shout));
             }
         }
 
-        public void Express(Packet iPacket)
+        public void CharExpressionHandler(Packet inPacket)
         {
-            int expressionID = iPacket.ReadInt();
+            int expressionID = inPacket.ReadInt();
 
             if (expressionID > 7) // NOTE: Cash facial expression.
             {
@@ -1352,14 +1292,7 @@ namespace Destiny.Maple.Characters
                 // TODO: Validate if item exists.
             }
 
-            using (Packet oPacket = new Packet(ServerOperationCode.Emotion))
-            {
-                oPacket
-                    .WriteInt(this.ID)
-                    .WriteInt(expressionID);
-
-                this.Map.Broadcast(oPacket, this);
-            }
+            this.Map.Broadcast(CharacterPackets.ExpressEmotion(this, expressionID));
         }
 
         public void Converse(int mapleID)
@@ -1367,9 +1300,9 @@ namespace Destiny.Maple.Characters
             // TODO.
         }
 
-        public void Converse(Packet iPacket)
+        public void Converse(Packet inPacket)
         {
-            int objectID = iPacket.ReadInt();
+            int objectID = inPacket.ReadInt();
 
             this.Converse(this.Map.Npcs[objectID]);
         }
@@ -1382,15 +1315,12 @@ namespace Destiny.Maple.Characters
             this.LastNpc.Converse(this);
         }
 
-        public void DistributeAP(Packet iPacket)
+        public void CharDistributeAPHandler(Packet inPacket)
         {
-            if (this.AbilityPoints == 0)
-            {
-                return;
-            }
+            if (this.AbilityPoints == 0) return;
 
-            iPacket.ReadInt(); // NOTE: Ticks.
-            CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) iPacket.ReadInt();
+            inPacket.ReadInt(); // NOTE: Ticks.
+            CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) inPacket.ReadInt();
 
             CharacterStats.DistributeAP(this, type);
             this.AbilityPoints--;
@@ -1405,7 +1335,7 @@ namespace Destiny.Maple.Characters
 
             for (int i = 0; i < count; i++)
             {
-                CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) iPacket.ReadInt();
+                CharacterConstants.StatisticType type = (CharacterConstants.StatisticType)iPacket.ReadInt();
                 int amount = iPacket.ReadInt();
 
                 if (amount > this.AbilityPoints || amount < 0)
@@ -1413,12 +1343,12 @@ namespace Destiny.Maple.Characters
                     return;
                 }
 
-                CharacterStats.DistributeAP(this, type, (short) amount);
+                CharacterStats.DistributeAP(this, type, (short)amount);
 
                 total += amount;
             }
 
-            this.AbilityPoints -= (short) total;
+            this.AbilityPoints -= (short)total;
         }
 
         public void HealOverTime(Packet iPacket)
@@ -1492,30 +1422,35 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void DropMeso(Packet iPacket)
+        public void DropMeso(Packet iPacket) // NOTE: DropMesoHandler()
         {
-            iPacket.Skip(4); // NOTE: tRequestTime (ticks).
+            iPacket.Skip(4); // NOTE: tRequestTime (ticks). // TODO: validate request by time
             int amount = iPacket.ReadInt();
 
-            if (amount > this.Meso || amount < 10 || amount > 50000)
+            // TODO: add this to settings
+            const int MIN_LIMIT = 10;
+            const int MAX_LIMIT = 50000;
+
+            if (amount > this.Meso || amount < MIN_LIMIT || amount > MAX_LIMIT)
             {
                 return;
             }
 
+            // take char mesos
             this.Meso -= amount;
-
+            // create new mesos
             Meso meso = new Meso(amount)
             {
                 Dropper = this,
                 Owner = null
             };
-
+            // add it to current map
             this.Map.Drops.Add(meso);
         }
 
         public void InformOnCharacter(Packet iPacket)
         {
-            iPacket.Skip(4);
+            iPacket.Skip(4); // NOTE: Ticks
             int characterID = iPacket.ReadInt();
 
             Character target;
@@ -1539,7 +1474,7 @@ namespace Destiny.Maple.Characters
                 oPacket
                     .WriteInt(target.ID)
                     .WriteByte(target.Level)
-                    .WriteShort((short) target.Job)
+                    .WriteShort((short)target.Job)
                     .WriteShort(target.Fame)
                     .WriteBool(false) // NOTE: Marriage.
                     .WriteString("-") // NOTE: Guild name.
@@ -1564,7 +1499,7 @@ namespace Destiny.Maple.Characters
         // instead of pooling the world for characters?
         public void MultiTalk(Packet iPacket)
         {
-            MultiChatType type = (MultiChatType) iPacket.ReadByte();
+            MultiChatType type = (MultiChatType)iPacket.ReadByte();
             byte count = iPacket.ReadByte();
 
             List<int> recipients = new List<int>();
@@ -1572,7 +1507,6 @@ namespace Destiny.Maple.Characters
             while (count-- > 0)
             {
                 int recipientID = iPacket.ReadInt();
-
                 recipients.Add(recipientID);
             }
 
@@ -1581,27 +1515,23 @@ namespace Destiny.Maple.Characters
             switch (type)
             {
                 case MultiChatType.Buddy:
-                {
-
-                }
+                    {
+                    }
                     break;
 
                 case MultiChatType.Party:
-                {
-
-                }
+                    {
+                    }
                     break;
 
                 case MultiChatType.Guild:
-                {
-
-                }
+                    {
+                    }
                     break;
 
                 case MultiChatType.Alliance:
-                {
-
-                }
+                    {
+                    }
                     break;
             }
 
@@ -1611,19 +1541,14 @@ namespace Destiny.Maple.Characters
             {
                 CommandFactory.Execute(this, text);
             }
-            else
-            {
-                using (Packet oPacket = new Packet(ServerOperationCode.GroupMessage))
-                {
-                    oPacket
-                        .WriteByte((byte) type)
-                        .WriteString(this.Name)
-                        .WriteString(text);
 
-                    foreach (int recipient in recipients)
-                    {
-                        //this.Client.World.GetCharacter(recipient).Client.Send(oPacket);
-                    }
+            else // NOTE: try to send to each recipient packet with group text
+            {
+                if (!recipients.Any()) return;
+
+                foreach (int recipient in recipients)
+                {
+                    //this.Client.World.GetCharacter(recipient).Client.Send(CharacterPackets.TalkToCharacterGroup(type, this, text));                 
                 }
             }
         }
@@ -1707,242 +1632,290 @@ namespace Destiny.Maple.Characters
 
         public void Interact(Packet iPacket)
         {
-            InteractionCode code = (InteractionCode) iPacket.ReadByte();
+            InteractionCode code = (InteractionCode)iPacket.ReadByte();
 
             switch (code)
             {
                 case InteractionCode.Create:
-                {
-                    InteractionType type = (InteractionType) iPacket.ReadByte();
-
-                    switch (type)
                     {
-                        case InteractionType.Omok:
+                        InteractionType type = (InteractionType)iPacket.ReadByte();
+
+                        switch (type)
                         {
+                            case InteractionType.Omok:
+                                {
 
+                                }
+                                break;
+
+                            case InteractionType.Trade:
+                                {
+                                    if (this.Trade == null)
+                                    {
+                                        this.Trade = new Trade(this);
+                                    }
+                                }
+                                break;
+
+                            case InteractionType.PlayerShop:
+                                {
+                                    string description = iPacket.ReadString();
+
+                                    if (this.PlayerShop == null)
+                                    {
+                                        this.PlayerShop = new PlayerShop(this, description);
+                                    }
+                                }
+                                break;
+
+                            case InteractionType.HiredMerchant:
+                                {
+
+                                }
+                                break;
                         }
-                            break;
-
-                        case InteractionType.Trade:
-                        {
-                            if (this.Trade == null)
-                            {
-                                this.Trade = new Trade(this);
-                            }
-                        }
-                            break;
-
-                        case InteractionType.PlayerShop:
-                        {
-                            string description = iPacket.ReadString();
-
-                            if (this.PlayerShop == null)
-                            {
-                                this.PlayerShop = new PlayerShop(this, description);
-                            }
-                        }
-                            break;
-
-                        case InteractionType.HiredMerchant:
-                        {
-
-                        }
-                            break;
                     }
-                }
                     break;
 
                 case InteractionCode.Visit:
-                {
-                    if (this.PlayerShop == null)
                     {
-                        int objectID = iPacket.ReadInt();
-
-                        if (this.Map.PlayerShops.Contains(objectID))
+                        if (this.PlayerShop == null)
                         {
-                            this.Map.PlayerShops[objectID].AddVisitor(this);
+                            int objectID = iPacket.ReadInt();
+
+                            if (this.Map.PlayerShops.Contains(objectID))
+                            {
+                                this.Map.PlayerShops[objectID].AddVisitor(this);
+                            }
                         }
                     }
-                }
                     break;
 
                 default:
-                {
-                    if (this.Trade != null)
                     {
-                        this.Trade.Handle(this, code, iPacket);
+                        if (this.Trade != null)
+                        {
+                            this.Trade.Handle(this, code, iPacket);
+                        }
+                        else if (this.PlayerShop != null)
+                        {
+                            this.PlayerShop.Handle(this, code, iPacket);
+                        }
                     }
-                    else if (this.PlayerShop != null)
-                    {
-                        this.PlayerShop.Handle(this, code, iPacket);
-                    }
-                }
                     break;
             }
         }
 
-        public void UseAdminCommand(Packet iPacket)
+        public void UseAdminCommand(Packet iPacket) // NOTE: AdminCommandHandler()
         {
+            //do we have privilege to use it?
             if (!this.IsMaster)
             {
                 return;
             }
 
-            CharacterConstants.AdminCommandType type = (CharacterConstants.AdminCommandType) iPacket.ReadByte();
+            //handling according to command type
+            CharacterConstants.AdminCommandType type = (CharacterConstants.AdminCommandType)iPacket.ReadByte();
 
             switch (type)
             {
-                case CharacterConstants.AdminCommandType.Hide:
-                {
-                    bool hide = iPacket.ReadBool();
-
-                    if (hide)
-                    {
-                        // TODO: Add SuperGM's hide buff.
-                    }
-                    else
-                    {
-                        // TOOD: Remove SuperGM's hide buff.
-                    }
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.Send:
-                {
-                    string name = iPacket.ReadString();
-                    int destinationID = iPacket.ReadInt();
-
-                    Character target = null; // this.Client.World.GetCharacter(name);
-
-                    if (target != null)
-                    {
-                        target.ChangeMap(destinationID);
-                    }
-                    else
-                    {
-                        using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
-                        {
-                            oPacket
-                                .WriteByte(6)
-                                .WriteByte(1);
-
-                            this.Client.Send(oPacket);
-                        }
-                    }
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.Summon:
-                {
-                    int mobID = iPacket.ReadInt();
-                    int count = iPacket.ReadInt();
-
-                    if (DataProvider.Mobs.Contains(mobID))
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            this.Map.Mobs.Add(new Mob(mobID, this.Position));
-                        }
-                    }
-                    else
-                    {
-                        this.Notify("invalid mob: " + mobID); // TODO: Actual message.
-                    }
-                }
-                    break;
-
                 case CharacterConstants.AdminCommandType.CreateItem:
-                {
-                    int itemID = iPacket.ReadInt();
+                    {
+                        int itemID = iPacket.ReadInt();
 
-                    this.Items.Add(new Item(itemID));
-                }
+                        this.Items.Add(new Item(itemID));
+                    }
                     break;
 
                 case CharacterConstants.AdminCommandType.DestroyFirstITem:
-                {
-                    // TODO: What does this do?
-                }
+                    {
+                        byte itemType = iPacket.ReadByte();
+                        // TODO: remove item from inventory by type
+                    }
                     break;
 
                 case CharacterConstants.AdminCommandType.GiveExperience:
-                {
-                    int amount = iPacket.ReadInt();
+                    {
+                        int amount = iPacket.ReadInt();
 
-                    this.Experience += amount;
-                }
+                        this.Experience += amount; // Unsafe
+                    }
                     break;
 
                 case CharacterConstants.AdminCommandType.Ban:
-                {
-                    string name = iPacket.ReadString();
-
-                    Character target = null; //this.Client.World.GetCharacter(name);
-
-                    if (target != null)
                     {
-                        target.Client.Stop();
+                        string name = iPacket.ReadString();
+
+                        Character target = null; //this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.Client.Stop();
+                        }
+                        else
+                        {
+                            using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
+                            {
+                                oPacket
+                                    .WriteByte(6)
+                                    .WriteByte(1);
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
                     }
-                    else
+                    break;
+
+                case CharacterConstants.AdminCommandType.Block:
                     {
+                        string theBlockedOne = iPacket.ReadString();
+                        byte blockType = iPacket.ReadByte();
+                        int duration = iPacket.ReadInt();
+                        string description = iPacket.ReadString();
+                        string reason = iPacket.ReadString();
+
+                        Character target = null; //this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.Client.Stop();
+                        }
+
+                        // TODO: Ban with reason+description.
+                        // TODO: Ban by IP, MAC, HWID
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.Hide:
+                    {
+                        bool hide = iPacket.ReadBool();
+
+                        if (hide)
+                        {
+                            Skill hideSkill = new Skill((int)CharacterConstants.SkillNames.SuperGM.Hide);
+                            Buff hideBuff = new Buff(this.Buffs, hideSkill, 1);
+
+                            if (!this.Buffs.Contains(hideBuff))
+                            {
+                                this.Buffs.Add(hideBuff);
+                            }
+                        }
+
+                        else
+                        {
+                            Skill hideSkill = new Skill((int)CharacterConstants.SkillNames.SuperGM.Hide);
+                            Buff hideBuff = new Buff(this.Buffs, hideSkill, 1);
+
+                            if (this.Buffs.Contains(hideBuff))
+                            {
+                                this.Buffs.Remove(hideBuff);
+                            }
+                        }
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.Send:
+                    {
+                        string name = iPacket.ReadString();
+                        int destinationID = iPacket.ReadInt();
+
+                        Character target = null; // this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.SendChangeMapRequest(destinationID);
+                        }
+                        else
+                        {
+                            using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
+                            {
+                                oPacket
+                                    .WriteByte(6)
+                                    .WriteByte(1);
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.Summon:
+                    {
+                        int mobID = iPacket.ReadInt();
+                        int count = iPacket.ReadInt();
+
+                        if (DataProvider.Mobs.Contains(mobID))
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                this.Map.Mobs.Add(new Mob(mobID, this.Position));
+                            }
+                        }
+
+                        else
+                        {
+                            Notify(this, "invalid mob: " + mobID); // TODO: Actual message.
+                        }
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.ShowMessageMap:
+                    {
+                        // TODO: What does this do?
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.Snow:
+                    {
+                        // TODO: We have yet to implement map weather.
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.VarSetGet:
+                    {
+                        // TODO: This seems useless. Should we implement this?
+                    }
+                    break;
+
+                case CharacterConstants.AdminCommandType.Warn:
+                    {
+                        string victimName = iPacket.ReadString();
+                        string text = iPacket.ReadString();
+
+                        Character target = null; // this.Client.World.GetCharacter(victimName);
+
+                        if (target != null)
+                        {
+                            Notify(target, text, NoticeType.Popup);
+                        }
+
                         using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
                         {
                             oPacket
-                                .WriteByte(6)
-                                .WriteByte(1);
+                                .WriteByte((byte)CharacterConstants.AdminCommandType.Warn)
+                                .WriteBool(target != null);
 
                             this.Client.Send(oPacket);
                         }
                     }
-                }
+
+                    break;
+                case CharacterConstants.AdminCommandType.Kill:
+                    break;
+                case CharacterConstants.AdminCommandType.QuestReset:
+                    break;
+                case CharacterConstants.AdminCommandType.GetMobHP:
+                    break;
+                case CharacterConstants.AdminCommandType.Log:
+                    break;
+                case CharacterConstants.AdminCommandType.SetObjectState:
+                    break;
+                case CharacterConstants.AdminCommandType.ArtifactRanking:
                     break;
 
-                case CharacterConstants.AdminCommandType.Block:
-                {
-                    // TODO: Ban.
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.ShowMessageMap:
-                {
-                    // TODO: What does this do?
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.Snow:
-                {
-                    // TODO: We have yet to implement map weather.
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.VarSetGet:
-                {
-                    // TODO: This seems useless. Should we implement this?
-                }
-                    break;
-
-                case CharacterConstants.AdminCommandType.Warn:
-                {
-                    string name = iPacket.ReadString();
-                    string text = iPacket.ReadString();
-
-                    Character target = null; // this.Client.World.GetCharacter(name);
-
-                    if (target != null)
-                    {
-                        target.Notify(text, NoticeType.Popup);
-                    }
-
-                    using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
-                    {
-                        oPacket
-                            .WriteByte(29)
-                            .WriteBool(target != null);
-
-                        this.Client.Send(oPacket);
-                    }
-                }
-                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+                    // TODO: register encounter of unhanded GM packet, get debug info
             }
         }
 
@@ -1956,7 +1929,6 @@ namespace Destiny.Maple.Characters
             }
 
             string label = iPacket.ReadString();
-
             Portal portal;
 
             try
@@ -1986,7 +1958,7 @@ namespace Destiny.Maple.Characters
 
         public void Report(Packet iPacket)
         {
-            CharacterConstants.ReportType type = (CharacterConstants.ReportType) iPacket.ReadByte();
+            CharacterConstants.ReportType type = (CharacterConstants.ReportType)iPacket.ReadByte();
             string victimName = iPacket.ReadString();
             iPacket.ReadByte(); // NOTE: Unknown.
             string description = iPacket.ReadString();
@@ -1996,14 +1968,14 @@ namespace Destiny.Maple.Characters
             switch (type)
             {
                 case CharacterConstants.ReportType.IllegalProgramUsage:
-                {
-                }
+                    {
+                    }
                     break;
 
                 case CharacterConstants.ReportType.ConversationClaim:
-                {
-                    string chatLog = iPacket.ReadString();
-                }
+                    {
+                        string chatLog = iPacket.ReadString();
+                    }
                     break;
             }
 
@@ -2038,7 +2010,7 @@ namespace Destiny.Maple.Characters
 
             using (Packet oPacket = new Packet(ServerOperationCode.SueCharacterResult))
             {
-                oPacket.WriteByte((byte) result);
+                oPacket.WriteByte((byte)result);
 
                 this.Client.Send(oPacket);
             }
@@ -2080,7 +2052,7 @@ namespace Destiny.Maple.Characters
                 oPacket
                     .WriteInt(this.ID)
                     .WriteStringFixed(this.Name, 13)
-                    .WriteByte((byte) this.Gender)
+                    .WriteByte((byte)this.Gender)
                     .WriteByte(this.Skin)
                     .WriteInt(this.Face)
                     .WriteInt(this.Hair)
@@ -2088,7 +2060,7 @@ namespace Destiny.Maple.Characters
                     .WriteLong()
                     .WriteLong()
                     .WriteByte(this.Level)
-                    .WriteShort((short) this.Job)
+                    .WriteShort((short)this.Job)
                     .WriteShort(this.Strength)
                     .WriteShort(this.Dexterity)
                     .WriteShort(this.Intelligence)
@@ -2116,7 +2088,7 @@ namespace Destiny.Maple.Characters
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteByte((byte) this.Gender)
+                    .WriteByte((byte)this.Gender)
                     .WriteByte(this.Skin)
                     .WriteInt(this.Face)
                     .WriteBool(true)
@@ -2225,7 +2197,7 @@ namespace Destiny.Maple.Characters
             {
                 case MessageType.DropPickup: //when itemID == 0:
                     oPacket
-                        .WriteByte((byte) type)
+                        .WriteByte((byte)type)
                         .WriteBool(white)
                         .WriteByte(0) // NOTE: Unknown.
                         .WriteInt(ammount)
@@ -2244,7 +2216,7 @@ namespace Destiny.Maple.Characters
 
                 case MessageType.IncreaseEXP:
                     oPacket
-                        .WriteByte((byte) type) // NOTE: enum MessageType 
+                        .WriteByte((byte)type) // NOTE: enum MessageType 
                         .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
                         .WriteInt(ammount)
                         .WriteBool(inChat) // NOTE: display message in chat box
@@ -2326,11 +2298,11 @@ namespace Destiny.Maple.Characters
 
             oPacket
                 .WriteBytes(this.Buffs.ToByteArray())
-                .WriteShort((short) this.Job)
+                .WriteShort((short)this.Job)
                 .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))
                 .WriteInt() // NOTE: Item effect.
-                .WriteInt((int) (Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
+                .WriteInt((int)(Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
                 .WriteShort(this.Position.X)
                 .WriteShort(this.Position.Y)
                 .WriteByte(this.Stance)
@@ -2349,7 +2321,7 @@ namespace Destiny.Maple.Characters
                     .WriteByte()
                     .WriteByte()
                     .WriteByte(1)
-                    .WriteByte((byte) (this.PlayerShop.IsFull ? 1 : 2)) // NOTE: Visitor availability.
+                    .WriteByte((byte)(this.PlayerShop.IsFull ? 1 : 2)) // NOTE: Visitor availability.
                     .WriteByte();
             }
             else

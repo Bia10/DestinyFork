@@ -50,19 +50,19 @@ namespace Destiny.Maple.Commands.Implementation
 
                 if (query.Length < 2)
                 {
-                    caller.Notify("[Command] Please enter at least 2 characters.");
+                    Character.Notify(caller, "[Command] Please enter at least 2 characters.");
                 }
                 else
                 {
                     bool hasResult = false;
 
-                    caller.Notify("[Results]");
+                    Character.Notify(caller, "[Results]");
 
                     using (Database.TemporarySchema(Database.SchemaMCDB))
                     {
                         foreach (Datum datum in new Datums("strings").Populate("`label` LIKE '%{0}%'", query))
                         {
-                            caller.Notify(string.Format("   -{0}: {1}", (string)datum["label"], (int)datum["objectid"]));
+                            Character.Notify(caller, string.Format("   -{0}: {1}", (string)datum["label"], (int)datum["objectid"]));
 
                             hasResult = true;
                         }
@@ -70,7 +70,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                     if (!hasResult)
                     {
-                        caller.Notify("   No result found.");
+                        Character.Notify(caller, "   No result found.");
                     }
                 }
             }

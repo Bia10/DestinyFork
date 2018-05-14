@@ -120,7 +120,7 @@ namespace Destiny.Maple.Shops
 
                         if (customer.Items.SpaceTakenBy(purchase) > customer.Items.RemainingSlots(purchase.Type))
                         {
-                            customer.Notify("Your inventory is full.", NoticeType.Popup);
+                            Character.Notify(customer, "Your inventory is full.", NoticeType.Popup);
                         }
                         else
                         {
@@ -192,7 +192,7 @@ namespace Destiny.Maple.Shops
 
                         if (customer.Meso < price)
                         {
-                            customer.Notify("You do not have enough mesos.", NoticeType.Popup);
+                            Character.Notify(customer, "You do not have enough mesos.", NoticeType.Popup);
                         }
                         else
                         {

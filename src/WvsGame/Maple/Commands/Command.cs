@@ -36,7 +36,7 @@ namespace Destiny.Maple.Commands
 
         public void ShowSyntax(Character caller)
         {
-            caller.Notify(string.Format("[Syntax] {0}{1} {2}", Application.CommandIndicator, this.Name, this.Parameters.ClearFormatters()));
+            Character.Notify(caller, string.Format("[Syntax] {0}{1} {2}", Application.CommandIndicator, this.Name, this.Parameters.ClearFormatters()));
         }
     }
 }

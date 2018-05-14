@@ -39,9 +39,9 @@ namespace Destiny.Maple.Commands.Implementation
             {
                 if (args.Length == 1 && args[0] == "-current")
                 {
-                    caller.Notify("[Command] Current map: " + caller.Map.MapleID);
-                    caller.Notify("   -X: " + caller.Position.X);
-                    caller.Notify("   -Y: " + caller.Position.Y);
+                    Character.Notify(caller, "[Command] Current map: " + caller.Map.MapleID);
+                    Character.Notify(caller, "   -X: " + caller.Position.X);
+                    Character.Notify(caller, "   -Y: " + caller.Position.Y);
                 }
                 else
                 {
@@ -66,13 +66,13 @@ namespace Destiny.Maple.Commands.Implementation
                     if (mapID > -1)
                     {
                         if (true) // TODO: Check if map exists.
-                            caller.ChangeMap(mapID, portalID);
+                            caller.SendChangeMapRequest(mapID, portalID);
                         //else
                             //caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));
                     }
                     else
                     {
-                        caller.Notify(string.Format("[Command] Invalid map name \"{0}\".", mapName));
+                        Character.Notify(caller, string.Format("[Command] Invalid map name \"{0}\".", mapName));
                     }
                 }
             }

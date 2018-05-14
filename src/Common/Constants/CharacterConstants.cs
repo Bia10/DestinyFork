@@ -217,15 +217,24 @@ namespace Destiny.Constants
             GiveExperience = 2,
             Ban = 3,
             Block = 4,
+
             VarSetGet = 9,
+
             Hide = 16,
             ShowMessageMap = 17,
             Send = 18,
+
+            Kill = 21,
+            QuestReset = 22,
             Summon = 23,
+            GetMobHP = 24,
+
             Snow = 28,
             Warn = 29,
             Log = 30,
-            SetObjectState = 34
+
+            SetObjectState = 34,
+            ArtifactRanking = 36
         }
 
         public enum CharacterDisease : ulong
@@ -273,14 +282,14 @@ namespace Destiny.Constants
             {
                 FollowTheLead = 8,
                 BlessingOfTheFairy = 12,
-                ChairMaster = 100, 
+                ChairMaster = 100,
                 ThreeSnails = 1000,
                 Recovery = 1001,
                 NimbleFeet = 1002,
                 LegendarySpirit = 1003,
                 MonsterRider = 1004,
                 EchoOfHero = 1005,
-                JumpDown = 1006, 
+                JumpDown = 1006,
                 Maker = 1007,
                 //dojoo temporary skills
                 BambooRain = 1009,
@@ -780,13 +789,13 @@ namespace Destiny.Constants
                 SuperDragonRoar = 9001001,
                 Teleport = 9001002,
 
-               // Bless = 9001003,
-               // Hide = 9001004,
-               // Resurrection = 9001005,
-               // SuperDragonRoar2 = 9001006, //??
-               // Teleport2 = 9001007, //??
-               // HyperBody = 9001008,
-               // ADMIN_ANTIMACRO = 9001009 //??
+                // Bless = 9001003,
+                // Hide = 9001004,
+                // Resurrection = 9001005,
+                // SuperDragonRoar2 = 9001006, //??
+                // Teleport2 = 9001007, //??
+                // HyperBody = 9001008,
+                // ADMIN_ANTIMACRO = 9001009 //??
             }
 
             public enum SuperGM : int

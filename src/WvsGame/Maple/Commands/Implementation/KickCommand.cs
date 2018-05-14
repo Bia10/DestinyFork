@@ -41,7 +41,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                 if (target == null)
                 {
-                    caller.Notify($"[Command] Character '{name}' could not be found.");
+                    Character.Notify(caller, $"[Command] Character '{name}' could not be found.");
 
                     return;
                 }

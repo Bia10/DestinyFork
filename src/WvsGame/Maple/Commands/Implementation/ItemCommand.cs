@@ -57,7 +57,7 @@ namespace Destiny.Maple.Commands.Implementation
                 }
                 else
                 {
-                    caller.Notify("[Command] Invalid item.");
+                    Character.Notify(caller, "[Command] Invalid item.");
                 }
             }
         }

@@ -119,7 +119,7 @@ namespace Destiny.Maple.Interaction
                             this.Visitor = null;
                             character.Trade = null;
 
-                            character.Notify("Trade has been closed.", NoticeType.Popup);
+                           Character.Notify(character, "Trade has been closed.", NoticeType.Popup);
                         }
                         else
                         {

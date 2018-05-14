@@ -226,7 +226,7 @@ namespace Destiny.Maple.Characters
             
             if (result == ItemConstants.TrockResult.Success)
             {
-                this.Parent.ChangeMap(destinationMapID);
+                this.Parent.SendChangeMapRequest(destinationMapID);
 
                 used = true;
             }

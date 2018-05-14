@@ -897,7 +897,7 @@ namespace Destiny.Maple.Characters
 
             this.Remove(itemID, 1);
 
-            this.Parent.ChangeMap(item.CMoveTo);
+            this.Parent.SendChangeMapRequest(item.CMoveTo);
         }
 
         public void Pickup(Drop drop)

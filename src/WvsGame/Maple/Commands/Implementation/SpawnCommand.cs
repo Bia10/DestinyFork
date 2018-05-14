@@ -76,7 +76,7 @@ namespace Destiny.Maple.Commands.Implementation
                 }
                 else
                 {
-                    caller.Notify("[Command] Invalid mob.");
+                    Character.Notify(caller, "[Command] Invalid mob.");
                 }
             }
         }

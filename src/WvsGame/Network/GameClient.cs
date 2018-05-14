@@ -74,7 +74,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.MapChange:
-                    this.Character.ChangeMap(iPacket);
+                    this.Character.ChangeMapHandler(iPacket);
                     break;
 
                 case ClientOperationCode.ChannelChange:
@@ -82,15 +82,15 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.PlayerMovement:
-                    this.Character.Move(iPacket);
+                    this.Character.CharMoveHandler(iPacket);
                     break;
 
                 case ClientOperationCode.Sit:
-                    this.Character.Sit(iPacket);
+                    this.Character.CharSitHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseChair:
-                    this.Character.SitChair(iPacket);
+                    this.Character.CharSitOnChairHandler(iPacket);
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:
@@ -110,7 +110,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.PlayerChat:
-                    this.Character.Talk(iPacket);
+                    this.Character.CharTalkHandler(iPacket);
                     break;
 
                 case ClientOperationCode.CloseChalkboard:
@@ -118,7 +118,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.FaceExpression:
-                    this.Character.Express(iPacket);
+                    this.Character.CharExpressionHandler(iPacket);
                     break;
 
                 case ClientOperationCode.NpcConverse:
@@ -134,7 +134,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.Storage:
-                    this.Character.Storage.Handle(iPacket);
+                    this.Character.Storage.CharStorageHandler(iPacket);
                     break;
 
                 case ClientOperationCode.InventorySort:
@@ -170,7 +170,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.DistributeAP:
-                    this.Character.DistributeAP(iPacket);
+                    this.Character.CharDistributeAPHandler(iPacket);
                     break;
 
                 case ClientOperationCode.AutoDistributeAP:

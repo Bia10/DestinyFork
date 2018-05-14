@@ -321,7 +321,7 @@ namespace Destiny
         Unknown2 = 0x100000,
         HardSkin = 0x200000,
         NinjaAmbush = 0x400000,
-        ElementalAttribute = 0x800000, 
+        ElementalAttribute = 0x800000,
         VenomousWeapon = 0x1000000,
         Blind = 0x2000000,
         SealSkill = 0x4000000,
@@ -409,11 +409,23 @@ namespace Destiny
 
     public enum StorageAction : byte
     {
-        Withdraw = 4,
-        Deposit,
-        Unknown,
-        ModifyMeso,
-        Leave
+        WithdrawItem = 4,
+        DepositItem,
+        ArrangeItem,
+        ChangeMesos,
+        CloseStorage,
+        OpenStorage = 22
+    }
+
+    public enum StoragePacketType : byte
+    {
+        TakeItem = 9,
+        ErrorPlayerInventoryFull = 10,
+        ErrorNotEnoughMesos = 11,
+        ErrorOneOfaKind = 12,
+        AddItem = 13,
+        ErrorStorageInventoryFull = 17,
+        UpdateMesos = 19
     }
     #endregion
 

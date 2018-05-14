@@ -36,7 +36,7 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Notify("[Online]");
+                Character.Notify(caller, "[Online]");
 
                 //foreach (WorldServer world in MasterServer.Worlds)
                 //{

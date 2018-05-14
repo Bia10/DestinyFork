@@ -94,7 +94,7 @@ namespace Destiny.Maple.Maps
         {
             foreach (Character character in this.Characters)
             {
-                character.Notify(text, type);
+                Character.Notify(character, text, type);
             }
         }
 

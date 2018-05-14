@@ -48,7 +48,7 @@ namespace Destiny.Maple.Commands.Implementation
                     }
                     else
                     {
-                        caller.Notify("[Command] Invalid job ID.");
+                        Character.Notify(caller, "[Command] Invalid job ID.");
                     }
                 }
                 catch (FormatException)
@@ -59,7 +59,7 @@ namespace Destiny.Maple.Commands.Implementation
                     }
                     catch (ArgumentException)
                     {
-                        caller.Notify("[Command] Invalid job name.");
+                        Character.Notify(caller, "[Command] Invalid job name.");
                     }
                 }
             }

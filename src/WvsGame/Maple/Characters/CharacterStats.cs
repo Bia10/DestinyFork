@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Destiny.Constants;
-using Destiny.Network.PacketFactory.MaplePacketFactory;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
@@ -647,7 +647,7 @@ namespace Destiny.Maple.Characters
 
         public static void Update(Character character, params CharacterConstants.StatisticType[] charStats)
         {
-            character.Client.Send(MapleCharacterPackets.UpdateStatsPacket(character, charStats));  
+            character.Client.Send(CharacterPackets.UpdateStatsPacket(character, charStats));  
         }
 
         //TODO: hp/mp modification bugs out UI bars, add multiple stats, some kind of message to sideBar/chat

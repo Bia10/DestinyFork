@@ -70,7 +70,7 @@ namespace Destiny.Maple.Commands.Implementation
                             }
                             catch (KeyNotFoundException)
                             {
-                                caller.Notify("[Command] " + targetName + " cannot be found.");
+                                Character.Notify(caller, "[Command] " + targetName + " cannot be found.");
 
                                 return;
                             }
