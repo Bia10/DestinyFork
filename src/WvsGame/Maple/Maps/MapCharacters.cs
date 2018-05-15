@@ -1,9 +1,9 @@
-﻿using Destiny.Network;
-using Destiny.Maple.Characters;
+﻿using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
 using System;
 using Destiny.IO;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple.Maps
 {

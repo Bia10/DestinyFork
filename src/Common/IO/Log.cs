@@ -259,7 +259,20 @@ namespace Destiny.IO
 
         public static void Error(string label, Exception exception, params object[] args)
         {
-            Log.WriteItem("Error", ConsoleColor.Red, "{0}\n{1}", string.Format(label, args), Log.ShowStackTrace ? exception.ToString() : exception.Message);
+            try
+            {
+                Log.WriteItem("Error", ConsoleColor.Red, "{0}\n{1}", string.Format(label, args), Log.ShowStackTrace ? exception.ToString() : exception.Message);
+
+            }
+
+            catch (System.FormatException ex)
+            {
+                Log.SkipLine();
+                Tracer.TraceErrorMessage(ex, "Incorrect string format! or out of bounds!");
+                Log.SkipLine();
+                throw;
+            }
+
             Log.WriteToFile(exception.ToString());
         }
 

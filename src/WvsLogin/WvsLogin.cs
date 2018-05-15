@@ -1,12 +1,13 @@
-﻿using Destiny.Data;
-using Destiny.Interoperability;
-using Destiny.IO;
-using Destiny.Maple;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+
+using Destiny.Data;
+using Destiny.Interoperability;
+using Destiny.IO;
+using Destiny.Maple;
 
 namespace Destiny.Network
 {

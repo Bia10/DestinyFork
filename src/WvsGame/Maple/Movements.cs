@@ -1,6 +1,6 @@
 ﻿using Destiny.IO;
-using Destiny.Network;
 using System.Collections.Generic;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple
 {

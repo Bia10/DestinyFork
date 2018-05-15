@@ -1,7 +1,9 @@
-﻿using Destiny.Network;
+﻿using System.Collections.Generic;
+
 using Destiny.Maple.Characters;
-using System.Collections.Generic;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Interaction
 {
@@ -185,7 +187,7 @@ namespace Destiny.Maple.Interaction
                         }
                         else
                         {
-                            character.Items.Remove(item, true);
+                            character.Items.RemoveItemFromInventory(item, true);
                         }
 
                         item.Slot = 0;
@@ -403,13 +405,14 @@ namespace Destiny.Maple.Interaction
 
         public void Complete()
         {
-            if (this.Owner.Items.CouldReceive(this.VisitorItems) && this.Visitor.Items.CouldReceive(this.OwnerItems))
+            if (this.Owner.Items.CouldReceiveItems(this.VisitorItems) 
+                && this.Visitor.Items.CouldReceiveItems(this.OwnerItems))
             {
                 this.Owner.Meso += this.VisitorMeso;
                 this.Visitor.Meso += this.OwnerMeso;
 
-                this.Owner.Items.AddRange(this.VisitorItems);
-                this.Visitor.Items.AddRange(this.OwnerItems);
+                this.Owner.Items.AddRangeOfItems(this.VisitorItems);
+                this.Visitor.Items.AddRangeOfItems(this.OwnerItems);
             }
             else
             {
@@ -422,8 +425,8 @@ namespace Destiny.Maple.Interaction
             this.Owner.Meso += this.OwnerMeso;
             this.Visitor.Meso += this.VisitorMeso;
 
-            this.Owner.Items.AddRange(this.OwnerItems);
-            this.Visitor.Items.AddRange(this.VisitorItems);
+            this.Owner.Items.AddRangeOfItems(this.OwnerItems);
+            this.Visitor.Items.AddRangeOfItems(this.VisitorItems);
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Destiny.Data;
-using Destiny.Network;
 using Destiny.Maple.Characters;
 using System;
 using System.Collections.Generic;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Life
 {

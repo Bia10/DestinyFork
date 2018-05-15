@@ -1,5 +1,6 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Network;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 using Destiny.Threading;
 
 namespace Destiny.Maple.Maps

@@ -2,6 +2,8 @@
 using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Life
 {

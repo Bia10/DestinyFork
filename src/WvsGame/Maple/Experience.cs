@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Network;
 using Destiny.Constants;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple
 {

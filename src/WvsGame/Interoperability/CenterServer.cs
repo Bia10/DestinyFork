@@ -1,15 +1,17 @@
-﻿using Destiny.Collections;
+﻿using System;
+using System.Linq;
+using System.Net;
+
+using Destiny.Collections;
 using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using Destiny.Network;
 using Destiny.Security;
-using System;
-using System.Linq;
-using System.Net;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Interoperability
 {
@@ -301,11 +303,11 @@ namespace Destiny.Interoperability
             character.SpawnPoint = 0;
             character.Meso = 0;
 
-            character.Items.Add(new Item(topID, equipped: true));
-            character.Items.Add(new Item(bottomID, equipped: true));
-            character.Items.Add(new Item(shoesID, equipped: true));
-            character.Items.Add(new Item(weaponID, equipped: true));
-            character.Items.Add(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
+            character.Items.AddItemToInventory(new Item(topID, equipped: true));
+            character.Items.AddItemToInventory(new Item(bottomID, equipped: true));
+            character.Items.AddItemToInventory(new Item(shoesID, equipped: true));
+            character.Items.AddItemToInventory(new Item(weaponID, equipped: true));
+            character.Items.AddItemToInventory(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
             character.Keymap.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
             character.Keymap.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));

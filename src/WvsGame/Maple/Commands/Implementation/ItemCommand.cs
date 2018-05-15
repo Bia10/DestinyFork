@@ -53,7 +53,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                 if (DataProvider.Items.Contains(itemID))
                 {
-                    caller.Items.Add(new Item(itemID, quantity));
+                    caller.Items.AddItemToInventory(new Item(itemID, quantity));
                 }
                 else
                 {

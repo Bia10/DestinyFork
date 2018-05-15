@@ -1,5 +1,4 @@
-﻿using Destiny.Network;
-using Destiny.Data;
+﻿using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
@@ -7,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.IO;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple
 {
@@ -880,7 +881,7 @@ namespace Destiny.Maple
 
                 this.Character.Map.Drops.Add(this);
 
-                this.Parent.Remove(this, false);
+                this.Parent.RemoveItemFromInventory(this, false);
             }
             else if (quantity < this.Quantity)
             {

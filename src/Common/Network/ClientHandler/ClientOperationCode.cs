@@ -1,4 +1,4 @@
-﻿namespace Destiny.Network
+﻿namespace Destiny.Network.ClientHandler
 {
     public enum ClientOperationCode : short
     {

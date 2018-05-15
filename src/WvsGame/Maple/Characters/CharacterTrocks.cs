@@ -1,10 +1,12 @@
-﻿using Destiny.Network;
+﻿using System.Collections.Generic;
+
 using Destiny.Data;
 using Destiny.Maple.Maps;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Maple.Data;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Characters
 {
@@ -162,19 +164,19 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public bool Use(int itemID, Packet iPacket)
+        public bool UseTrockHandler(int trockID, Packet inPacket)
         {
             bool used = false;
-            byte action = iPacket.ReadByte();
+            byte action = inPacket.ReadByte();
 
-            ItemConstants.TrockType type = itemID == 5040000 ? ItemConstants.TrockType.Regular : ItemConstants.TrockType.VIP;
+            ItemConstants.TrockType type = trockID == 5040000 ? ItemConstants.TrockType.Regular : ItemConstants.TrockType.VIP;
 
             int destinationMapID = -1;
             ItemConstants.TrockResult result = ItemConstants.TrockResult.Success;
 
             if (action == 0) // NOTE: Preset map.
             {
-                int mapID = iPacket.ReadInt();
+                int mapID = inPacket.ReadInt();
 
                 if (!this.Parent.Trocks.Contains(mapID))
                 {
@@ -185,7 +187,7 @@ namespace Destiny.Maple.Characters
             }
             else if (action == 1) // NOTE: IGN.
             {
-                string targetName = iPacket.ReadString();
+                string targetName = inPacket.ReadString();
 
                 Character target = null;// this.Parent.Client.Channel.Characters.GetCharacter(targetName);
 
@@ -199,7 +201,7 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            iPacket.ReadInt(); // NOTE: Ticks.
+            inPacket.ReadInt(); // NOTE: Ticks.
 
             if (destinationMapID != -1)
             {

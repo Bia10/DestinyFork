@@ -37,7 +37,7 @@ namespace Destiny.IO
             Log.Error("Method/Property name: {0}", memberName);
             Log.Error("Source file path: {0}", sourceFilePath);
             Log.Error("Source file line number: {0}", sourceLineNumber);
-            Log.Error("Exception information: {0}", e);
+            Log.Error(e);
         }
         #endregion
 

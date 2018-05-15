@@ -1,4 +1,4 @@
-﻿namespace Destiny.Network
+﻿namespace Destiny.Network.Common
 {
     public enum InteroperabilityOperationCode : short
     {

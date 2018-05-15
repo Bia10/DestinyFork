@@ -1,7 +1,9 @@
-﻿using Destiny.Network;
+﻿using System.Collections.ObjectModel;
+
 using Destiny.Data;
-using System.Collections.ObjectModel;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Characters
 {

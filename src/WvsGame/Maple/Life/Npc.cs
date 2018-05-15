@@ -1,10 +1,11 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Network;
 using Destiny.Data;
 using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;
 using System;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Life
 {

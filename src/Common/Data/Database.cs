@@ -83,7 +83,8 @@ namespace Destiny.Data
         {
             get
             {
-                return string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
+                return string.Format("server={0}; database={1}; uid={2}; password={3}; " +
+                                     "convertzerodatetime=yes; SslMode=none;",
                     Database.Host,
                     Database.Schema,
                     Database.Username,
@@ -203,28 +204,52 @@ namespace Destiny.Data
             }
         }
 
-        public static void ExecuteScript(string host, string username, string password, string query, params object[] args)
+        public static bool ExecuteScript(string host, string username, string password, string query, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2};", host, username, password)))
+            try
             {
-                connection.Open();
-                new MySqlScript(connection, string.Format(query, args)).Execute();
-                connection.Close();
+                using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2}; SslMode=none;", host, username, password)))
+                {
+                    connection.Open();
+                    new MySqlScript(connection, string.Format(query, args)).Execute();
+                    connection.Close();
+                }
+
+                return true;
+            }
+
+            catch (Exception e)
+            {
+                return false;
             }
         }
 
-        public static void ExecuteFile(string host, string username, string password, string path)
+        public static bool ExecuteFile(string host, string username, string password, string path)
         {
-            using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2};", host, username, password)))
+            using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2}; SslMode=none;", host, username, password)))
             {
                 connection.Open();
 
-                using (TextReader reader = new StreamReader(path))
+                try
                 {
-                    new MySqlScript(connection, reader.ReadToEnd()).Execute();
+                    using (TextReader reader = new StreamReader(path))
+                    {
+                    
+                        new MySqlScript(connection, reader.ReadToEnd()).Execute();
+                    }
+                }
+
+                catch (DirectoryNotFoundException ex)
+                {
+                    Log.SkipLine();
+                    Tracer.TraceErrorMessage(ex, "Failed to find MCDB.sql!");
+                    Log.SkipLine();
+                    connection.Close();
+                    return false;
                 }
 
                 connection.Close();
+                return true;
             }
         }
 

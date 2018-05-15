@@ -1,11 +1,13 @@
-﻿using Destiny.Network;
+﻿using System;
+using System.Collections.Generic;
+
 using Destiny.Data;
 using Destiny.Maple.Data;
-using System;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.Maple.Life;
 using Destiny.IO;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Characters
 {
@@ -137,11 +139,11 @@ namespace Destiny.Maple.Characters
                         int quantity = iPacket.ReadInt();
                         int itemID = iPacket.ReadInt();
 
-                        quantity -= this.Parent.Items.Available(itemID);
+                        quantity -= this.Parent.Items.InventoryAvailableItemByID(itemID);
 
                         Item item = new Item(itemID, (short)quantity);
 
-                        this.Parent.Items.Add(item);
+                        this.Parent.Items.AddItemToInventory(item);
                     }
                     break;
 
@@ -216,11 +218,11 @@ namespace Destiny.Maple.Characters
             {
                 if (item.Value > 0)
                 {
-                    this.Parent.Items.Add(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
+                    this.Parent.Items.AddItemToInventory(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
                 }
                 else if (item.Value < 0)
                 {
-                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                    this.Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
                 }
             }
 
@@ -242,7 +244,7 @@ namespace Destiny.Maple.Characters
         {
             foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
             {
-                this.Parent.Items.Remove(item.Key, item.Value);
+                this.Parent.Items.RemoveItemFromInventoryByID(item.Key, item.Value);
             }
 
             this.Parent.Experience += quest.ExperienceReward[1];
@@ -317,11 +319,11 @@ namespace Destiny.Maple.Characters
                 {
                     if (item.Value > 0)
                     {
-                        this.Parent.Items.Add(new Item(item.Key, item.Value));
+                        this.Parent.Items.AddItemToInventory(new Item(item.Key, item.Value));
                     }
                     else if (item.Value < 0)
                     {
-                        this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                        this.Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
                     }
 
                     using (Packet oPacket = new Packet(ServerOperationCode.Effect))
@@ -382,7 +384,7 @@ namespace Destiny.Maple.Characters
 
             foreach (KeyValuePair<int, short> requiredItem in quest.PostRequiredItems)
             {
-                if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
+                if (!this.Parent.Items.InventoryContainsItemByID(requiredItem.Key, requiredItem.Value))
                 {
                     return false;
                 }

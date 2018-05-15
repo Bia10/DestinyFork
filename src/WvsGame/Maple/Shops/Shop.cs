@@ -1,9 +1,10 @@
-﻿using Destiny.Network;
-using Destiny.Data;
+﻿using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Shops
 {
@@ -118,14 +119,14 @@ namespace Destiny.Maple.Shops
                             price = item.PurchasePrice * quantity;
                         }
 
-                        if (customer.Items.SpaceTakenBy(purchase) > customer.Items.RemainingSlots(purchase.Type))
+                        if (customer.Items.SpaceTakenByItem(purchase) > customer.Items.GetRemainingSlots(purchase.Type))
                         {
                             Character.Notify(customer, "Your inventory is full.", NoticeType.Popup);
                         }
                         else
                         {
                             customer.Meso -= price;
-                            customer.Items.Add(purchase);
+                            customer.Items.AddItemToInventory(purchase);
                         }
 
                         using (Packet oPacket = new Packet(ServerOperationCode.ConfirmShopTransaction))
@@ -156,7 +157,7 @@ namespace Destiny.Maple.Shops
                         }
                         else if (quantity == item.Quantity)
                         {
-                            customer.Items.Remove(item, true);
+                            customer.Items.RemoveItemFromInventory(item, true);
                         }
                         else if (quantity < item.Quantity)
                         {

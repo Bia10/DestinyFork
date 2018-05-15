@@ -1,5 +1,5 @@
-﻿using Destiny.Network;
-using Destiny.Maple.Interaction;
+﻿using Destiny.Maple.Interaction;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple.Maps
 {

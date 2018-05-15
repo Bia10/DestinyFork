@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 using Destiny.Data;
 using Destiny.IO;
-using Destiny.Network;
 using Destiny.Constants;
+using Destiny.Network.Common;
 using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters

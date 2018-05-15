@@ -1,10 +1,11 @@
-﻿using Destiny.Security;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Destiny.Network
+using Destiny.Security;
+
+namespace Destiny.Network.Common
 {
     public abstract class NetworkConnector<TReceiveOP, TSendOP, TCryptograph> : MarshalByRefObject where TCryptograph : Cryptograph, new()
     {

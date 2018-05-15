@@ -1,5 +1,7 @@
-﻿using Destiny.Network;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.Network;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple
 {

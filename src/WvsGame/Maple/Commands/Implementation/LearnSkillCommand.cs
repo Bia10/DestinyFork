@@ -45,10 +45,11 @@ namespace Destiny.Maple.Commands.Implementation
                     if (caller.Skills.Contains(skillID))
                     {
                         Skill skillToModify = caller.Skills[skillID];
-
                         skillToModify.CurrentLevel = (byte)skillLVL;
-                        skillToModify.Update();
+
+                        caller.Skills.UpdateSkill(skillToModify);
                     }
+
                     // TODO: needs proper treatment
                     else if(!caller.Skills.Contains(skillID))
                     {
@@ -58,7 +59,7 @@ namespace Destiny.Maple.Commands.Implementation
                             MapleID = skillID
                         };
 
-                        skillToAdd.Update();
+                        caller.Skills.UpdateSkill(skillToAdd);
                     }
                 }
                 else

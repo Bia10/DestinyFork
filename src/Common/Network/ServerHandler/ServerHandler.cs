@@ -1,11 +1,13 @@
-﻿using Destiny.IO;
-using Destiny.Security;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Destiny.Network
+using Destiny.IO;
+using Destiny.Network.Common;
+using Destiny.Security;
+
+namespace Destiny.Network.ServerHandler
 {
     public abstract class ServerHandler<TReceiveOP, TSendOP, TCryptograph>
         : NetworkConnector<TReceiveOP, TSendOP, TCryptograph>, IDisposable where TCryptograph : Cryptograph, new()

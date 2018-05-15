@@ -1,6 +1,6 @@
-﻿using Destiny.Network;
-using Destiny.Maple.Data;
+﻿using Destiny.Maple.Data;
 using Destiny.Maple.Life;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple.Maps
 {

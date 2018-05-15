@@ -1,9 +1,10 @@
 ﻿using System;
-using Destiny.Network;
+using System.Collections.Generic;
+
 using Destiny.Data;
 using Destiny.Maple.Life;
-using System.Collections.Generic;
 using Destiny.Constants;
+using Destiny.Network.Common;
 using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
@@ -111,7 +112,7 @@ namespace Destiny.Maple.Characters
                         }
 
                         // Do i actually have free inventory slot to place withdrawn item in?
-                        if (this.Parent.Items.IsFull(item.Type))
+                        if (this.Parent.Items.IsInventoryFull(item.Type))
                         {
                             this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, StoragePacketType.ErrorPlayerInventoryFull));
                             return;
@@ -132,7 +133,7 @@ namespace Destiny.Maple.Characters
                             this.Items.Remove(item); // Remove item from storage
                             item.Delete(); // Delete item from Database
                             item.IsStored = false; // Set stored flag to false
-                            this.Parent.Items.Add(item, forceGetSlot: true); // Add item to char. items
+                            this.Parent.Items.AddItemToInventory(item, forceGetSlot: true); // Add item to char. items
 
                             // routine to get count of items of same type
                             List<Item> itemsByType = new List<Item>();
@@ -177,7 +178,7 @@ namespace Destiny.Maple.Characters
                         if (this.Parent.Meso >= this.Npc.StorageCost)
                         {
                             this.Parent.Meso -= this.Npc.StorageCost; //devour mesos
-                            this.Parent.Items.Remove(item, true); // remove item form inventory
+                            this.Parent.Items.RemoveItemFromInventory(item, true); // remove item form inventory
 
                             item.Parent = this.Parent.Items; // NOTE: This is needed because when we remove the item is sets parent to none.
                             item.Slot = (short)this.Items.Count; // slot in storage is maxCount of items in it

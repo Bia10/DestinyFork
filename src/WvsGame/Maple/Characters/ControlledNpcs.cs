@@ -1,7 +1,8 @@
-﻿using Destiny.Network;
-using Destiny.Maple.Life;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
+using Destiny.Maple.Life;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple.Characters
 {

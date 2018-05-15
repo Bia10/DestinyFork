@@ -1,9 +1,10 @@
-﻿using Destiny.Data;
-using Destiny.Network;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+
+using Destiny.Data;
+using Destiny.Network.Common;
 
 namespace Destiny.IO
 {

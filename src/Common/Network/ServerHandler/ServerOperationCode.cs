@@ -1,4 +1,4 @@
-﻿namespace Destiny.Network
+﻿namespace Destiny.Network.ServerHandler
 {
     public enum ServerOperationCode : short
     {

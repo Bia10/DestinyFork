@@ -1,6 +1,7 @@
 ﻿using Destiny.IO;
+using Destiny.Network.ServerHandler;
 
-namespace Destiny.Network
+namespace Destiny.Network.Common
 {
     public class Packet : ByteBuffer
     {

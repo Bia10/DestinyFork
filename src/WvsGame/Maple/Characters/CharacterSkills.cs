@@ -1,9 +1,11 @@
-﻿using Destiny.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
+using Destiny.Data;
 using Destiny.Constants;
-using Destiny.Network;
 using Destiny.IO;
+using Destiny.Network.Common;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
@@ -46,11 +48,11 @@ namespace Destiny.Maple.Characters
             return new Skill(skillMapleID);
         }
 
-    public void Cast(Packet iPacket)
+    public void CastSkillHandler(Packet inPacket)
         {
-            iPacket.ReadInt(); // NOTE: Ticks.
-            int mapleID = iPacket.ReadInt();
-            byte level = iPacket.ReadByte();
+            inPacket.ReadInt(); // NOTE: Ticks.
+            int mapleID = inPacket.ReadInt();
+            byte level = inPacket.ReadByte();
 
             Skill skill = this[mapleID];
 
@@ -66,11 +68,11 @@ namespace Destiny.Maple.Characters
             {
                 case (int)CharacterConstants.SkillNames.SuperGM.Resurrection:
                     {
-                        byte targets = iPacket.ReadByte();
+                        byte targets = inPacket.ReadByte();
 
                         while (targets-- > 0)
                         {
-                            int targetID = iPacket.ReadInt();
+                            int targetID = inPacket.ReadInt();
 
                             Character target = this.Parent.Map.Characters[targetID];
 
@@ -136,5 +138,44 @@ namespace Destiny.Maple.Characters
         {
             return item.MapleID;
         }
+
+        public void UpdateSkill(Skill skill)
+        {
+            skill.Character.Client.Send(CharacterSkillsPackets.UpdateSkill(skill));
+        }
+
+        public static bool IsHiddenSkill(int skill)
+        {
+            switch (skill)
+            {
+                case (int)CharacterConstants.SkillNames.Aran1.DoubleSwing:
+                    return true;
+
+                case (int)CharacterConstants.SkillNames.Aran2.TripleSwing:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public static void ModifySkillLevel(Character character, Skill skillToMod, byte newLevel, byte newMaxlevel)
+        {
+            if (newLevel > 0 && newLevel <= newMaxlevel)
+            {
+                character.Skills.Add(new Skill(skillToMod.MapleID, newLevel, newMaxlevel));
+
+                if (!IsHiddenSkill(skillToMod.MapleID))
+                {
+                    character.Skills.UpdateSkill(skillToMod);
+                }
+            }
+            else
+            {
+                character.Skills.Remove(skillToMod);
+                character.Skills.UpdateSkill(skillToMod);
+            }
+        }
+
     }
 }

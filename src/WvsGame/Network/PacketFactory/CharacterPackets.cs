@@ -5,6 +5,8 @@ using Destiny.Constants;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Network.PacketFactory
 {

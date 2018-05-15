@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Destiny.Network
+namespace Destiny.Network.Common
 {
     public class NetworkException : Exception
     {

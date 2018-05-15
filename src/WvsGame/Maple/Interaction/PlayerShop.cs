@@ -1,8 +1,10 @@
-﻿using Destiny.Maple.Maps;
-using Destiny.Network;
+﻿using System.Collections.Generic;
+
+using Destiny.Maple.Maps;
 using Destiny.Maple.Characters;
-using System.Collections.Generic;
 using Destiny.Constants;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Interaction
 {
@@ -102,7 +104,7 @@ namespace Destiny.Maple.Interaction
                         }
                         else
                         {
-                            character.Items.Remove(item, true);
+                            character.Items.RemoveItemFromInventory(item, true);
                         }
 
                         PlayerShopItem shopItem = new PlayerShopItem(item.MapleID, bundles, quantity, price);
@@ -128,7 +130,7 @@ namespace Destiny.Maple.Interaction
 
                             if (shopItem.Quantity > 0)
                             {
-                                this.Owner.Items.Add(new Item(shopItem.MapleID, shopItem.Quantity));
+                                this.Owner.Items.AddItemToInventory(new Item(shopItem.MapleID, shopItem.Quantity));
                             }
 
                             this.Items.Remove(shopItem);
@@ -183,7 +185,7 @@ namespace Destiny.Maple.Interaction
                         character.Meso -= shopItem.MerchantPrice * quantity;
                         this.Owner.Meso += shopItem.MerchantPrice * quantity;
 
-                        character.Items.Add(new Item(shopItem.MapleID, quantity));
+                        character.Items.AddItemToInventory(new Item(shopItem.MapleID, quantity));
 
                         this.UpdateItems(); // TODO: This doesn't mark the item as sold.
 
@@ -246,7 +248,7 @@ namespace Destiny.Maple.Interaction
             {
                 if (loopShopItem.Quantity > 0)
                 {
-                    this.Owner.Items.Add(new Item(loopShopItem.MapleID, loopShopItem.Quantity));
+                    this.Owner.Items.AddItemToInventory(new Item(loopShopItem.MapleID, loopShopItem.Quantity));
                 }
             }
 

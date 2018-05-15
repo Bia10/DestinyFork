@@ -1,8 +1,8 @@
 ﻿using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
-using Destiny.Network;
 using Destiny.Threading;
 using System;
+using Destiny.Network.Common;
 
 namespace Destiny.Maple.Scripting
 {

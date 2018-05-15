@@ -1,11 +1,15 @@
-﻿using Destiny.Maple;
+﻿using System.Net.Sockets;
+
+using Destiny.Maple;
 using Destiny.Maple.Characters;
-using System.Net.Sockets;
 using Destiny.Constants;
+using Destiny.Network.ClientHandler;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Network
 {
-    public sealed class GameClient : MapleClientHandler
+    public sealed class GameClient : MapleClientHandler.MapleClientHandler
     {
         public long ID { get; private set; }
 
@@ -138,35 +142,35 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.InventorySort:
-                    this.Character.Items.Sort(iPacket);
+                    this.Character.Items.SortItemsHandler(iPacket);
                     break;
 
                 case ClientOperationCode.InventoryGather:
-                    this.Character.Items.Gather(iPacket);
+                    this.Character.Items.GatherItemsHandler(iPacket);
                     break;
 
                 case ClientOperationCode.InventoryAction:
-                    this.Character.Items.Handle(iPacket);
+                    this.Character.Items.CharItemsHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseItem:
-                    this.Character.Items.UseItem(iPacket);
+                    this.Character.Items.UseItemHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseSummonBag:
-                    this.Character.Items.UseSummonBag(iPacket);
+                    this.Character.Items.UseSummonBagHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseCashItem:
-                    this.Character.Items.UseCashItem(iPacket);
+                    this.Character.Items.UseCashItemHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseTeleportRock: // NOTE: Only occurs with the special Teleport Rock in the usable inventory.
-                    this.Character.Trocks.Use(2320000, iPacket);
+                    this.Character.Trocks.UseTrockHandler(2320000, iPacket);
                     break;
 
                 case ClientOperationCode.UseReturnScroll:
-                    this.Character.Items.UseReturnScroll(iPacket);
+                    this.Character.Items.UseReturnScrollHandler(iPacket);
                     break;
 
                 case ClientOperationCode.DistributeAP:
@@ -182,11 +186,11 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.DistributeSP:
-                    this.Character.DistributeSP(iPacket);
+                    this.Character.DistributeSPHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseSkill:
-                    this.Character.Skills.Cast(iPacket);
+                    this.Character.Skills.CastSkillHandler(iPacket);
                     break;
 
                 case ClientOperationCode.CancelBuff:
@@ -250,7 +254,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.DropPickup:
-                    this.Character.Items.Pickup(iPacket);
+                    this.Character.Items.PickupItemHandler(iPacket);
                     break;
 
                 case ClientOperationCode.NpcMovement:

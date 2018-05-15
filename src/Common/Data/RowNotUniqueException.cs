@@ -1,4 +1,6 @@
-﻿namespace System.Data
+﻿using System.Data;
+
+namespace Destiny.Data
 {
     public class RowNotUniqueException : DataException
     {

@@ -12,7 +12,9 @@ using Destiny.Maple.Interaction;
 using Destiny.Network;
 using Destiny.IO;
 using Destiny.Maple.Scripting;
+using Destiny.Network.Common;
 using Destiny.Network.PacketFactory;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Characters
 {
@@ -653,7 +655,7 @@ namespace Destiny.Maple.Characters
             this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
             this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte)datum["CashSlots"];
 
-            this.Items.Load();
+            this.Items.LoadInventory();
             this.Skills.Load();
             this.Quests.Load();
             this.Buffs.Load();
@@ -713,7 +715,7 @@ namespace Destiny.Maple.Characters
                 this.Assigned = true;
             }
 
-            this.Items.Save();
+            this.Items.SaveInventory();
             this.Skills.Save();
             this.Quests.Save();
             this.Buffs.Save();
@@ -912,7 +914,7 @@ namespace Destiny.Maple.Characters
         {
             int chairMapleID = inPacket.ReadInt();
 
-            if (!this.Items.Contains(chairMapleID))
+            if (!this.Items.InventoryContainsItemByID(chairMapleID))
             {
                 return;
                 //Throw: exception occured no chair with mapleID received in packet found in char inventory
@@ -1385,15 +1387,15 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void DistributeSP(Packet iPacket)
+        public void DistributeSPHandler(Packet inPacket)
         {
             if (this.SkillPoints == 0)
             {
                 return;
             }
 
-            iPacket.ReadInt(); // NOTE: Ticks.
-            int mapleID = iPacket.ReadInt();
+            inPacket.ReadInt(); // NOTE: Ticks.
+            int mapleID = inPacket.ReadInt();
 
             if (!this.Skills.Contains(mapleID))
             {
@@ -1723,7 +1725,7 @@ namespace Destiny.Maple.Characters
                     {
                         int itemID = iPacket.ReadInt();
 
-                        this.Items.Add(new Item(itemID));
+                        this.Items.AddItemToInventory(new Item(itemID));
                     }
                     break;
 
@@ -2165,7 +2167,7 @@ namespace Destiny.Maple.Characters
                     .WriteByte(20) // NOTE: Max buddylist size.
                     .WriteBool(false) // NOTE: Blessing of Fairy.
                     .WriteInt(this.Meso)
-                    .WriteBytes(this.Items.ToByteArray())
+                    .WriteBytes(this.Items.ItemToByteArray())
                     .WriteBytes(this.Skills.ToByteArray())
                     .WriteBytes(this.Quests.ToByteArray())
                     .WriteShort() // NOTE: Mini games record.
@@ -2300,7 +2302,7 @@ namespace Destiny.Maple.Characters
                 .WriteBytes(this.Buffs.ToByteArray())
                 .WriteShort((short)this.Job)
                 .WriteBytes(this.AppearanceToByteArray())
-                .WriteInt(this.Items.Available(5110000))
+                .WriteInt(this.Items.InventoryAvailableItemByID(5110000))
                 .WriteInt() // NOTE: Item effect.
                 .WriteInt((int)(Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
                 .WriteShort(this.Position.X)

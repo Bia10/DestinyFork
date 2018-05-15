@@ -1,6 +1,8 @@
 ﻿using Destiny.Constants;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 
 namespace Destiny.Network.PacketFactory
 {
@@ -24,7 +26,7 @@ namespace Destiny.Network.PacketFactory
         #region  ShowRemoteBuffEffect
         public static Packet ShowRemoteBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
         {
-            direction = 3;
+            direction = 3; // TODO: fix this
 
             Packet showRemoteBuffEffectPacket = new Packet(ServerOperationCode.ShowRemoteEffect);
 

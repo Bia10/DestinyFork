@@ -1,14 +1,18 @@
-﻿using Destiny.Data;
-using Destiny.Maple;
-using Destiny.Security;
-using Destiny.Constants;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 
+using Destiny.Data;
+using Destiny.Maple;
+using Destiny.Security;
+using Destiny.Constants;
+using Destiny.Network.ClientHandler;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
+
 namespace Destiny.Network
 {
-    public sealed class LoginClient : MapleClientHandler
+    public sealed class LoginClient : MapleClientHandler.MapleClientHandler
     {
         public long ID { get; private set; }
         public byte World { get; private set; }

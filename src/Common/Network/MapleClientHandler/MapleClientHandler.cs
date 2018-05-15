@@ -1,8 +1,12 @@
-﻿using Destiny.IO;
-using Destiny.Security;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
-namespace Destiny.Network
+using Destiny.IO;
+using Destiny.Network.ClientHandler;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
+using Destiny.Security;
+
+namespace Destiny.Network.MapleClientHandler
 {
     public abstract class MapleClientHandler : ClientHandler<ClientOperationCode, ServerOperationCode, MapleCryptograph>
     {

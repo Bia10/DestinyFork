@@ -1,12 +1,14 @@
-﻿using Destiny.Network;
+﻿using System;
+using System.Linq;
+
+using Destiny.IO;
 using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using System;
-using System.Linq;
 using Destiny.Constants;
-using Destiny.IO;
 using Destiny.Maple.Life;
+using Destiny.Network.Common;
+using Destiny.Network.ServerHandler;
 using Destiny.Threading;
 
 namespace Destiny.Maple
@@ -56,6 +58,7 @@ namespace Destiny.Maple
         public Point LT { get; private set; }
         public Point RB { get; private set; }
         public int Cooldown { get; set; }
+        // TODO: skill element?
 
         public bool HasBuff
         {
@@ -81,7 +84,7 @@ namespace Destiny.Maple
 
                     if (this.Character.IsInitialized)
                     {
-                        this.Update();
+                        this.Parent.UpdateSkill(this);
                     }
                 }
             }
@@ -99,7 +102,7 @@ namespace Destiny.Maple
 
                 if (this.Parent != null && this.Character.IsInitialized)
                 {
-                    this.Update();
+                    this.Parent.UpdateSkill(this);
                 }
             }
         }
@@ -123,8 +126,8 @@ namespace Destiny.Maple
         public bool IsFromFourthJob
         {
             get
-            {
-                return this.MapleID > 1000000 && (this.MapleID / 10000).ToString()[2] == '2'; // TODO: Redo that.
+            {   // TODO: Redo that.
+                return this.MapleID > 1000000 && (this.MapleID / 10000).ToString()[2] == '2'; 
             }
         }
 
@@ -192,6 +195,7 @@ namespace Destiny.Maple
 
                 if (this.IsCoolingDown)
                 {
+                    //set cooldown
                     using (Packet oPacket = new Packet(ServerOperationCode.Cooldown))
                     {
                         oPacket
@@ -201,7 +205,8 @@ namespace Destiny.Maple
                         this.Character.Client.Send(oPacket);
                     }
 
-                    Delay.Execute(() =>
+                    //remove cooldown
+                    Delay.Execute(() => 
                     {
                         using (Packet oPacket = new Packet(ServerOperationCode.Cooldown))
                         {
@@ -211,7 +216,12 @@ namespace Destiny.Maple
 
                             this.Character.Client.Send(oPacket);
                         }
+
                     }, (this.RemainingCooldownSeconds * 1000));
+
+
+
+
                 }
             }
         }
@@ -328,23 +338,6 @@ namespace Destiny.Maple
             this.Assigned = false;
         }
 
-        public void Update()
-        {
-            using (Packet oPacket = new Packet(ServerOperationCode.ChangeSkillRecordResult))
-            {
-                oPacket
-                    .WriteByte(1)
-                    .WriteShort(1)
-                    .WriteInt(this.MapleID)
-                    .WriteInt(this.CurrentLevel)
-                    .WriteInt(this.MaxLevel)
-                    .WriteDateTime(this.Expiration)
-                    .WriteByte(4);
-
-                this.Character.Client.Send(oPacket);
-            }
-        }
-
         public void Recalculate()
         {
             this.MobCount = this.CachedReference.MobCount;
@@ -384,35 +377,30 @@ namespace Destiny.Maple
 
         public void Cast()
         {
-            if (this.IsCoolingDown)
-            {
-                return;
-            }
+            if (!this.Character.IsAlive) return;       
+            if (this.IsCoolingDown) return;
 
             this.Character.Health -= this.CostHP;
             this.Character.Mana -= this.CostMP;
-
-            if (this.CostItem > 0)
-            {
-
-            }
-
-            if (this.CostBullet > 0)
-            {
-
-            }
-
-            if (this.CostMeso > 0)
-            {
-
-            }
 
             if (this.Cooldown > 0)
             {
                 this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
             }
 
-            if (this.MapleID == (int)CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
+            if (this.CostItem > 0)
+            {
+            }
+
+            if (this.CostBullet > 0)
+            {
+            }
+
+            if (this.CostMeso > 0)
+            {
+            }
+
+            if (this.MapleID == (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
             {
                 Point mistMaxLT = new Point(-200, -150);
                 Point mistMaxRB = new Point(200, 150);
