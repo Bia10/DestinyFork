@@ -1,13 +1,14 @@
-﻿using Destiny.Data;
-using Destiny.IO;
-using Destiny.Maple;
-using Destiny.Network;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+
+using Destiny.Data;
+using Destiny.IO;
+using Destiny.Maple;
+using Destiny.Network;
 
 namespace Destiny
 {
