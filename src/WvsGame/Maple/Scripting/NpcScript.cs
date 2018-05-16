@@ -2,6 +2,7 @@
 using Destiny.Maple.Life;
 using Destiny.Threading;
 using System;
+using Destiny.Constants;
 using Destiny.Network.Common;
 
 namespace Destiny.Maple.Scripting
@@ -13,7 +14,7 @@ namespace Destiny.Maple.Scripting
         private WaitableResult<int> mResult;
 
         public NpcScript(Npc npc, Character character)
-            : base(ScriptType.Npc, npc.MapleID.ToString(), character, true) // TODO: Use actual npc script instead of ID.
+            : base(ServerConstants.ScriptType.Npc, npc.MapleID.ToString(), character, true) // TODO: Use actual npc script instead of ID.
         {
             mNpc = npc;
 
@@ -50,7 +51,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 0, 0))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.Standard, 0, 0))
             {
                 mCharacter.Client.Send(oPacket);
             }
@@ -66,7 +67,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 0, 1))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.Standard, 0, 1))
             {
                 mCharacter.Client.Send(oPacket);
             }
@@ -82,7 +83,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 1, 0))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.Standard, 1, 0))
             {
                 mCharacter.Client.Send(oPacket);
             }
@@ -98,7 +99,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 1, 1))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.Standard, 1, 1))
             {
                 mCharacter.Client.Send(oPacket);
             }
@@ -114,7 +115,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.YesNo))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.YesNo))
             {
                 mCharacter.Client.Send(oPacket);
             }
@@ -130,7 +131,7 @@ namespace Destiny.Maple.Scripting
         {
             mResult = new WaitableResult<int>();
 
-            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.AcceptDecline))
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NPCsConstants.NpcMessageType.AcceptDecline))
             {
                 mCharacter.Client.Send(oPacket);
             }

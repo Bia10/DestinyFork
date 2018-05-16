@@ -4,6 +4,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -24,7 +25,7 @@ namespace Destiny.Maple.Life
         public short Foothold { get; set; }
         public MobSkills Skills { get; private set; }
         public Dictionary<MobSkill, DateTime> Cooldowns { get; private set; }
-        public List<MobStatus> Buffs { get; private set; }
+        public List<MobConstants.MobStatus> Buffs { get; private set; }
         public List<int> DeathSummons { get; private set; }
 
         public short Level { get; private set; }
@@ -165,7 +166,7 @@ namespace Destiny.Maple.Life
 
             this.Attackers = new Dictionary<Character, uint>();
             this.Cooldowns = new Dictionary<MobSkill, DateTime>();
-            this.Buffs = new List<MobStatus>();
+            this.Buffs = new List<MobConstants.MobStatus>();
             this.Stance = 5;
             this.CanDrop = true;
         }
@@ -292,7 +293,7 @@ namespace Destiny.Maple.Life
             {
                 if (this.Health * 100 / this.MaxHealth > skill.PercentageLimitHP ||
                     (this.Cooldowns.ContainsKey(skill) && this.Cooldowns[skill].AddSeconds(skill.Cooldown) >= DateTime.Now) ||
-                    ((MobSkillName)skill.MapleID) == MobSkillName.Summon && this.Map.Mobs.Count >= 100)
+                    ((MobConstants.MobSkillName)skill.MapleID) == MobConstants.MobSkillName.Summon && this.Map.Mobs.Count >= 100)
                 {
                     skill = null;
                 }
@@ -330,7 +331,7 @@ namespace Destiny.Maple.Life
             }
         }
 
-        public void Buff(MobStatus buff, short value, MobSkill skill)
+        public void Buff(MobConstants.MobStatus buff, short value, MobSkill skill)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.MobStatSet))
             {
@@ -367,7 +368,7 @@ namespace Destiny.Maple.Life
             }, skill.Duration * 1000);
         }
 
-        public void Buff(MobStatus buff, short value, Skill skill)
+        public void Buff(MobConstants.MobStatus buff, short value, Skill skill)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.MobStatSet))
             {

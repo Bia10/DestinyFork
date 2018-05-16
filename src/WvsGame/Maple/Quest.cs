@@ -53,8 +53,8 @@ namespace Destiny.Maple
             {
                 byte flags = 0;
 
-                if (this.AutoStart) flags |= (byte)QuestFlags.AutoStart;
-                if (this.SelectedMob) flags |= (byte)QuestFlags.SelectedMob;
+                if (this.AutoStart) flags |= (byte)QuestConstants.QuestFlags.AutoStart;
+                if (this.SelectedMob) flags |= (byte)QuestConstants.QuestFlags.SelectedMob;
 
                 return flags;
             }

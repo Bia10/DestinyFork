@@ -54,115 +54,115 @@ namespace Destiny.Maple.Life
 
         public void Cast(Mob caster)
         {
-            MobStatus status = MobStatus.None;
+            MobConstants.MobStatus status = MobConstants.MobStatus.None;
             CharacterConstants.CharacterDisease disease = CharacterConstants.CharacterDisease.None;
             bool heal = false;
             //bool banish = false;
             bool dispel = false;
 
-            switch ((MobSkillName)this.MapleID)
+            switch ((MobConstants.MobSkillName)this.MapleID)
             {
-                case MobSkillName.WeaponAttackUp:
-                case MobSkillName.WeaponAttackUpAreaOfEffect:
-                case MobSkillName.WeaponAttackUpMonsterCarnival:
-                    status = MobStatus.WeaponAttackUp;
+                case MobConstants.MobSkillName.WeaponAttackUp:
+                case MobConstants.MobSkillName.WeaponAttackUpAreaOfEffect:
+                case MobConstants.MobSkillName.WeaponAttackUpMonsterCarnival:
+                    status = MobConstants.MobStatus.WeaponAttackUp;
                     break;
 
-                case MobSkillName.MagicAttackUp:
-                case MobSkillName.MagicAttackUpAreaOfEffect:
-                case MobSkillName.MagicAttackUpMonsterCarnival:
-                    status = MobStatus.MagicAttackUp;
+                case MobConstants.MobSkillName.MagicAttackUp:
+                case MobConstants.MobSkillName.MagicAttackUpAreaOfEffect:
+                case MobConstants.MobSkillName.MagicAttackUpMonsterCarnival:
+                    status = MobConstants.MobStatus.MagicAttackUp;
                     break;
 
-                case MobSkillName.WeaponDefenseUp:
-                case MobSkillName.WeaponDefenseUpAreaOfEffect:
-                case MobSkillName.WeaponDefenseUpMonsterCarnival:
-                    status = MobStatus.WeaponDefenseUp;
+                case MobConstants.MobSkillName.WeaponDefenseUp:
+                case MobConstants.MobSkillName.WeaponDefenseUpAreaOfEffect:
+                case MobConstants.MobSkillName.WeaponDefenseUpMonsterCarnival:
+                    status = MobConstants.MobStatus.WeaponDefenseUp;
                     break;
 
-                case MobSkillName.MagicDefenseUp:
-                case MobSkillName.MagicDefenseUpAreaOfEffect:
-                case MobSkillName.MagicDefenseUpMonsterCarnival:
-                    status = MobStatus.MagicDefenseUp;
+                case MobConstants.MobSkillName.MagicDefenseUp:
+                case MobConstants.MobSkillName.MagicDefenseUpAreaOfEffect:
+                case MobConstants.MobSkillName.MagicDefenseUpMonsterCarnival:
+                    status = MobConstants.MobStatus.MagicDefenseUp;
                     break;
 
-                case MobSkillName.HealAreaOfEffect:
+                case MobConstants.MobSkillName.HealAreaOfEffect:
                     heal = true;
                     break;
 
-                case MobSkillName.Seal:
+                case MobConstants.MobSkillName.Seal:
                     disease = CharacterConstants.CharacterDisease.Sealed;
                     break;
 
-                case MobSkillName.Darkness:
+                case MobConstants.MobSkillName.Darkness:
                     disease = CharacterConstants.CharacterDisease.Darkness;
                     break;
 
-                case MobSkillName.Weakness:
+                case MobConstants.MobSkillName.Weakness:
                     disease = CharacterConstants.CharacterDisease.Weaken;
                     break;
 
-                case MobSkillName.Stun:
+                case MobConstants.MobSkillName.Stun:
                     disease = CharacterConstants.CharacterDisease.Stun;
                     break;
 
-                case MobSkillName.Curse:
+                case MobConstants.MobSkillName.Curse:
                     disease = CharacterConstants.CharacterDisease.Curse;
                     break;
 
-                case MobSkillName.Poison:
+                case MobConstants.MobSkillName.Poison:
                     disease = CharacterConstants.CharacterDisease.Poison;
                     break;
 
-                case MobSkillName.Slow:
+                case MobConstants.MobSkillName.Slow:
                     disease = CharacterConstants.CharacterDisease.Slow;
                     break;
 
-                case MobSkillName.Dispel:
+                case MobConstants.MobSkillName.Dispel:
                     dispel = true;
                     break;
 
-                case MobSkillName.Seduce:
+                case MobConstants.MobSkillName.Seduce:
                     disease = CharacterConstants.CharacterDisease.Seduce;
                     break;
 
-                case MobSkillName.SendToTown:
+                case MobConstants.MobSkillName.SendToTown:
                     // TODO: Send to town.
                     break;
 
-                case MobSkillName.PoisonMist:                  
+                case MobConstants.MobSkillName.PoisonMist:                  
                     // TODO: Spawn poison mist.
                     break;
 
-                case MobSkillName.Confuse:
+                case MobConstants.MobSkillName.Confuse:
                     disease = CharacterConstants.CharacterDisease.Confuse;
                     break;
 
-                case MobSkillName.Zombify:
+                case MobConstants.MobSkillName.Zombify:
                     // TODO: Zombify.
                     break;
 
-                case MobSkillName.WeaponImmunity:
-                    status = MobStatus.WeaponImmunity;
+                case MobConstants.MobSkillName.WeaponImmunity:
+                    status = MobConstants.MobStatus.WeaponImmunity;
                     break;
 
-                case MobSkillName.MagicImmunity:
-                    status = MobStatus.MagicImmunity;
+                case MobConstants.MobSkillName.MagicImmunity:
+                    status = MobConstants.MobStatus.MagicImmunity;
                     break;
 
-                case MobSkillName.WeaponDamageReflect:
-                case MobSkillName.MagicDamageReflect:
-                case MobSkillName.AnyDamageReflect:
+                case MobConstants.MobSkillName.WeaponDamageReflect:
+                case MobConstants.MobSkillName.MagicDamageReflect:
+                case MobConstants.MobSkillName.AnyDamageReflect:
                     // TODO: Reflect.
                     break;
 
-                case MobSkillName.AccuracyUpMonsterCarnival:
-                case MobSkillName.AvoidabilityUpMonsterCarnival:
-                case MobSkillName.SpeedUpMonsterCarnival:
+                case MobConstants.MobSkillName.AccuracyUpMonsterCarnival:
+                case MobConstants.MobSkillName.AvoidabilityUpMonsterCarnival:
+                case MobConstants.MobSkillName.SpeedUpMonsterCarnival:
                     // TODO: Monster carnival buffs.
                     break;
 
-                case MobSkillName.Summon:
+                case MobConstants.MobSkillName.Summon:
 
                     foreach (int mobId in MobSkill.Summons[this.Level])
                     {
@@ -184,7 +184,7 @@ namespace Destiny.Maple.Life
                     affectedMob.Heal((uint)this.ParameterA, this.ParameterB);
                 }
 
-                if (status != MobStatus.None && !affectedMob.Buffs.Contains(status))
+                if (status != MobConstants.MobStatus.None && !affectedMob.Buffs.Contains(status))
                 {
                     affectedMob.Buff(status, (short)this.ParameterA, this);
                 }

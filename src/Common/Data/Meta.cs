@@ -1,5 +1,6 @@
-﻿using Destiny.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
+using Destiny.IO;
 
 namespace Destiny.Data
 {

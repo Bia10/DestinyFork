@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Destiny.Constants;
 
 namespace Destiny.Maple
 {
@@ -6,17 +7,17 @@ namespace Destiny.Maple
     {
         internal Worlds() : base() { }
 
-        internal World Next(ServerType type)
+        internal World Next(ServerConstants.ServerType type)
         {
             lock (this)
             {
                 foreach (World loopWorld in this)
                 {
-                    if (type == ServerType.Channel && loopWorld.IsFull)
+                    if (type == ServerConstants.ServerType.Channel && loopWorld.IsFull)
                     {
                         continue;
                     }
-                    else if (type == ServerType.Shop && loopWorld.HasShop)
+                    else if (type == ServerConstants.ServerType.Shop && loopWorld.HasShop)
                     {
                         continue;
                     }

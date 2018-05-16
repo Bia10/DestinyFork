@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Characters;
+﻿using Destiny.Constants;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -38,7 +39,7 @@ namespace Destiny.Maple
             Packet oPacket = new Packet(ServerOperationCode.Message);
 
             oPacket
-                .WriteByte((byte)MessageType.DropPickup)
+                .WriteByte((byte)ServerConstants.MessageType.DropPickup)
                 .WriteBool(true)
                 .WriteByte() // NOTE: Unknown.
                 .WriteInt(this.Amount)
@@ -49,7 +50,7 @@ namespace Destiny.Maple
 
         public static Packet GetShowMesoGainPacket(bool white, int ammount, bool inChat)
         {
-            return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, 0, ammount, inChat, 0, 0);
+            return Character.GetShowSidebarInfoPacket(ServerConstants.MessageType.DropPickup, white, 0, ammount, inChat, 0, 0);
         }
 
     }

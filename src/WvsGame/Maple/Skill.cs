@@ -417,7 +417,7 @@ namespace Destiny.Maple
                 Mob victim = this.Character.ControlledMobs.FirstOrDefault();
                 if (victim != null)
                 {
-                    victim.Buff(MobStatus.Poisoned, 1, this);
+                    victim.Buff(MobConstants.MobStatus.Poisoned, 1, this);
                 }
             }
         }

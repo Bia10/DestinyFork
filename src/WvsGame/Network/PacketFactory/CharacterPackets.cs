@@ -194,14 +194,14 @@ namespace Destiny.Network.PacketFactory
         #endregion
 
         #region MessagePackets
-        public static Packet BroadcastMessage(NoticeType messageType, string message)
+        public static Packet BroadcastMessage(ServerConstants.NoticeType messageType, string message)
         {
             Packet broadcastMessage = new Packet(ServerOperationCode.BroadcastMsg);
 
             broadcastMessage
                 .WriteByte((byte)messageType);
 
-            if (messageType == NoticeType.ScrollingText)
+            if (messageType == ServerConstants.NoticeType.ScrollingText)
             {
                 broadcastMessage.WriteBool(!string.IsNullOrEmpty(message));
             }
@@ -213,7 +213,7 @@ namespace Destiny.Network.PacketFactory
         #endregion
 
         #region StoragePackets
-        public static Packet StorageErrorPacket(Character character, StoragePacketType type)
+        public static Packet StorageErrorPacket(Character character, NPCsConstants.StoragePacketType type)
         {
             Packet storageErrorPacket = new Packet(ServerOperationCode.Storage);
 
@@ -227,7 +227,7 @@ namespace Destiny.Network.PacketFactory
             Packet storageRemovePacket = new Packet(ServerOperationCode.Storage);
 
             storageRemovePacket
-                .WriteByte((byte)StorageAction.WithdrawItem)
+                .WriteByte((byte)NPCsConstants.StorageAction.WithdrawItem)
                 .WriteByte(character.Storage.Slots)
                 .WriteShort((short)(2 << (byte)itemToWithdraw.Type)) // ??
                 .WriteShort() // ??
@@ -247,7 +247,7 @@ namespace Destiny.Network.PacketFactory
             Packet storageAddItem = new Packet(ServerOperationCode.Storage);
 
             storageAddItem
-                .WriteByte((byte)StorageAction.DepositItem)
+                .WriteByte((byte)NPCsConstants.StorageAction.DepositItem)
                 .WriteByte(character.Storage.Slots)
                 .WriteShort((short)(2 << (byte)itemToDeposit.Type)) //  ??
                 .WriteShort() // ??
@@ -267,7 +267,7 @@ namespace Destiny.Network.PacketFactory
             Packet storageArrangePacket = new Packet(ServerOperationCode.Storage);
 
             storageArrangePacket
-                .WriteByte((byte)StorageAction.ChangeMesos)
+                .WriteByte((byte)NPCsConstants.StorageAction.ChangeMesos)
                 .WriteByte(character.Storage.Slots)
                 .WriteShort(2) // ??
                 .WriteShort() // ??
@@ -282,7 +282,7 @@ namespace Destiny.Network.PacketFactory
             Packet storageOpenPacket = new Packet(ServerOperationCode.Storage);
 
             storageOpenPacket
-                .WriteByte((byte)StorageAction.OpenStorage)
+                .WriteByte((byte)NPCsConstants.StorageAction.OpenStorage)
                 .WriteInt(storageNpc.MapleID)
                 .WriteByte(charStorage.Slots)
                 .WriteShort(126)
@@ -309,7 +309,7 @@ namespace Destiny.Network.PacketFactory
             Packet storageChangeMesosPacket = new Packet(ServerOperationCode.Storage);
 
             storageChangeMesosPacket
-                .WriteByte((byte)StoragePacketType.UpdateMesos)
+                .WriteByte((byte)NPCsConstants.StoragePacketType.UpdateMesos)
                 .WriteByte(character.Storage.Slots)
                 .WriteShort(2)
                 .WriteShort()
@@ -415,7 +415,7 @@ namespace Destiny.Network.PacketFactory
         #endregion
 
         #region CharacterTalkToGroup
-        public static Packet TalkToCharacterGroup(MultiChatType type, Character character, string text)
+        public static Packet TalkToCharacterGroup(SocialConstants.MultiChatType type, Character character, string text)
         {
             Packet characterTalkToGroup = new Packet(ServerOperationCode.GroupMessage);
 

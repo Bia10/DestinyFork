@@ -1,5 +1,6 @@
 ﻿using Destiny.IO;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.Network.Common;
 
 namespace Destiny.Maple
@@ -7,7 +8,7 @@ namespace Destiny.Maple
 
     public sealed class Movement
     {
-        public MovementType Type { get; set; }
+        public MapConstants.MovementType Type { get; set; }
         public Point Position { get; set; }
         public Point Velocity { get; set; }
         public short FallStart { get; set; }
@@ -42,7 +43,7 @@ namespace Destiny.Maple
 
             while (count-- > 0)
             {
-                MovementType type = (MovementType)iPacket.ReadByte();
+                MapConstants.MovementType type = (MapConstants.MovementType)iPacket.ReadByte();
 
                 Movement movement = new Movement();
 
@@ -53,16 +54,16 @@ namespace Destiny.Maple
 
                 switch (type)
                 {
-                    case MovementType.Normal:
-                    case MovementType.Normal2:
-                    case MovementType.JumpDown:
-                    case MovementType.WingsFalling:
+                    case MapConstants.MovementType.Normal:
+                    case MapConstants.MovementType.Normal2:
+                    case MapConstants.MovementType.JumpDown:
+                    case MapConstants.MovementType.WingsFalling:
                         {
                             movement.Position = new Point(iPacket.ReadShort(), iPacket.ReadShort());
                             movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
                             movement.Foothold = iPacket.ReadShort();
 
-                            if (movement.Type == MovementType.JumpDown)
+                            if (movement.Type == MapConstants.MovementType.JumpDown)
                             {
                                 movement.FallStart = iPacket.ReadShort();
                             }
@@ -72,12 +73,12 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Jump:
-                    case MovementType.JumpKnockback:
-                    case MovementType.FlashJump:
-                    case MovementType.ExcessiveKnockback:
-                    case MovementType.RecoilShot:
-                    case MovementType.Aran:
+                    case MapConstants.MovementType.Jump:
+                    case MapConstants.MovementType.JumpKnockback:
+                    case MapConstants.MovementType.FlashJump:
+                    case MapConstants.MovementType.ExcessiveKnockback:
+                    case MapConstants.MovementType.RecoilShot:
+                    case MapConstants.MovementType.Aran:
                         {
                             movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
                             movement.Stance = iPacket.ReadByte();
@@ -85,12 +86,12 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Immediate:
-                    case MovementType.Teleport:
-                    case MovementType.Assaulter:
-                    case MovementType.Assassinate:
-                    case MovementType.Rush:
-                    case MovementType.Chair:
+                    case MapConstants.MovementType.Immediate:
+                    case MapConstants.MovementType.Teleport:
+                    case MapConstants.MovementType.Assaulter:
+                    case MapConstants.MovementType.Assassinate:
+                    case MapConstants.MovementType.Rush:
+                    case MapConstants.MovementType.Chair:
                         {
                             movement.Position = new Point(iPacket.ReadShort(), iPacket.ReadShort());
                             movement.Foothold = iPacket.ReadShort();
@@ -99,13 +100,13 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Falling:
+                    case MapConstants.MovementType.Falling:
                         {
                             movement.Statistic = iPacket.ReadByte();
                         }
                         break;
 
-                    case MovementType.Unknown:
+                    case MapConstants.MovementType.Unknown:
                         {
                             movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
                             movement.FallStart = iPacket.ReadShort();
@@ -165,10 +166,10 @@ namespace Destiny.Maple
 
                     switch (movement.Type)
                     {
-                        case MovementType.Normal:
-                        case MovementType.Normal2:
-                        case MovementType.JumpDown:
-                        case MovementType.WingsFalling:
+                        case MapConstants.MovementType.Normal:
+                        case MapConstants.MovementType.Normal2:
+                        case MapConstants.MovementType.JumpDown:
+                        case MapConstants.MovementType.WingsFalling:
                             {
                                 oPacket
                                     .WriteShort(movement.Position.X)
@@ -177,7 +178,7 @@ namespace Destiny.Maple
                                     .WriteShort(movement.Velocity.Y)
                                     .WriteShort(movement.Foothold);
 
-                                if (movement.Type == MovementType.JumpDown)
+                                if (movement.Type == MapConstants.MovementType.JumpDown)
                                 {
                                     oPacket.WriteShort(movement.FallStart);
                                 }
@@ -188,12 +189,12 @@ namespace Destiny.Maple
                             }
                             break;
 
-                        case MovementType.Jump:
-                        case MovementType.JumpKnockback:
-                        case MovementType.FlashJump:
-                        case MovementType.ExcessiveKnockback:
-                        case MovementType.RecoilShot:
-                        case MovementType.Aran:
+                        case MapConstants.MovementType.Jump:
+                        case MapConstants.MovementType.JumpKnockback:
+                        case MapConstants.MovementType.FlashJump:
+                        case MapConstants.MovementType.ExcessiveKnockback:
+                        case MapConstants.MovementType.RecoilShot:
+                        case MapConstants.MovementType.Aran:
                             {
                                 oPacket
                                     .WriteShort(movement.Velocity.X)
@@ -203,12 +204,12 @@ namespace Destiny.Maple
                             }
                             break;
 
-                        case MovementType.Immediate:
-                        case MovementType.Teleport:
-                        case MovementType.Assaulter:
-                        case MovementType.Assassinate:
-                        case MovementType.Rush:
-                        case MovementType.Chair:
+                        case MapConstants.MovementType.Immediate:
+                        case MapConstants.MovementType.Teleport:
+                        case MapConstants.MovementType.Assaulter:
+                        case MapConstants.MovementType.Assassinate:
+                        case MapConstants.MovementType.Rush:
+                        case MapConstants.MovementType.Chair:
                             {
                                 oPacket
                                     .WriteShort(movement.Position.X)
@@ -219,13 +220,13 @@ namespace Destiny.Maple
                             }
                             break;
 
-                        case MovementType.Falling:
+                        case MapConstants.MovementType.Falling:
                             {
                                 oPacket.WriteByte(movement.Statistic);
                             }
                             break;
 
-                        case MovementType.Unknown:
+                        case MapConstants.MovementType.Unknown:
                             {
                                 oPacket
                                     .WriteShort(movement.Velocity.X)

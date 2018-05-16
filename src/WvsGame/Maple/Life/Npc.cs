@@ -4,6 +4,7 @@ using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;
 using System;
+using Destiny.Constants;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
 
@@ -85,7 +86,7 @@ namespace Destiny.Maple.Life
                 return;
             }
 
-            NpcMessageType lastMessageType = (NpcMessageType)iPacket.ReadByte();
+            NPCsConstants.NpcMessageType lastMessageType = (NPCsConstants.NpcMessageType)iPacket.ReadByte();
 
             byte action = iPacket.ReadByte();
 
@@ -97,10 +98,10 @@ namespace Destiny.Maple.Life
 
             switch (lastMessageType)
             {
-                case NpcMessageType.RequestText:
-                case NpcMessageType.RequestNumber:
-                case NpcMessageType.RequestStyle:
-                case NpcMessageType.Choice:
+                case NPCsConstants.NpcMessageType.RequestText:
+                case NPCsConstants.NpcMessageType.RequestNumber:
+                case NPCsConstants.NpcMessageType.RequestStyle:
+                case NPCsConstants.NpcMessageType.Choice:
                     endTalkByte = 0;
                     break;
 
@@ -120,7 +121,7 @@ namespace Destiny.Maple.Life
                     selection = iPacket.ReadByte();
                 }
 
-                if (lastMessageType == NpcMessageType.RequestStyle)
+                if (lastMessageType == NPCsConstants.NpcMessageType.RequestStyle)
                 {
                     //selection = this.StyleSelectionHelpers[talker][selection];
                 }
@@ -215,7 +216,7 @@ namespace Destiny.Maple.Life
             return oPacket;
         }
 
-        public Packet GetDialogPacket(string text, NpcMessageType messageType, params byte[] footer)
+        public Packet GetDialogPacket(string text, NPCsConstants.NpcMessageType messageType, params byte[] footer)
         {
             Packet oPacket = new Packet(ServerOperationCode.ScriptMessage);
 

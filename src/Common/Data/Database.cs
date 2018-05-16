@@ -274,7 +274,7 @@ namespace Destiny.Data
             return command;
         }
 
-        public static string ParameterizeCommandText(string namePrefix, string commandText, params object[] args)
+        public static string ParameterizeCommandText(string namePrefix, string commandText, params object[] args) // TODO: rework fugly
         {
             return commandText != null ? string.Format(commandText, args?.Select((v, i) => "@" + namePrefix + i).ToArray()) : string.Empty;
         }

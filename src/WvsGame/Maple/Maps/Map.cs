@@ -1,4 +1,5 @@
-﻿using Destiny.Data;
+﻿using Destiny.Constants;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Network.Common;
 
@@ -90,7 +91,7 @@ namespace Destiny.Maple.Maps
             }
         }
 
-        public void Notify(string text, NoticeType type = NoticeType.Popup)
+        public void Notify(string text, ServerConstants.NoticeType type = ServerConstants.NoticeType.Popup)
         {
             foreach (Character character in this.Characters)
             {

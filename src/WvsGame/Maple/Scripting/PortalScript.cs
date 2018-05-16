@@ -10,7 +10,7 @@ namespace Destiny.Maple.Scripting
         private Portal mPortal;
 
         public PortalScript(Portal portal, Character character)
-            : base(ScriptType.Portal, portal.Script, character, false)
+            : base(ServerConstants.ScriptType.Portal, portal.Script, character, false)
         {
             mPortal = portal;
 

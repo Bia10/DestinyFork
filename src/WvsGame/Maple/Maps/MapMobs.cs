@@ -3,6 +3,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -112,7 +113,7 @@ namespace Destiny.Maple.Maps
                             using (Packet oPacket = new Packet(ServerOperationCode.Message))
                             {
                                 oPacket
-                                    .WriteByte((byte)MessageType.QuestRecord)
+                                    .WriteByte((byte)ServerConstants.MessageType.QuestRecord)
                                     .WriteUShort(loopStarted.Key)
                                     .WriteByte(1);
 

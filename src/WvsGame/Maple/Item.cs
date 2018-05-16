@@ -1161,7 +1161,7 @@ namespace Destiny.Maple
             Packet oPacket = new Packet(ServerOperationCode.Message);
 
             oPacket
-                .WriteByte((byte)MessageType.DropPickup)
+                .WriteByte((byte)ServerConstants.MessageType.DropPickup)
                 .WriteBool(false)
                 .WriteInt(this.MapleID)
                 .WriteInt(this.Quantity)

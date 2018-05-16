@@ -84,10 +84,20 @@
   <ItemGroup>
     <Compile Include="Application.cs" />
     <Compile Include="Collections\PendingKeyedQueue.cs" />
-    <Compile Include="Constants.cs" />
     <Compile Include="Constants\CharacterConstants.cs" />
+    <Compile Include="Constants\InteractionConstants.cs" />
     <Compile Include="Constants\ItemConstants.cs" />
+    <Compile Include="Constants\KeyMapConstants.cs" />
+    <Compile Include="Constants\LoginConstants.cs" />
+    <Compile Include="Constants\MapConstants.cs" />
+    <Compile Include="Constants\MobConstants.cs" />
+    <Compile Include="Constants\NPCsConstants.cs" />
+    <Compile Include="Constants\QuestConstants.cs" />
+    <Compile Include="Constants\ReactorConstants.cs" />
+    <Compile Include="Constants\ServerConstants.cs" />
+    <Compile Include="Constants\SocialConstants.cs" />
     <Compile Include="Constants\SummonConstants.cs" />
+    <Compile Include="Constants\WorldConstants.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\Meta.cs" />

@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Net;
+using Destiny.Constants;
 
 namespace Destiny
 {
@@ -118,14 +119,14 @@ namespace Destiny
             int[] worldPartyQuestExperienceRate = new int[worldCount];
             int[] worldMesoDropRate = new int[worldCount];
             int[] worldItemDropRate = new int[worldCount];
-            WorldFlag[] worldFlag = new WorldFlag[worldCount];
+            WorldConstants.WorldFlag[] worldFlag = new WorldConstants.WorldFlag[worldCount];
 
             for (int i = 0; i < worldCount; i++)
             {
                 Log.Inform("Please enter the following basic details for World {0}: ", i);
                 Log.SkipLine();
 
-                worldName[i] = Log.Input("Name [Default: GMSlike]: ", Enum.GetName(typeof(WorldNames), i));
+                worldName[i] = Log.Input("Name [Default: GMSlike]: ", Enum.GetName(typeof(WorldConstants.WorldNames), i));
                 worldChannels[i] = Log.Input("Channels [Default: 1]: ", 1);
                 worldIP[i] = Log.Input("Host IP (external for remote only) [Default: IPAddress.Loopback]: ", IPAddress.Loopback);
                 worldEventMessage[i] = Log.Input("Event message [Default: string.Empty]: ", string.Empty);
@@ -145,13 +146,13 @@ namespace Destiny
                 Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
                 Log.SkipLine();
 
-                worldFlag[i] = WorldFlag.None;
+                worldFlag[i] = WorldConstants.WorldFlag.None;
 
                 inputFlag:
                 Log.SkipLine();
                 try
                 {
-                    worldFlag[i] = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag [Default: None]: ", "None"), true);
+                    worldFlag[i] = (WorldConstants.WorldFlag)Enum.Parse(typeof(WorldConstants.WorldFlag), Log.Input("World flag [Default: None]: ", "None"), true);
                 }
                 catch
                 {

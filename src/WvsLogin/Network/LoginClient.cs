@@ -117,7 +117,7 @@ namespace Destiny.Network
 
             if (!username.IsAlphaNumeric())
             {
-                this.SendLoginResult(LoginResult.InvalidUsername);
+                this.SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
             }
             else
             {
@@ -129,19 +129,19 @@ namespace Destiny.Network
 
                     if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
                     {
-                        this.SendLoginResult(LoginResult.InvalidPassword);
+                        this.SendLoginResult(LoginConstants.LoginResult.InvalidPassword);
                     }                  
                     else if (this.Account.IsBanned)
                     {
-                        this.SendLoginResult(LoginResult.Banned);
+                        this.SendLoginResult(LoginConstants.LoginResult.Banned);
                     }
                     else if (!this.Account.EULA)
                     {
-                        this.SendLoginResult(LoginResult.EULA);
+                        this.SendLoginResult(LoginConstants.LoginResult.EULA);
                     }
                     else // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
                     {
-                        this.SendLoginResult(LoginResult.Valid);
+                        this.SendLoginResult(LoginConstants.LoginResult.Valid);
                     }
                 }
                 catch (NoAccountException)
@@ -163,11 +163,11 @@ namespace Destiny.Network
 
                         this.Account.Save();
 
-                        this.SendLoginResult(LoginResult.Valid);
+                        this.SendLoginResult(LoginConstants.LoginResult.Valid);
                     }
                     else
                     {
-                        this.SendLoginResult(LoginResult.InvalidUsername);
+                        this.SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
 
                         this.LastUsername = username;
                         this.LastPassword = password;
@@ -176,7 +176,7 @@ namespace Destiny.Network
             }
         }
 
-        private void SendLoginResult(LoginResult result)
+        private void SendLoginResult(LoginConstants.LoginResult result)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.CheckPasswordResult))
             {
@@ -185,7 +185,7 @@ namespace Destiny.Network
                     .WriteByte()
                     .WriteByte();
 
-                if (result == LoginResult.Valid)
+                if (result == LoginConstants.LoginResult.Valid)
                 {
                     oPacket
                         .WriteInt(this.Account.ID)
@@ -221,7 +221,7 @@ namespace Destiny.Network
 
                 datum.Update("ID = {0}", this.Account.ID);
 
-                this.SendLoginResult(LoginResult.Valid);
+                this.SendLoginResult(LoginConstants.LoginResult.Valid);
             }
             else
             {
@@ -250,7 +250,7 @@ namespace Destiny.Network
 
                 datum.Update("ID = {0}", this.Account.ID);
 
-                this.SendLoginResult(LoginResult.Valid);
+                this.SendLoginResult(LoginConstants.LoginResult.Valid);
             }
         }
 
@@ -259,7 +259,7 @@ namespace Destiny.Network
             byte a = iPacket.ReadByte();
             byte b = iPacket.ReadByte();
 
-            PinResult result;
+            LoginConstants.PinResult result;
 
             if (b == 0)
             {
@@ -267,21 +267,21 @@ namespace Destiny.Network
 
                 if (SHACryptograph.Encrypt(SHAMode.SHA256, pin) != this.Account.Pin)
                 {
-                    result = PinResult.Invalid;
+                    result = LoginConstants.PinResult.Invalid;
                 }
                 else
                 {
                     if (a == 1)
                     {
-                        result = PinResult.Valid;
+                        result = LoginConstants.PinResult.Valid;
                     }
                     else if (a == 2)
                     {
-                        result = PinResult.Register;
+                        result = LoginConstants.PinResult.Register;
                     }
                     else
                     {
-                        result = PinResult.Error;
+                        result = LoginConstants.PinResult.Error;
                     }
                 }
             }
@@ -289,16 +289,16 @@ namespace Destiny.Network
             {
                 if (string.IsNullOrEmpty(this.Account.Pin))
                 {
-                    result = PinResult.Register;
+                    result = LoginConstants.PinResult.Register;
                 }
                 else
                 {
-                    result = PinResult.Request;
+                    result = LoginConstants.PinResult.Request;
                 }
             }
             else
             {
-                result = PinResult.Error;
+                result = LoginConstants.PinResult.Error;
             }
 
             using (Packet oPacket = new Packet(ServerOperationCode.CheckPinCodeResult))
@@ -557,18 +557,18 @@ namespace Destiny.Network
             string pic = iPacket.ReadString();
             int characterID = iPacket.ReadInt();
 
-            CharacterDeletionResult result;
+            LoginConstants.CharacterDeletionResult result;
 
             if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !WvsLogin.RequestPic)
             {
                 //NOTE: As long as foreign keys are set to cascade, all child entries related to this CharacterID will also be deleted.
                 Database.Delete("characters", "ID = {0}", characterID);
 
-                result = CharacterDeletionResult.Valid;
+                result = LoginConstants.CharacterDeletionResult.Valid;
             }
             else
             {
-                result = CharacterDeletionResult.InvalidPic;
+                result = LoginConstants.CharacterDeletionResult.InvalidPic;
             }
 
             using (Packet oPacket = new Packet(ServerOperationCode.DeleteCharacterResult))

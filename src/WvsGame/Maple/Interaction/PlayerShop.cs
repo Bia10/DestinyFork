@@ -43,7 +43,7 @@ namespace Destiny.Maple.Interaction
             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
             {
                 oPacket
-                    .WriteByte((byte)InteractionCode.Room)
+                    .WriteByte((byte)InteractionConstants.InteractionCode.Room)
                     .WriteByte(4)
                     .WriteByte(4)
                     .WriteByte(0)
@@ -59,11 +59,11 @@ namespace Destiny.Maple.Interaction
             }
         }
 
-        public void Handle(Character character, InteractionCode code, Packet iPacket)
+        public void Handle(Character character, InteractionConstants.InteractionCode code, Packet iPacket)
         {
             switch (code)
             {
-                case InteractionCode.OpenStore:
+                case InteractionConstants.InteractionCode.OpenStore:
                     {
                         this.Owner.Map.PlayerShops.Add(this);
 
@@ -71,7 +71,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.AddItem:
+                case InteractionConstants.InteractionCode.AddItem:
                     {
                         ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
                         short slot = iPacket.ReadShort();
@@ -115,7 +115,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.RemoveItem:
+                case InteractionConstants.InteractionCode.RemoveItem:
                     {
                         if (character == this.Owner)
                         {
@@ -140,7 +140,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Exit:
+                case InteractionConstants.InteractionCode.Exit:
                     {
                         if (character == this.Owner)
                         {
@@ -153,7 +153,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Buy:
+                case InteractionConstants.InteractionCode.Buy:
                     {
                         short slot = iPacket.ReadByte();
                         short quantity = iPacket.ReadShort();
@@ -211,14 +211,14 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Chat:
+                case InteractionConstants.InteractionCode.Chat:
                     {
                         string text = iPacket.ReadString();
 
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.Chat)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.Chat)
                                 .WriteByte(8);
 
                             byte sender = 0;
@@ -263,7 +263,7 @@ namespace Destiny.Maple.Interaction
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.Exit)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
                                 .WriteByte(1)
                                 .WriteByte(10);
 
@@ -283,7 +283,7 @@ namespace Destiny.Maple.Interaction
             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
             {
                 oPacket
-                    .WriteByte((byte)InteractionCode.UpdateItems)
+                    .WriteByte((byte)InteractionConstants.InteractionCode.UpdateItems)
                     .WriteByte((byte)this.Items.Count);
 
                 foreach (PlayerShopItem loopShopItem in this.Items)
@@ -324,7 +324,7 @@ namespace Destiny.Maple.Interaction
                     using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                     {
                         oPacket
-                            .WriteByte((byte)InteractionCode.Visit)
+                            .WriteByte((byte)InteractionConstants.InteractionCode.Visit)
                             .WriteByte((byte)(i + 1))
                             .WriteBytes(visitor.AppearanceToByteArray())
                             .WriteString(visitor.Name);
@@ -338,7 +338,7 @@ namespace Destiny.Maple.Interaction
                     using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                     {
                         oPacket
-                            .WriteByte((byte)InteractionCode.Room)
+                            .WriteByte((byte)InteractionConstants.InteractionCode.Room)
                             .WriteByte(4)
                             .WriteByte(4)
                             .WriteBool(true)
@@ -391,7 +391,7 @@ namespace Destiny.Maple.Interaction
 
                     using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                     {
-                        oPacket.WriteByte((byte)InteractionCode.Exit);
+                        oPacket.WriteByte((byte)InteractionConstants.InteractionCode.Exit);
 
                         if (i > 0)
                         {
@@ -404,7 +404,7 @@ namespace Destiny.Maple.Interaction
                     using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                     {
                         oPacket
-                            .WriteByte((byte)InteractionCode.Exit)
+                            .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
                             .WriteByte((byte)(i + 1));
 
                         this.Owner.Client.Send(oPacket);

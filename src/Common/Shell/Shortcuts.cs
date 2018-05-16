@@ -1,6 +1,7 @@
-﻿using Destiny.IO;
-using System;
+﻿using System;
 using System.Windows.Shell;
+
+using Destiny.IO;
 
 namespace Destiny.Shell
 {

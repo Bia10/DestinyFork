@@ -34,7 +34,7 @@ namespace Destiny.Maple.Interaction
             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
             {
                 oPacket
-                    .WriteByte((byte)InteractionCode.Room)
+                    .WriteByte((byte)InteractionConstants.InteractionCode.Room)
                     .WriteByte(3)
                     .WriteByte(2)
                     .WriteByte(0) // NOTE: Player index.
@@ -47,11 +47,11 @@ namespace Destiny.Maple.Interaction
             }
         }
 
-        public void Handle(Character character, InteractionCode code, Packet iPacket)
+        public void Handle(Character character, InteractionConstants.InteractionCode code, Packet iPacket)
         {
             switch (code)
             {
-                case InteractionCode.Invite:
+                case InteractionConstants.InteractionCode.Invite:
                     {
                         int characterID = iPacket.ReadInt();
 
@@ -69,7 +69,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                    .WriteByte((byte)InteractionCode.Decline)
+                                    .WriteByte((byte)InteractionConstants.InteractionCode.Decline)
                                     .WriteByte(2)
                                     .WriteString(invitee.Name);
 
@@ -84,7 +84,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                    .WriteByte((byte)InteractionCode.Invite)
+                                    .WriteByte((byte)InteractionConstants.InteractionCode.Invite)
                                     .WriteByte(3)
                                     .WriteString(this.Owner.Name)
                                     .WriteBytes(new byte[4] { 0xB7, 0x50, 0x00, 0x00 });
@@ -95,12 +95,12 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Decline:
+                case InteractionConstants.InteractionCode.Decline:
                     {
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.Decline)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.Decline)
                                 .WriteByte(3)
                                 .WriteString(character.Name);
 
@@ -114,14 +114,14 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Visit:
+                case InteractionConstants.InteractionCode.Visit:
                     {
                         if (this.Owner == null)
                         {
                             this.Visitor = null;
                             character.Trade = null;
 
-                           Character.Notify(character, "Trade has been closed.", NoticeType.Popup);
+                           Character.Notify(character, "Trade has been closed.", ServerConstants.NoticeType.Popup);
                         }
                         else
                         {
@@ -130,7 +130,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                    .WriteByte((byte)InteractionCode.Visit)
+                                    .WriteByte((byte)InteractionConstants.InteractionCode.Visit)
                                     .WriteByte(1)
                                     .WriteBytes(this.Visitor.AppearanceToByteArray())
                                     .WriteString(this.Visitor.Name);
@@ -141,7 +141,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                    .WriteByte((byte)InteractionCode.Room)
+                                    .WriteByte((byte)InteractionConstants.InteractionCode.Room)
                                     .WriteByte(3)
                                     .WriteByte(2)
                                     .WriteByte(1)
@@ -159,7 +159,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.SetItems:
+                case InteractionConstants.InteractionCode.SetItems:
                     {
                         ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
                         short slot = iPacket.ReadShort();
@@ -195,7 +195,7 @@ namespace Destiny.Maple.Interaction
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.SetItems)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.SetItems)
                                 .WriteByte(0)
                                 .WriteByte(targetSlot)
                                 .WriteBytes(item.ToByteArray(true));
@@ -217,7 +217,7 @@ namespace Destiny.Maple.Interaction
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.SetItems)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.SetItems)
                                 .WriteByte(1)
                                 .WriteByte(targetSlot)
                                 .WriteBytes(item.ToByteArray(true));
@@ -234,7 +234,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.SetMeso:
+                case InteractionConstants.InteractionCode.SetMeso:
                     {
                         int meso = iPacket.ReadInt();
 
@@ -249,7 +249,7 @@ namespace Destiny.Maple.Interaction
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.SetMeso)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.SetMeso)
                                 .WriteByte(0)
                                 .WriteInt(meso);
 
@@ -282,7 +282,7 @@ namespace Destiny.Maple.Interaction
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.SetMeso)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.SetMeso)
                                 .WriteByte(1)
                                 .WriteInt(meso);
 
@@ -300,7 +300,7 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Exit:
+                case InteractionConstants.InteractionCode.Exit:
                     {
                         if (this.Started)
                         {
@@ -309,7 +309,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                   .WriteByte((byte)InteractionCode.Exit)
+                                   .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
                                    .WriteByte(0)
                                    .WriteByte(2);
 
@@ -327,7 +327,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                   .WriteByte((byte)InteractionCode.Exit)
+                                   .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
                                     .WriteByte(0)
                                     .WriteByte(2);
 
@@ -340,11 +340,11 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Confirm:
+                case InteractionConstants.InteractionCode.Confirm:
                     {
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
-                            oPacket.WriteByte((byte)InteractionCode.Confirm);
+                            oPacket.WriteByte((byte)InteractionConstants.InteractionCode.Confirm);
 
                             if (character == this.Owner)
                             {
@@ -367,7 +367,7 @@ namespace Destiny.Maple.Interaction
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
-                                    .WriteByte((byte)InteractionCode.Exit)
+                                    .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
                                     .WriteByte(0)
                                     .WriteByte(6);
 
@@ -383,14 +383,14 @@ namespace Destiny.Maple.Interaction
                     }
                     break;
 
-                case InteractionCode.Chat:
+                case InteractionConstants.InteractionCode.Chat:
                     {
                         string text = iPacket.ReadString();
 
                         using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
-                                .WriteByte((byte)InteractionCode.Chat)
+                                .WriteByte((byte)InteractionConstants.InteractionCode.Chat)
                                 .WriteByte(8)
                                 .WriteBool(this.Owner != character)
                                 .WriteString("{0} : {1}", character.Name, text);

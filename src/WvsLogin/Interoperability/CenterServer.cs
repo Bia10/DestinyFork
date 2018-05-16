@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 
 using Destiny.Collections;
+using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Maple;
 using Destiny.Network;
@@ -56,7 +57,7 @@ namespace Destiny.Interoperability
         {
             using (Packet Packet = new Packet(InteroperabilityOperationCode.RegistrationRequest))
             {
-                Packet.WriteByte((byte)ServerType.Login);
+                Packet.WriteByte((byte)ServerConstants.ServerType.Login);
                 Packet.WriteString((string)args[0]);
                 Packet.WriteByte((byte)WvsLogin.Worlds.Count);
 

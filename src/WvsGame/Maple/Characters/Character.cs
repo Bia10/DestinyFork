@@ -758,7 +758,7 @@ namespace Destiny.Maple.Characters
             CharacterStats.Update(character);
         }
 
-        public static void Notify(Character character, string message, NoticeType type = NoticeType.PinkText)
+        public static void Notify(Character character, string message, ServerConstants.NoticeType type = ServerConstants.NoticeType.PinkText)
         {
             character.Client.Send(CharacterPackets.BroadcastMessage(type, message));
         }
@@ -1501,7 +1501,7 @@ namespace Destiny.Maple.Characters
         // instead of pooling the world for characters?
         public void MultiTalk(Packet iPacket)
         {
-            MultiChatType type = (MultiChatType)iPacket.ReadByte();
+            SocialConstants.MultiChatType type = (SocialConstants.MultiChatType)iPacket.ReadByte();
             byte count = iPacket.ReadByte();
 
             List<int> recipients = new List<int>();
@@ -1516,22 +1516,22 @@ namespace Destiny.Maple.Characters
 
             switch (type)
             {
-                case MultiChatType.Buddy:
+                case SocialConstants.MultiChatType.Buddy:
                     {
                     }
                     break;
 
-                case MultiChatType.Party:
+                case SocialConstants.MultiChatType.Party:
                     {
                     }
                     break;
 
-                case MultiChatType.Guild:
+                case SocialConstants.MultiChatType.Guild:
                     {
                     }
                     break;
 
-                case MultiChatType.Alliance:
+                case SocialConstants.MultiChatType.Alliance:
                     {
                     }
                     break;
@@ -1634,23 +1634,23 @@ namespace Destiny.Maple.Characters
 
         public void Interact(Packet iPacket)
         {
-            InteractionCode code = (InteractionCode)iPacket.ReadByte();
+            InteractionConstants.InteractionCode code = (InteractionConstants.InteractionCode)iPacket.ReadByte();
 
             switch (code)
             {
-                case InteractionCode.Create:
+                case InteractionConstants.InteractionCode.Create:
                     {
-                        InteractionType type = (InteractionType)iPacket.ReadByte();
+                        InteractionConstants.InteractionType type = (InteractionConstants.InteractionType)iPacket.ReadByte();
 
                         switch (type)
                         {
-                            case InteractionType.Omok:
+                            case InteractionConstants.InteractionType.Omok:
                                 {
 
                                 }
                                 break;
 
-                            case InteractionType.Trade:
+                            case InteractionConstants.InteractionType.Trade:
                                 {
                                     if (this.Trade == null)
                                     {
@@ -1659,7 +1659,7 @@ namespace Destiny.Maple.Characters
                                 }
                                 break;
 
-                            case InteractionType.PlayerShop:
+                            case InteractionConstants.InteractionType.PlayerShop:
                                 {
                                     string description = iPacket.ReadString();
 
@@ -1670,7 +1670,7 @@ namespace Destiny.Maple.Characters
                                 }
                                 break;
 
-                            case InteractionType.HiredMerchant:
+                            case InteractionConstants.InteractionType.HiredMerchant:
                                 {
 
                                 }
@@ -1679,7 +1679,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case InteractionCode.Visit:
+                case InteractionConstants.InteractionCode.Visit:
                     {
                         if (this.PlayerShop == null)
                         {
@@ -1888,7 +1888,7 @@ namespace Destiny.Maple.Characters
 
                         if (target != null)
                         {
-                            Notify(target, text, NoticeType.Popup);
+                            Notify(target, text, ServerConstants.NoticeType.Popup);
                         }
 
                         using (Packet oPacket = new Packet(ServerOperationCode.AdminResult))
@@ -2189,7 +2189,7 @@ namespace Destiny.Maple.Characters
         }
 
         //TODO: theoretically this could handle all kinds of messages to player like drops, mesos, guild points etc....
-        public static Packet GetShowSidebarInfoPacket(MessageType type, bool white, int itemID, int ammount,
+        public static Packet GetShowSidebarInfoPacket(ServerConstants.MessageType type, bool white, int itemID, int ammount,
             bool inChat, int partyBonus, int equipBonus)
         {
             Packet oPacket = new Packet(ServerOperationCode.Message);
@@ -2197,7 +2197,7 @@ namespace Destiny.Maple.Characters
             //the mesos work, drops dont idk why
             switch (type)
             {
-                case MessageType.DropPickup: //when itemID == 0:
+                case ServerConstants.MessageType.DropPickup: //when itemID == 0:
                     oPacket
                         .WriteByte((byte)type)
                         .WriteBool(white)
@@ -2216,7 +2216,7 @@ namespace Destiny.Maple.Characters
                          .WriteInt(0);
                      break; */
 
-                case MessageType.IncreaseEXP:
+                case ServerConstants.MessageType.IncreaseEXP:
                     oPacket
                         .WriteByte((byte)type) // NOTE: enum MessageType 
                         .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
@@ -2239,31 +2239,31 @@ namespace Destiny.Maple.Characters
 
                     break;
 
-                case MessageType.QuestRecord:
+                case ServerConstants.MessageType.QuestRecord:
                     break;
-                case MessageType.CashItemExpire:
+                case ServerConstants.MessageType.CashItemExpire:
                     break;
-                case MessageType.IncreaseFame:
+                case ServerConstants.MessageType.IncreaseFame:
                     break;
-                case MessageType.IncreaseMeso:
+                case ServerConstants.MessageType.IncreaseMeso:
                     break;
-                case MessageType.IncreaseGP:
+                case ServerConstants.MessageType.IncreaseGP:
                     break;
-                case MessageType.GiveBuff:
+                case ServerConstants.MessageType.GiveBuff:
                     break;
-                case MessageType.GeneralItemExpire:
+                case ServerConstants.MessageType.GeneralItemExpire:
                     break;
-                case MessageType.System:
+                case ServerConstants.MessageType.System:
                     break;
-                case MessageType.QuestRecordEx:
+                case ServerConstants.MessageType.QuestRecordEx:
                     break;
-                case MessageType.ItemProtectExpire:
+                case ServerConstants.MessageType.ItemProtectExpire:
                     break;
-                case MessageType.ItemExpireReplace:
+                case ServerConstants.MessageType.ItemExpireReplace:
                     break;
-                case MessageType.SkillExpire:
+                case ServerConstants.MessageType.SkillExpire:
                     break;
-                case MessageType.TutorialMessage:
+                case ServerConstants.MessageType.TutorialMessage:
                     break;
             }
 

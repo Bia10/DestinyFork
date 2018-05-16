@@ -553,7 +553,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte)NoticeType.Megaphone)
+                                .WriteByte((byte)ServerConstants.NoticeType.Megaphone)
                                 .WriteString(message);
 
                             //this.Parent.Client.Channel.Broadcast(oPacket);
@@ -574,7 +574,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte) NoticeType.Megaphone)
+                                .WriteByte((byte) ServerConstants.NoticeType.Megaphone)
                                 .WriteString(message);
 
                             //this.Parent.Client.Channel.Broadcast(oPacket);
@@ -596,7 +596,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte) NoticeType.SuperMegaphone)
+                                .WriteByte((byte) ServerConstants.NoticeType.SuperMegaphone)
                                 .WriteString(message)
                                 .WriteByte(WvsGame.ChannelID)
                                 .WriteBool(whisper);
@@ -684,7 +684,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte) NoticeType.ItemMegaphone)
+                                .WriteByte((byte) ServerConstants.NoticeType.ItemMegaphone)
                                 .WriteString(message)
                                 .WriteByte(WvsGame.ChannelID)
                                 .WriteBool(whisper)
@@ -829,7 +829,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.Message))
                         {
                             oPacket
-                                .WriteByte((byte)MessageType.IncreaseMeso)
+                                .WriteByte((byte)ServerConstants.MessageType.IncreaseMeso)
                                 .WriteInt(item.Meso)
                                 .WriteShort();
 

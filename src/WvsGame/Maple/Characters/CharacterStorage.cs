@@ -86,11 +86,11 @@ namespace Destiny.Maple.Characters
 
         public void CharStorageHandler(Packet inPacket)
         {
-            StorageAction actionType = (StorageAction)inPacket.ReadByte();
+            NPCsConstants.StorageAction actionType = (NPCsConstants.StorageAction)inPacket.ReadByte();
 
             switch (actionType)
             {
-                case StorageAction.WithdrawItem:
+                case NPCsConstants.StorageAction.WithdrawItem:
                     {
                         // Read packet data
                         ItemConstants.ItemType itemType = (ItemConstants.ItemType)inPacket.ReadByte();
@@ -114,7 +114,7 @@ namespace Destiny.Maple.Characters
                         // Do i actually have free inventory slot to place withdrawn item in?
                         if (this.Parent.Items.IsInventoryFull(item.Type))
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, StoragePacketType.ErrorPlayerInventoryFull));
+                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorPlayerInventoryFull));
                             return;
                         }
 
@@ -122,7 +122,7 @@ namespace Destiny.Maple.Characters
                         int costToWithdraw = 1000; // TODO: how is the cost actually calculated?
                         if (this.Parent.Meso < costToWithdraw)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, StoragePacketType.ErrorNotEnoughMesos));
+                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
@@ -150,7 +150,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case StorageAction.DepositItem:
+                case NPCsConstants.StorageAction.DepositItem:
                     {
                         // Read packet data
                         short slot = inPacket.ReadShort();
@@ -164,14 +164,14 @@ namespace Destiny.Maple.Characters
                         // storage full cant deposit
                         if (this.IsFull)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, StoragePacketType.ErrorStorageInventoryFull));
+                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorStorageInventoryFull));
                             return;
                         }
 
                         // not enough mesos to pay for deposit
                         if (this.Parent.Meso <= this.Npc.StorageCost)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, StoragePacketType.ErrorNotEnoughMesos));
+                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
@@ -201,13 +201,13 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case StorageAction.ArrangeItem:
+                case NPCsConstants.StorageAction.ArrangeItem:
                     {
                         this.Parent.Client.Send(CharacterPackets.StorageArrangeItems(this.Parent));
                     }
                     break;
 
-                case StorageAction.ChangeMesos:
+                case NPCsConstants.StorageAction.ChangeMesos:
                     {
                         int meso = inPacket.ReadInt();
 
@@ -227,7 +227,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case StorageAction.CloseStorage:
+                case NPCsConstants.StorageAction.CloseStorage:
                     {
                         this.Save();
                     }

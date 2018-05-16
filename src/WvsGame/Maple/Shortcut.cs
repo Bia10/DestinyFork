@@ -1,25 +1,26 @@
-﻿using Destiny.Data;
+﻿using Destiny.Constants;
+using Destiny.Data;
 
 namespace Destiny.Maple
 {
     public sealed class Shortcut
     {
-        public KeymapKey Key { get; private set; }
-        public KeymapType Type { get; set; }
-        public KeymapAction Action { get; set; }
+        public KeyMapConstants.KeymapKey Key { get; private set; }
+        public KeyMapConstants.KeymapType Type { get; set; }
+        public KeyMapConstants.KeymapAction Action { get; set; }
 
         public Shortcut(Datum datum)
         {
-            this.Key = (KeymapKey)datum["Key"];
-            this.Type = (KeymapType)datum["Type"];
-            this.Action = (KeymapAction)datum["Action"];
+            this.Key = (KeyMapConstants.KeymapKey)datum["Key"];
+            this.Type = (KeyMapConstants.KeymapType)datum["Type"];
+            this.Action = (KeyMapConstants.KeymapAction)datum["Action"];
         }
 
-        public Shortcut(KeymapKey key, KeymapAction action, KeymapType type = KeymapType.None)
+        public Shortcut(KeyMapConstants.KeymapKey key, KeyMapConstants.KeymapAction action, KeyMapConstants.KeymapType type = KeyMapConstants.KeymapType.None)
         {
             this.Key = key;
 
-            if (type == KeymapType.None)
+            if (type == KeyMapConstants.KeymapType.None)
             {
                 this.Type = this.GetTypeFromAction(action);
             }
@@ -31,59 +32,59 @@ namespace Destiny.Maple
             this.Action = action;
         }
 
-        private KeymapType GetTypeFromAction(KeymapAction action)
+        private KeyMapConstants.KeymapType GetTypeFromAction(KeyMapConstants.KeymapAction action)
         {
             switch (action)
             {
-                case KeymapAction.Cockeyed:
-                case KeymapAction.Happy:
-                case KeymapAction.Sarcastic:
-                case KeymapAction.Crying:
-                case KeymapAction.Outraged:
-                case KeymapAction.Shocked:
-                case KeymapAction.Annoyed:
-                    return KeymapType.BasicFace;
+                case KeyMapConstants.KeymapAction.Cockeyed:
+                case KeyMapConstants.KeymapAction.Happy:
+                case KeyMapConstants.KeymapAction.Sarcastic:
+                case KeyMapConstants.KeymapAction.Crying:
+                case KeyMapConstants.KeymapAction.Outraged:
+                case KeyMapConstants.KeymapAction.Shocked:
+                case KeyMapConstants.KeymapAction.Annoyed:
+                    return KeyMapConstants.KeymapType.BasicFace;
 
-                case KeymapAction.PickUp:
-                case KeymapAction.Sit:
-                case KeymapAction.Attack:
-                case KeymapAction.Jump:
-                case KeymapAction.NpcChat:
-                    return KeymapType.BasicAction;
+                case KeyMapConstants.KeymapAction.PickUp:
+                case KeyMapConstants.KeymapAction.Sit:
+                case KeyMapConstants.KeymapAction.Attack:
+                case KeyMapConstants.KeymapAction.Jump:
+                case KeyMapConstants.KeymapAction.NpcChat:
+                    return KeyMapConstants.KeymapType.BasicAction;
 
-                case KeymapAction.EquipmentMenu:
-                case KeymapAction.ItemMenu:
-                case KeymapAction.AbilityMenu:
-                case KeymapAction.SkillMenu:
-                case KeymapAction.BuddyList:
-                case KeymapAction.WorldMap:
-                case KeymapAction.Messenger:
-                case KeymapAction.MiniMap:
-                case KeymapAction.QuestMenu:
-                case KeymapAction.SetKey:
-                case KeymapAction.AllChat:
-                case KeymapAction.WhisperChat:
-                case KeymapAction.PartyChat:
-                case KeymapAction.BuddyChat:
-                case KeymapAction.Shortcut:
-                case KeymapAction.QuickSlot:
-                case KeymapAction.ExpandChat:
-                case KeymapAction.GuildList:
-                case KeymapAction.GuildChat:
-                case KeymapAction.PartyList:
-                case KeymapAction.QuestHelper:
-                case KeymapAction.SpouseChat:
-                case KeymapAction.MonsterBook:
-                case KeymapAction.CashShop:
-                case KeymapAction.AllianceChat:
-                case KeymapAction.PartySearch:
-                case KeymapAction.FamilyList:
-                case KeymapAction.Medal:
-                    return KeymapType.Menu;
+                case KeyMapConstants.KeymapAction.EquipmentMenu:
+                case KeyMapConstants.KeymapAction.ItemMenu:
+                case KeyMapConstants.KeymapAction.AbilityMenu:
+                case KeyMapConstants.KeymapAction.SkillMenu:
+                case KeyMapConstants.KeymapAction.BuddyList:
+                case KeyMapConstants.KeymapAction.WorldMap:
+                case KeyMapConstants.KeymapAction.Messenger:
+                case KeyMapConstants.KeymapAction.MiniMap:
+                case KeyMapConstants.KeymapAction.QuestMenu:
+                case KeyMapConstants.KeymapAction.SetKey:
+                case KeyMapConstants.KeymapAction.AllChat:
+                case KeyMapConstants.KeymapAction.WhisperChat:
+                case KeyMapConstants.KeymapAction.PartyChat:
+                case KeyMapConstants.KeymapAction.BuddyChat:
+                case KeyMapConstants.KeymapAction.Shortcut:
+                case KeyMapConstants.KeymapAction.QuickSlot:
+                case KeyMapConstants.KeymapAction.ExpandChat:
+                case KeyMapConstants.KeymapAction.GuildList:
+                case KeyMapConstants.KeymapAction.GuildChat:
+                case KeyMapConstants.KeymapAction.PartyList:
+                case KeyMapConstants.KeymapAction.QuestHelper:
+                case KeyMapConstants.KeymapAction.SpouseChat:
+                case KeyMapConstants.KeymapAction.MonsterBook:
+                case KeyMapConstants.KeymapAction.CashShop:
+                case KeyMapConstants.KeymapAction.AllianceChat:
+                case KeyMapConstants.KeymapAction.PartySearch:
+                case KeyMapConstants.KeymapAction.FamilyList:
+                case KeyMapConstants.KeymapAction.Medal:
+                    return KeyMapConstants.KeymapType.Menu;
             }
 
 
-            return KeymapType.None;
+            return KeyMapConstants.KeymapType.None;
         }
     }
 }

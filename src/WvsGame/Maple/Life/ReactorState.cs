@@ -1,11 +1,12 @@
 ﻿using Destiny.Data;
 using System;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Life
 {
     public sealed class ReactorState
     {
-        public ReactorEventType Type { get; private set; }
+        public ReactorConstants.ReactorEventType Type { get; private set; }
         public byte State { get; private set; }
         public byte NextState { get; private set; }
         public int Timeout { get; private set; }
@@ -15,7 +16,7 @@ namespace Destiny.Maple.Life
 
         public ReactorState(Datum datum)
         {
-            this.Type = this.Timeout > 0 ? ReactorEventType.Timeout : (ReactorEventType)Enum.Parse(typeof(ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
+            this.Type = this.Timeout > 0 ? ReactorConstants.ReactorEventType.Timeout : (ReactorConstants.ReactorEventType)Enum.Parse(typeof(ReactorConstants.ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
             this.State = (byte)(sbyte)datum["state"];
             this.NextState = (byte)(sbyte)datum["next_state"];
             this.Timeout = (int)datum["timeout"];

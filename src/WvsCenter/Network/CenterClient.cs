@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-
+using Destiny.Constants;
 using Destiny.Maple;
 using Destiny.IO;
 using Destiny.Security;
@@ -14,7 +14,7 @@ namespace Destiny.Network
     {
         public static string SecurityCode { get; set; }
 
-        public ServerType Type { get; private set; }
+        public ServerConstants.ServerType Type { get; private set; }
 
         public World World { get; private set; }
         public byte ID { get; set; }
@@ -45,7 +45,7 @@ namespace Destiny.Network
         {
             switch (this.Type)
             {
-                case ServerType.Login:
+                case ServerConstants.ServerType.Login:
                     {
                         WvsCenter.Login = null;
 
@@ -55,7 +55,7 @@ namespace Destiny.Network
                     }
                     break;
 
-                case ServerType.Channel:
+                case ServerConstants.ServerType.Channel:
                     {
                         this.World.Remove(this);
 
@@ -73,7 +73,7 @@ namespace Destiny.Network
                     }
                     break;
 
-                case ServerType.Shop:
+                case ServerConstants.ServerType.Shop:
                     {
                         this.World.Shop = null;
 
@@ -143,14 +143,14 @@ namespace Destiny.Network
 
         private void Register(Packet inPacket)
         {
-            ServerType type = (ServerType)inPacket.ReadByte();
+            ServerConstants.ServerType type = (ServerConstants.ServerType)inPacket.ReadByte();
             string securityCode = inPacket.ReadString();
 
             bool valid = true;
 
             using (Packet Packet = new Packet(InteroperabilityOperationCode.RegistrationResponse))
             {
-                if (!Enum.IsDefined(typeof(ServerType), type))
+                if (!Enum.IsDefined(typeof(ServerConstants.ServerType), type))
                 {
                     Packet.WriteByte((byte)ServerRegsitrationResponse.InvalidType);
 
@@ -166,7 +166,7 @@ namespace Destiny.Network
                 {
                     switch (type)
                     {
-                        case ServerType.Login:
+                        case ServerConstants.ServerType.Login:
                             {
                                 if (WvsCenter.Login != null)
                                 {
@@ -183,8 +183,8 @@ namespace Destiny.Network
                             }
                             break;
 
-                        case ServerType.Channel:
-                        case ServerType.Shop:
+                        case ServerConstants.ServerType.Channel:
+                        case ServerConstants.ServerType.Shop:
                             {
                                 World world = WvsCenter.Worlds.Next(type);
 
@@ -200,11 +200,11 @@ namespace Destiny.Network
 
                                     switch (type)
                                     {
-                                        case ServerType.Channel:
+                                        case ServerConstants.ServerType.Channel:
                                             this.World.Add(this);
                                             break;
 
-                                        case ServerType.Shop:
+                                        case ServerConstants.ServerType.Shop:
                                             this.World.Shop = this;
                                             break;
                                     }
@@ -213,7 +213,7 @@ namespace Destiny.Network
                                     Packet.WriteByte(this.World.ID);
                                     Packet.WriteString(this.World.Name);
 
-                                    if (type == ServerType.Channel)
+                                    if (type == ServerConstants.ServerType.Channel)
                                     {
                                         Packet.WriteString(this.World.TickerMessage);
                                         Packet.WriteByte(this.ID);
@@ -221,7 +221,7 @@ namespace Destiny.Network
 
                                     Packet.WriteUShort(this.Port);
 
-                                    if (type == ServerType.Channel)
+                                    if (type == ServerConstants.ServerType.Channel)
                                     {
                                         Packet.WriteBool(this.World.AllowMultiLeveling);
                                         Packet.WriteInt(this.World.ExperienceRate);
@@ -245,7 +245,7 @@ namespace Destiny.Network
 
                 switch (type)
                 {
-                    case ServerType.Login:
+                    case ServerConstants.ServerType.Login:
                         {
                             byte count = inPacket.ReadByte();
 
@@ -281,7 +281,7 @@ namespace Destiny.Network
                         }
                         break;
 
-                    case ServerType.Channel:
+                    case ServerConstants.ServerType.Channel:
                         {
                             using (Packet Packet = new Packet(InteroperabilityOperationCode.UpdateChannel))
                             {
@@ -299,7 +299,7 @@ namespace Destiny.Network
                         }
                         break;
 
-                    case ServerType.Shop:
+                    case ServerConstants.ServerType.Shop:
                         {
                             Log.SkipLine();
                             Log.Success("Registered Shop Server ({0}).", this.World.Name);

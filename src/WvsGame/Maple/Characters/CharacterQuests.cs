@@ -120,7 +120,7 @@ namespace Destiny.Maple.Characters
 
         public void Handle(Packet iPacket)
         {
-            QuestAction action = (QuestAction)iPacket.ReadByte();
+            QuestConstants.QuestAction action = (QuestConstants.QuestAction)iPacket.ReadByte();
             ushort questID = iPacket.ReadUShort();
 
             if (!DataProvider.Quests.Contains(questID))
@@ -134,7 +134,7 @@ namespace Destiny.Maple.Characters
 
             switch (action)
             {
-                case QuestAction.RestoreLostItem: // TODO: Validate.
+                case QuestConstants.QuestAction.RestoreLostItem: // TODO: Validate.
                     {
                         int quantity = iPacket.ReadInt();
                         int itemID = iPacket.ReadInt();
@@ -147,7 +147,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case QuestAction.Start:
+                case QuestConstants.QuestAction.Start:
                     {
                         npcId = iPacket.ReadInt();
 
@@ -155,7 +155,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case QuestAction.Complete:
+                case QuestConstants.QuestAction.Complete:
                     {
                         npcId = iPacket.ReadInt();
                         iPacket.ReadInt(); // NOTE: Unknown
@@ -165,14 +165,14 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case QuestAction.Forfeit:
+                case QuestConstants.QuestAction.Forfeit:
                     {
                         this.Forfeit(quest.MapleID);
                     }
                     break;
 
-                case QuestAction.ScriptStart:
-                case QuestAction.ScriptEnd:
+                case QuestConstants.QuestAction.ScriptStart:
+                case QuestConstants.QuestAction.ScriptEnd:
                     {
                         npcId = iPacket.ReadInt();
 
@@ -226,12 +226,12 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            this.Update(quest.MapleID, QuestStatus.InProgress);
+            this.Update(quest.MapleID, QuestConstants.QuestStatus.InProgress);
 
             using (Packet oPacket = new Packet(ServerOperationCode.QuestResult))
             {
                 oPacket
-                    .WriteByte((byte)QuestResult.Complete)
+                    .WriteByte((byte)QuestConstants.QuestResult.Complete)
                     .WriteUShort(quest.MapleID)
                     .WriteInt(npcID)
                     .WriteInt();
@@ -252,7 +252,7 @@ namespace Destiny.Maple.Characters
             using (Packet oPacket = new Packet(ServerOperationCode.Message))
             {
                 oPacket
-                    .WriteByte((byte)MessageType.IncreaseEXP)
+                    .WriteByte((byte)ServerConstants.MessageType.IncreaseEXP)
                     .WriteBool(true)
                     .WriteInt(quest.ExperienceReward[1])
                     .WriteBool(true)
@@ -339,7 +339,7 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            this.Update(quest.MapleID, QuestStatus.Complete);
+            this.Update(quest.MapleID, QuestConstants.QuestStatus.Complete);
 
             this.Delete(quest.MapleID);
 
@@ -353,23 +353,23 @@ namespace Destiny.Maple.Characters
         {
             this.Delete(questID);
 
-            this.Update(questID, QuestStatus.NotStarted);
+            this.Update(questID, QuestConstants.QuestStatus.NotStarted);
         }
 
-        private void Update(ushort questID, QuestStatus status, string progress = "")
+        private void Update(ushort questID, QuestConstants.QuestStatus status, string progress = "")
         {
             using (Packet oPacket = new Packet(ServerOperationCode.Message))
             {
                 oPacket
-                    .WriteByte((byte)MessageType.QuestRecord)
+                    .WriteByte((byte)ServerConstants.MessageType.QuestRecord)
                     .WriteUShort(questID)
                     .WriteByte((byte)status);
 
-                if (status == QuestStatus.InProgress)
+                if (status == QuestConstants.QuestStatus.InProgress)
                 {
                     oPacket.WriteString(progress);
                 }
-                else if (status == QuestStatus.Complete)
+                else if (status == QuestConstants.QuestStatus.Complete)
                 {
                     oPacket.WriteDateTime(DateTime.Now);
                 }

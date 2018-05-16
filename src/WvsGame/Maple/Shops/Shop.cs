@@ -83,11 +83,11 @@ namespace Destiny.Maple.Shops
 
         public void Handle(Character customer, Packet iPacket)
         {
-            ShopAction action = (ShopAction)iPacket.ReadByte();
+            NPCsConstants.ShopAction action = (NPCsConstants.ShopAction)iPacket.ReadByte();
 
             switch (action)
             {
-                case ShopAction.Buy:
+                case NPCsConstants.ShopAction.Buy:
                     {
                         short index = iPacket.ReadShort();
                         int mapleID = iPacket.ReadInt();
@@ -121,7 +121,7 @@ namespace Destiny.Maple.Shops
 
                         if (customer.Items.SpaceTakenByItem(purchase) > customer.Items.GetRemainingSlots(purchase.Type))
                         {
-                            Character.Notify(customer, "Your inventory is full.", NoticeType.Popup);
+                            Character.Notify(customer, "Your inventory is full.", ServerConstants.NoticeType.Popup);
                         }
                         else
                         {
@@ -138,7 +138,7 @@ namespace Destiny.Maple.Shops
                     }
                     break;
 
-                case ShopAction.Sell:
+                case NPCsConstants.ShopAction.Sell:
                     {
                         short slot = iPacket.ReadShort();
                         int mapleID = iPacket.ReadInt();
@@ -183,7 +183,7 @@ namespace Destiny.Maple.Shops
                     }
                     break;
 
-                case ShopAction.Recharge:
+                case NPCsConstants.ShopAction.Recharge:
                     {
                         short slot = iPacket.ReadShort();
 
@@ -193,7 +193,7 @@ namespace Destiny.Maple.Shops
 
                         if (customer.Meso < price)
                         {
-                            Character.Notify(customer, "You do not have enough mesos.", NoticeType.Popup);
+                            Character.Notify(customer, "You do not have enough mesos.", ServerConstants.NoticeType.Popup);
                         }
                         else
                         {
@@ -212,7 +212,7 @@ namespace Destiny.Maple.Shops
                     }
                     break;
 
-                case ShopAction.Leave:
+                case NPCsConstants.ShopAction.Leave:
                     {
                         customer.LastNpc = null;
                     }

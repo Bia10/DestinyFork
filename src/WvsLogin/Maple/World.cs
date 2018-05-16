@@ -1,5 +1,6 @@
 ﻿using Destiny.IO;
 using System.Collections.ObjectModel;
+using Destiny.Constants;
 
 namespace Destiny.Maple
 {
@@ -10,7 +11,7 @@ namespace Destiny.Maple
         public ushort Port { get; private set; }
         public ushort ShopPort { get; private set; }
         public byte Channels { get; private set; }
-        public WorldFlag Flag { get; private set; }
+        public WorldConstants.WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
         public string TickerMessage { get; private set; }
         public bool AllowMultiLeveling { get; private set; }
@@ -23,11 +24,11 @@ namespace Destiny.Maple
         public int DropRate { get; set; }
 
         // NOTE: Unless there's a max amount of users set, this is useless.
-        public WorldStatus Status
+        public WorldConstants.WorldStatus Status
         {
             get
             {
-                return WorldStatus.Normal;
+                return WorldConstants.WorldStatus.Normal;
             }
         }
 
@@ -67,7 +68,7 @@ namespace Destiny.Maple
             this.Port = (ushort)(8585 + 100 * this.ID);
             this.ShopPort = 9000;
             this.Channels = Settings.GetByte(configSection + "/Channels");
-            this.Flag = Settings.GetEnum<WorldFlag>(configSection + "/Flag");
+            this.Flag = Settings.GetEnum<WorldConstants.WorldFlag>(configSection + "/Flag");
             this.EventMessage = Settings.GetString(configSection + "/EventMessage");
             this.TickerMessage = Settings.GetString(configSection + "/TickerMessage");
             this.AllowMultiLeveling = true;

@@ -1,5 +1,6 @@
-﻿using Destiny.IO;
-using System;
+﻿using System;
+
+using Destiny.IO;
 
 namespace Destiny.Security
 {

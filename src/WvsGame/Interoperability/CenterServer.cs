@@ -59,7 +59,7 @@ namespace Destiny.Interoperability
         {
             using (Packet Packet = new Packet(InteroperabilityOperationCode.RegistrationRequest))
             {
-                Packet.WriteByte((byte)ServerType.Channel);
+                Packet.WriteByte((byte)ServerConstants.ServerType.Channel);
                 Packet.WriteString((string)args[0]);
 
                 this.Send(Packet);
@@ -309,46 +309,46 @@ namespace Destiny.Interoperability
             character.Items.AddItemToInventory(new Item(weaponID, equipped: true));
             character.Items.AddItemToInventory(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
-            character.Keymap.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Three, KeymapAction.BuddyChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Four, KeymapAction.GuildChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Five, KeymapAction.AllianceChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Six, KeymapAction.SpouseChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Q, KeymapAction.QuestMenu));
-            character.Keymap.Add(new Shortcut(KeymapKey.W, KeymapAction.WorldMap));
-            character.Keymap.Add(new Shortcut(KeymapKey.E, KeymapAction.EquipmentMenu));
-            character.Keymap.Add(new Shortcut(KeymapKey.R, KeymapAction.BuddyList));
-            character.Keymap.Add(new Shortcut(KeymapKey.I, KeymapAction.ItemMenu));
-            character.Keymap.Add(new Shortcut(KeymapKey.O, KeymapAction.PartySearch));
-            character.Keymap.Add(new Shortcut(KeymapKey.P, KeymapAction.PartyList));
-            character.Keymap.Add(new Shortcut(KeymapKey.BracketLeft, KeymapAction.Shortcut));
-            character.Keymap.Add(new Shortcut(KeymapKey.BracketRight, KeymapAction.QuickSlot));
-            character.Keymap.Add(new Shortcut(KeymapKey.LeftCtrl, KeymapAction.Attack));
-            character.Keymap.Add(new Shortcut(KeymapKey.S, KeymapAction.AbilityMenu));
-            character.Keymap.Add(new Shortcut(KeymapKey.F, KeymapAction.FamilyList));
-            character.Keymap.Add(new Shortcut(KeymapKey.G, KeymapAction.GuildList));
-            character.Keymap.Add(new Shortcut(KeymapKey.H, KeymapAction.WhisperChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.K, KeymapAction.SkillMenu));
-            character.Keymap.Add(new Shortcut(KeymapKey.L, KeymapAction.QuestHelper));
-            character.Keymap.Add(new Shortcut(KeymapKey.Semicolon, KeymapAction.Medal));
-            character.Keymap.Add(new Shortcut(KeymapKey.Quote, KeymapAction.ExpandChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.Backtick, KeymapAction.CashShop));
-            character.Keymap.Add(new Shortcut(KeymapKey.Backslash, KeymapAction.SetKey));
-            character.Keymap.Add(new Shortcut(KeymapKey.Z, KeymapAction.PickUp));
-            character.Keymap.Add(new Shortcut(KeymapKey.X, KeymapAction.Sit));
-            character.Keymap.Add(new Shortcut(KeymapKey.C, KeymapAction.Messenger));
-            character.Keymap.Add(new Shortcut(KeymapKey.B, KeymapAction.MonsterBook));
-            character.Keymap.Add(new Shortcut(KeymapKey.M, KeymapAction.MiniMap));
-            character.Keymap.Add(new Shortcut(KeymapKey.LeftAlt, KeymapAction.Jump));
-            character.Keymap.Add(new Shortcut(KeymapKey.Space, KeymapAction.NpcChat));
-            character.Keymap.Add(new Shortcut(KeymapKey.F1, KeymapAction.Cockeyed));
-            character.Keymap.Add(new Shortcut(KeymapKey.F2, KeymapAction.Happy));
-            character.Keymap.Add(new Shortcut(KeymapKey.F3, KeymapAction.Sarcastic));
-            character.Keymap.Add(new Shortcut(KeymapKey.F4, KeymapAction.Crying));
-            character.Keymap.Add(new Shortcut(KeymapKey.F5, KeymapAction.Outraged));
-            character.Keymap.Add(new Shortcut(KeymapKey.F6, KeymapAction.Shocked));
-            character.Keymap.Add(new Shortcut(KeymapKey.F7, KeymapAction.Annoyed));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.One, KeyMapConstants.KeymapAction.AllChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Two, KeyMapConstants.KeymapAction.PartyChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Three, KeyMapConstants.KeymapAction.BuddyChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Four, KeyMapConstants.KeymapAction.GuildChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Five, KeyMapConstants.KeymapAction.AllianceChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Six, KeyMapConstants.KeymapAction.SpouseChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Q, KeyMapConstants.KeymapAction.QuestMenu));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.W, KeyMapConstants.KeymapAction.WorldMap));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.E, KeyMapConstants.KeymapAction.EquipmentMenu));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.R, KeyMapConstants.KeymapAction.BuddyList));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.I, KeyMapConstants.KeymapAction.ItemMenu));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.O, KeyMapConstants.KeymapAction.PartySearch));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.P, KeyMapConstants.KeymapAction.PartyList));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.BracketLeft, KeyMapConstants.KeymapAction.Shortcut));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.BracketRight, KeyMapConstants.KeymapAction.QuickSlot));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.LeftCtrl, KeyMapConstants.KeymapAction.Attack));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.S, KeyMapConstants.KeymapAction.AbilityMenu));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F, KeyMapConstants.KeymapAction.FamilyList));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.G, KeyMapConstants.KeymapAction.GuildList));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.H, KeyMapConstants.KeymapAction.WhisperChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.K, KeyMapConstants.KeymapAction.SkillMenu));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.L, KeyMapConstants.KeymapAction.QuestHelper));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Semicolon, KeyMapConstants.KeymapAction.Medal));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Quote, KeyMapConstants.KeymapAction.ExpandChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Backtick, KeyMapConstants.KeymapAction.CashShop));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Backslash, KeyMapConstants.KeymapAction.SetKey));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Z, KeyMapConstants.KeymapAction.PickUp));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.X, KeyMapConstants.KeymapAction.Sit));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.C, KeyMapConstants.KeymapAction.Messenger));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.B, KeyMapConstants.KeymapAction.MonsterBook));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.M, KeyMapConstants.KeymapAction.MiniMap));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.LeftAlt, KeyMapConstants.KeymapAction.Jump));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Space, KeyMapConstants.KeymapAction.NpcChat));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F1, KeyMapConstants.KeymapAction.Cockeyed));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F2, KeyMapConstants.KeymapAction.Happy));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F3, KeyMapConstants.KeymapAction.Sarcastic));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F4, KeyMapConstants.KeymapAction.Crying));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F5, KeyMapConstants.KeymapAction.Outraged));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F6, KeyMapConstants.KeymapAction.Shocked));
+            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F7, KeyMapConstants.KeymapAction.Annoyed));
 
             character.Save();
 

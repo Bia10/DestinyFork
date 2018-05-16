@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
-
+using Destiny.Constants;
 using Destiny.Data;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple.Characters
 {
-    public sealed class CharacterKeymap : KeyedCollection<KeymapKey, Shortcut>
+    public sealed class CharacterKeymap : KeyedCollection<KeyMapConstants.KeymapKey, Shortcut>
     {
         private const int KeyCount = 90;
 
@@ -55,7 +55,7 @@ namespace Destiny.Maple.Characters
 
                 for (int i = 0; i < CharacterKeymap.KeyCount; i++)
                 {
-                    KeymapKey key = (KeymapKey)i;
+                    KeyMapConstants.KeymapKey key = (KeyMapConstants.KeymapKey)i;
 
                     if (this.Contains(key))
                     {
@@ -91,13 +91,13 @@ namespace Destiny.Maple.Characters
 
                 for (int i = 0; i < count; i++)
                 {
-                    KeymapKey key = (KeymapKey)iPacket.ReadInt();
-                    KeymapType type = (KeymapType)iPacket.ReadByte();
-                    KeymapAction action = (KeymapAction)iPacket.ReadInt();
+                    KeyMapConstants.KeymapKey key = (KeyMapConstants.KeymapKey)iPacket.ReadInt();
+                    KeyMapConstants.KeymapType type = (KeyMapConstants.KeymapType)iPacket.ReadByte();
+                    KeyMapConstants.KeymapAction action = (KeyMapConstants.KeymapAction)iPacket.ReadInt();
 
                     if (this.Contains(key))
                     {
-                        if (type == KeymapType.None)
+                        if (type == KeyMapConstants.KeymapType.None)
                         {
                             this.Remove(key);
                         }
@@ -123,7 +123,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        protected override KeymapKey GetKeyForItem(Shortcut item)
+        protected override KeyMapConstants.KeymapKey GetKeyForItem(Shortcut item)
         {
             return item.Key;
         }

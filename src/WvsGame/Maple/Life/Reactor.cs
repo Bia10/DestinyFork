@@ -1,4 +1,5 @@
-﻿using Destiny.Data;
+﻿using Destiny.Constants;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
@@ -53,7 +54,7 @@ namespace Destiny.Maple.Life
 
             switch (state.Type)
             {
-                case ReactorEventType.PlainAdvanceState:
+                case ReactorConstants.ReactorEventType.PlainAdvanceState:
                     {
                         this.State = state.NextState;
 
