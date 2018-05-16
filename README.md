@@ -6,6 +6,7 @@ Destiny is a C# based open-source server emulation software for 2D MMORPG game M
 - MapleStory V0.83, global + Localhost
 - SQL server, pref. MySQL or WampServer
 - Visual Studio, pref. 2015 or 2017
+- .NET Framework 4.6.1
 
 ### Setup Guide
 1. **Get Destiny**: Clone the Git repository to a local folder on your machine.
