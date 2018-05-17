@@ -1,9 +1,11 @@
-﻿using Destiny.Data;
-using Destiny.IO;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
+
 using System;
 using System.IO;
 using System.Net;
+
+using Destiny.Data;
+using Destiny.IO;
 
 namespace Destiny
 {
@@ -66,7 +68,7 @@ namespace Destiny
                             Log.SkipLine();
                             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
                             Console.ReadLine(); // console wait for enter to exit
-                            System.Environment.Exit(-1);
+                            Environment.Exit(-1);
                         }
                     }
                 }
@@ -94,7 +96,7 @@ namespace Destiny
                             Log.SkipLine();
                             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
                             Console.ReadLine(); // console wait for enter to exit
-                            System.Environment.Exit(-1);
+                            Environment.Exit(-1);
                         }
                     }
                     catch (Exception gamedbE)
@@ -148,7 +150,7 @@ namespace Destiny
                             Log.SkipLine();
                             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
                             Console.ReadLine(); // console wait for enter to exit
-                            System.Environment.Exit(-1);
+                            Environment.Exit(-1);
                         }
                     }
                 }

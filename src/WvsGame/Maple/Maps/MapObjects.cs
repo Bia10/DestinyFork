@@ -1,8 +1,9 @@
 ﻿using System;
-using Destiny.Maple.Characters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
 using Destiny.IO;
+using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Maps
 {
@@ -47,9 +48,8 @@ namespace Destiny.Maple.Maps
             catch(Exception e)
             {
                 Log.SkipLine();
-                Tracer.TraceErrorMessage("Failed to insert item!");
+                Tracer.TraceErrorMessage(e, "Failed to insert item!");
                 Log.SkipLine();
-                //Log.Inform("ERROR: MapObjects-InsertItem() failed to insert item! Index: {0} \n Exception occurred: {1}", index, e);
             }     
         }
 
@@ -82,9 +82,8 @@ namespace Destiny.Maple.Maps
                     catch (Exception e)
                     {
                         Log.SkipLine();
-                        Tracer.TraceErrorMessage("Failed to remove item! \n Exception occurred.");
+                        Tracer.TraceErrorMessage(e, "Failed to remove item! \n Exception occurred.");
                         Log.SkipLine();
-                        //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! ItemIndex: {0} \n Exception occurred: {1}", index, e);
                     }
                 }
 
@@ -93,7 +92,6 @@ namespace Destiny.Maple.Maps
                     Log.SkipLine();
                     Tracer.TraceErrorMessage("Failed to remove item!.");
                     Log.SkipLine();
-                    //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! ItemIndex: {0}, Items.Count: {1}", index, Items.Count);
                 }             
             }
 
@@ -102,7 +100,6 @@ namespace Destiny.Maple.Maps
                 Log.SkipLine();
                 Tracer.TraceErrorMessage("Failed item index out of bounds!!.");
                 Log.SkipLine();
-                //Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! ItemIndex: {0}", index);
             }
         }
     }

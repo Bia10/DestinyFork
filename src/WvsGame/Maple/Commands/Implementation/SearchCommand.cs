@@ -1,4 +1,6 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+
+using Destiny.Maple.Characters;
 using Destiny.Data;
 
 namespace Destiny.Maple.Commands.Implementation
@@ -39,7 +41,7 @@ namespace Destiny.Maple.Commands.Implementation
             {
                 string query;
 
-                if (args[0].StartsWith("-"))
+                if (args[0].StartsWith("-", StringComparison.Ordinal))
                 {
                     query = this.CombineArgs(args, 1).ToLower();
                 }

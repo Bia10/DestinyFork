@@ -1539,7 +1539,7 @@ namespace Destiny.Maple.Characters
 
             // NOTE: This is here for convenience. If you accidentally use another text window (like party) and not the main text window,
             // your commands won't be shown but instead executed from there as well.
-            if (text.StartsWith(Application.CommandIndiciator.ToString()))
+            if (text.StartsWith(Application.CommandIndiciator.ToString(), StringComparison.Ordinal))
             {
                 CommandFactory.Execute(this, text);
             }

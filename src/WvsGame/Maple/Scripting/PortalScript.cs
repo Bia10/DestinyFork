@@ -1,6 +1,7 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+
+using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
-using System;
 using Destiny.Constants;
 
 namespace Destiny.Maple.Scripting

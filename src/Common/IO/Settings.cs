@@ -45,7 +45,7 @@ namespace Destiny.IO
                 {
                     while ((line = file.ReadLine()) != null)
                     {
-                        if (line.StartsWith("[") && line.EndsWith("]"))
+                        if (line.StartsWith("[", StringComparison.Ordinal) && line.EndsWith("]"))
                         {
                             currentSection = line.Trim('[', ']');
                         }

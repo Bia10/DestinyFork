@@ -28,11 +28,11 @@ namespace Destiny.Maple.Life
             spawned = false;
         }
 
-        public bool IsPuppet(Skill summonSkill)
+        public bool IsPuppet(Skill sumSkill)
         {
-            return summonSkill.MapleID == (int) CharacterConstants.SkillNames.Ranger.Puppet ||
-                   summonSkill.MapleID == (int) CharacterConstants.SkillNames.Sniper.Puppet ||
-                   summonSkill.MapleID == (int) CharacterConstants.SkillNames.WindArcher3.Puppet;
+            return sumSkill.MapleID == (int) CharacterConstants.SkillNames.Ranger.Puppet ||
+                   sumSkill.MapleID == (int) CharacterConstants.SkillNames.Sniper.Puppet ||
+                   sumSkill.MapleID == (int) CharacterConstants.SkillNames.WindArcher3.Puppet;
         }
 
         public bool IsStationary(Summon summon)

@@ -222,6 +222,9 @@ namespace Destiny.Data
 
             catch (Exception e)
             {
+                Log.SkipLine();
+                Tracer.TraceErrorMessage(e, "Failed to execute script!");
+                Log.SkipLine();
                 return false;
             }
         }

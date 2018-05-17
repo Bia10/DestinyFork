@@ -1,9 +1,10 @@
-﻿using Destiny.Data;
+﻿using System;
+using System.Collections.Generic;
+
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
-using System;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
@@ -840,11 +841,11 @@ namespace Destiny.Maple
             Character.UpdateApperance(this.Character);
         }
 
-        public void Drop(short quantity)
+        public void Drop(short dropQuantity)
         {
             if (this.IsRechargeable)
             {
-                quantity = this.Quantity;
+                dropQuantity = this.Quantity;
             }
 
             if (this.IsBlocked)
@@ -852,12 +853,12 @@ namespace Destiny.Maple
                 return;
             }
 
-            if (quantity > this.Quantity)
+            if (dropQuantity > this.Quantity)
             {
                 return;
             }
 
-            if (quantity == this.Quantity)
+            if (dropQuantity == this.Quantity)
             {
                 using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
                 {
@@ -883,9 +884,9 @@ namespace Destiny.Maple
 
                 this.Parent.RemoveItemFromInventory(this, false);
             }
-            else if (quantity < this.Quantity)
+            else if (dropQuantity < this.Quantity)
             {
-                this.Quantity -= quantity;
+                this.Quantity -= dropQuantity;
 
                 using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
                 {

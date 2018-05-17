@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+
 using Destiny.Constants;
 using Destiny.Network.PacketFactory;
 
@@ -541,7 +542,8 @@ namespace Destiny.Maple.Characters
         public static void LevelUP(Character character, bool PlayEffect)
         {
             // increase level & update stats
-            character.Level++;
+            character.Level = character.Level ++;
+
             Update(character, CharacterConstants.StatisticType.Level);
             // generate randomized HP && MP bonus
             AdjustHPOnLevelUP(character);

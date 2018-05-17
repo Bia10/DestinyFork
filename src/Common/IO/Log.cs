@@ -265,7 +265,7 @@ namespace Destiny.IO
 
             }
 
-            catch (System.FormatException ex)
+            catch (FormatException ex)
             {
                 Log.SkipLine();
                 Tracer.TraceErrorMessage(ex, "Incorrect string format! or out of bounds!");
