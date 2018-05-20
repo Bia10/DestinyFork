@@ -2174,8 +2174,8 @@ namespace Destiny.Maple.Characters
                     .WriteShort() // NOTE: Rings (1).
                     .WriteShort() // NOTE: Rings (2). 
                     .WriteShort() // NOTE: Rings (3).
-                    .WriteBytes(this.Trocks.RegularToByteArray())
-                    .WriteBytes(this.Trocks.VIPToByteArray())
+                    .WriteBytes(CharacterTrocks.RegularTrockToByteArray())
+                    .WriteBytes(CharacterTrocks.VIPTrockToByteArray())
                     .WriteInt() // NOTE: Monster Book cover ID.
                     .WriteByte() // NOTE: Monster Book cards.
                     .WriteShort() // NOTE: New Year Cards.

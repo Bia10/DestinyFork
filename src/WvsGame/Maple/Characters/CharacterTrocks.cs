@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Destiny.Data;
 using Destiny.Maple.Maps;
@@ -6,69 +7,71 @@ using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Maple.Data;
 using Destiny.Network.Common;
-using Destiny.Network.ServerHandler;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
     public sealed class CharacterTrocks
     {
-        public Character Parent { get; private set; }
+        public Character TrockParent { get; private set; }
 
-        public List<int> Regular { get; private set; }
-        public List<int> VIP { get; private set; }
+        public static List<int> RegularTrocks { get; private set; }
+        public static List<int> VIPTrocks { get; private set; }
 
         public CharacterTrocks(Character parent)
         {
-            this.Parent = parent;
+            TrockParent = parent;
 
-            this.Regular = new List<int>();
-            this.VIP = new List<int>();
+            RegularTrocks = new List<int>();
+            VIPTrocks = new List<int>();
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("trocks").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("trocks").Populate("CharacterID = {0}", TrockParent.ID))
             {
                 byte index = (byte)datum["Index"];
                 int map = (int)datum["Map"];
 
                 if (index >= 5)
                 {
-                    this.VIP.Add(map);
+                    VIPTrocks.Add(map);
                 }
                 else
                 {
-                    this.Regular.Add(map);
+                    RegularTrocks.Add(map);
                 }
             }
         }
 
         public void Save()
         {
-            Database.Delete("trocks", "CharacterID = {0}", this.Parent.ID);
+            Database.Delete("trocks", "CharacterID = {0}", TrockParent.ID);
 
             byte index = 0;
 
-            foreach (int map in this.Regular)
+            foreach (int map in RegularTrocks)
             {
-                Datum datum = new Datum("trocks");
-
-                datum["CharacterID"] = this.Parent.ID;
-                datum["Index"] = index++;
-                datum["Map"] = map;
+                Datum datum = new Datum("trocks")
+                {
+                    ["CharacterID"] = TrockParent.ID,
+                    ["Index"] = index++,
+                    ["Map"] = map
+                };
 
                 datum.Insert();
             }
 
             index = 5;
 
-            foreach (int map in this.VIP)
+            foreach (int map in VIPTrocks)
             {
-                Datum datum = new Datum("trocks");
-
-                datum["CharacterID"] = this.Parent.ID;
-                datum["Index"] = index++;
-                datum["Map"] = map;
+                Datum datum = new Datum("trocks")
+                {
+                    ["CharacterID"] = TrockParent.ID,
+                    ["Index"] = index++,
+                    ["Map"] = map
+                };
 
                 datum.Insert();
             }
@@ -76,7 +79,7 @@ namespace Destiny.Maple.Characters
 
         public bool Contains(int mapID)
         {
-            foreach (int map in this.Regular)
+            foreach (int map in VIPTrocks)
             {
                 if (map == mapID)
                 {
@@ -84,7 +87,7 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            foreach (int map in this.VIP)
+            foreach (int map in VIPTrocks)
             {
                 if (map == mapID)
                 {
@@ -95,101 +98,107 @@ namespace Destiny.Maple.Characters
             return false;
         }
 
-        public void Update(Packet iPacket)
+        public void UpdateTrockHandler(Packet inPacket)
         {
-            ItemConstants.TrockAction action = (ItemConstants.TrockAction)iPacket.ReadByte();
-            ItemConstants.TrockType type = (ItemConstants.TrockType)iPacket.ReadByte();
+            ItemConstants.TrockInventoryAction action = (ItemConstants.TrockInventoryAction)inPacket.ReadByte();
+            ItemConstants.TrockType type = (ItemConstants.TrockType)inPacket.ReadByte();
 
             switch (action)
             {
-                case ItemConstants.TrockAction.Remove:
+                case ItemConstants.TrockInventoryAction.RemoveTrock:
                     {
-                        int mapID = iPacket.ReadInt();
+                        int mapID = inPacket.ReadInt();
 
-                        if (type == ItemConstants.TrockType.Regular)
+                        switch (type)
                         {
-                            if (!this.Regular.Contains(mapID))
-                            {
-                                return;
-                            }
+                            case ItemConstants.TrockType.Regular:
+                                if (!RegularTrocks.Contains(mapID)) return;
 
-                            this.Regular.Remove(mapID);
-                        }
-                        else if (type == ItemConstants.TrockType.VIP)
-                        {
-                            if (!this.VIP.Contains(mapID))
-                            {
-                                return;
-                            }
+                                VIPTrocks.Remove(mapID);
+                                break;
 
-                            this.VIP.Remove(mapID);
+                            case ItemConstants.TrockType.VIP:
+                                if (!VIPTrocks.Contains(mapID)) return;
+
+                                VIPTrocks.Remove(mapID);
+                                break;
+
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
-                    break;
+                        break;
 
-                case ItemConstants.TrockAction.Add:
+                case ItemConstants.TrockInventoryAction.AddTrock:
                     {
-                        int mapID = this.Parent.Map.MapleID;
+                        int mapID = TrockParent.Map.MapleID;
 
                         // TODO: Check if the map field limits allow trocks (e.g. Maple Island is forbidden).
 
                         if (true)
                         {
-                            if (type == ItemConstants.TrockType.Regular)
+                            switch (type)
                             {
-                                this.Regular.Add(mapID);
-                            }
-                            else if (type == ItemConstants.TrockType.VIP)
-                            {
-                                this.VIP.Add(mapID);
+                                case ItemConstants.TrockType.Regular:
+                                    RegularTrocks.Add(mapID);
+                                    break;
+
+                                case ItemConstants.TrockType.VIP:
+                                    VIPTrocks.Add(mapID);
+                                    break;
                             }
                         }
 
-                        else
+                        /*else
                         {
                             return;
-                        }
+                        }*/
                     }
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            using (Packet oPacket = new Packet(ServerOperationCode.MapTransferResult))
-            {
-                oPacket
-                    .WriteByte((byte)(action == ItemConstants.TrockAction.Remove ? 2 : 3))
-                    .WriteByte((byte)type)
-                    .WriteBytes(type == ItemConstants.TrockType.Regular ? this.RegularToByteArray() : this.VIPToByteArray());
-
-                this.Parent.Client.Send(oPacket);
-            }
+            TrockParent.Client.Send(CharacterTrocksPackets.TrockInventoryUpdate(action, type));
         }
 
         public bool UseTrockHandler(int trockID, Packet inPacket)
         {
             bool used = false;
             byte action = inPacket.ReadByte();
+            ItemConstants.TrockType type = ItemConstants.TrockType.Regular;
 
-            ItemConstants.TrockType type = trockID == 5040000 ? ItemConstants.TrockType.Regular : ItemConstants.TrockType.VIP;
+            switch (trockID)
+            {
+                case (int)ItemConstants.UsableCashItems.TeleportRock:
+                    type = ItemConstants.TrockType.Regular;
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.VIPTeleportRock:
+                    type = ItemConstants.TrockType.VIP;
+                    break;
+            }
 
             int destinationMapID = -1;
             ItemConstants.TrockResult result = ItemConstants.TrockResult.Success;
 
-            if (action == 0) // NOTE: Preset map.
+            if ( action == (int)ItemConstants.TrockUseAction.TeleportToPresetMap)
             {
                 int mapID = inPacket.ReadInt();
 
-                if (!this.Parent.Trocks.Contains(mapID))
+                if (!TrockParent.Trocks.Contains(mapID))
                 {
                     result = ItemConstants.TrockResult.CannotGo;
                 }
 
                 destinationMapID = mapID;
             }
-            else if (action == 1) // NOTE: IGN.
+            else if (action == (int)ItemConstants.TrockUseAction.TeleportToIGN)
             {
                 string targetName = inPacket.ReadString();
 
-                Character target = null;// this.Parent.Client.Channel.Characters.GetCharacter(targetName);
+                Character target = null; // TrockParent.Client.Channel.Characters.GetCharacter(targetName);
 
                 if (target == null)
                 {
@@ -201,11 +210,11 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
 
             if (destinationMapID != -1)
             {
-                Map originMap = this.Parent.Map;
+                Map originMap = TrockParent.Map;
                 Map destinationMap = DataProvider.Maps[destinationMapID];
 
                 if (false) // TODO: Field limit check.
@@ -228,34 +237,27 @@ namespace Destiny.Maple.Characters
             
             if (result == ItemConstants.TrockResult.Success)
             {
-                this.Parent.SendChangeMapRequest(destinationMapID);
+                TrockParent.SendChangeMapRequest(destinationMapID);
 
                 used = true;
             }
             else
             {
-                using (Packet oPacket = new Packet(ServerOperationCode.MapTransferResult))
-                {
-                    oPacket
-                        .WriteByte((byte)result)
-                        .WriteByte((byte)type);
-
-                    this.Parent.Client.Send(oPacket);
-                }
+                TrockParent.Client.Send(CharacterTrocksPackets.TrockTransferResult(result, type));
             }
 
             return used;
         }
 
-        public byte[] RegularToByteArray()
+        public static byte[] RegularTrockToByteArray()
         {
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 int remaining = 1;
 
-                while (remaining <= this.Regular.Count)
+                while (remaining <= RegularTrocks.Count)
                 {
-                    oPacket.WriteInt(this.Regular[remaining - 1]);
+                    oPacket.WriteInt(RegularTrocks[remaining - 1]);
 
                     remaining++;
                 }
@@ -272,15 +274,15 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public byte[] VIPToByteArray()
+        public static byte[] VIPTrockToByteArray()
         {
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 int remaining = 1;
 
-                while (remaining <= this.VIP.Count)
+                while (remaining <= VIPTrocks.Count)
                 {
-                    oPacket.WriteInt(this.VIP[remaining - 1]);
+                    oPacket.WriteInt(VIPTrocks[remaining - 1]);
 
                     remaining++;
                 }

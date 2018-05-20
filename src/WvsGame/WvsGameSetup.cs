@@ -96,7 +96,7 @@ namespace Destiny
                         {
                             Log.SkipLine();
                             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
-                            Console.ReadLine(); // console wait for enter to exit
+                            Console.ReadLine();
                             Environment.Exit(-1);
                         }
                     }
@@ -272,9 +272,9 @@ namespace Destiny
                 //read sql script from file
                 string script = File.ReadAllText(McDBFileName);
                 //regexp {0} for databaseSchema
-                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                string scriptModed = Regex.Replace(script, "{0}", databaseSchema);
                 //execute script
-                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed, databaseSchema))
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scriptModed, databaseSchema))
                 {
                     return true;
                 }
@@ -299,9 +299,9 @@ namespace Destiny
                 //read script from file
                 string script = File.ReadAllText(GameDBFileName);
                 //regexp {0} for databaseSchema
-                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                string scriptModed = Regex.Replace(script, "{0}", databaseSchema);
                 //execute script
-                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed, databaseSchema))
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scriptModed, databaseSchema))
                 {
                     return true;
                 }

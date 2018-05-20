@@ -64,13 +64,22 @@ namespace Destiny.Constants
         }
         #endregion
 
-        #region TrockAction
-        public enum TrockAction : byte
+        #region TrockInventoryAction
+        public enum TrockInventoryAction : byte
         {
-            Remove = 0,
-            Add = 1
+            RemoveTrock = 0,
+            AddTrock = 1
         }
         #endregion
+
+        #region TrockUseAction
+        public enum TrockUseAction : byte
+        {
+            TeleportToPresetMap = 0,
+            TeleportToIGN = 1
+        }
+        #endregion
+
 
         #region TrockType
         public enum TrockType : byte

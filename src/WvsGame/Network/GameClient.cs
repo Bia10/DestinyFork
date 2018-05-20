@@ -210,7 +210,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.TrockAction:
-                    this.Character.Trocks.Update(iPacket);
+                    this.Character.Trocks.UpdateTrockHandler(iPacket);
                     break;
 
                 case ClientOperationCode.Report:

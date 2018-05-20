@@ -83,7 +83,7 @@ namespace Destiny
         {
             Log.SkipLine();
             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
-            Console.ReadLine(); // console wait for enter to exit
+            Console.ReadLine();
             Environment.Exit(-1);
         }
 
@@ -94,10 +94,8 @@ namespace Destiny
             {
                 client.Stop();
             }
-
             // Dispose from thread
             WvsGame.Dispose();
-
             // Inform user
             Log.SkipLine();
             Log.Warn("Server stopped.");
@@ -151,7 +149,7 @@ namespace Destiny
                 Database.Test();
                 // Parse thru MaplestoryDB
                 Database.Analyze(true);
-                // Create shortcut ??
+                // Create key shortcuts
                 Shortcuts.Apply();
                 // Set auto-reset
                 WvsGame.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");

@@ -278,9 +278,9 @@ namespace Destiny
                 //read sql script from file
                 string script = File.ReadAllText(LoginDBFileName);
                 //regexp {0} for databaseSchema
-                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                string scriptModed = Regex.Replace(script, "{0}", databaseSchema);
                 //execute script
-                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed,
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scriptModed,
                     databaseSchema))
                 {
                     return true;
