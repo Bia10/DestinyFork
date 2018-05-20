@@ -217,11 +217,11 @@ namespace Destiny.Maple.Characters
                 Map originMap = TrockParent.Map;
                 Map destinationMap = DataProvider.Maps[destinationMapID];
 
-                if (false) // TODO: Field limit check.
+                if (destinationMap.FieldLimit == (int) MapConstants.FieldLimit.CannotUseVIPTrock)
                 {
                     result = ItemConstants.TrockResult.CannotGo;
                 }
-                else if (false) // TODO: Origin map field limit check.
+                else if (originMap.FieldLimit == (int) MapConstants.FieldLimit.CannotUseVIPTrock)
                 {
                     result = ItemConstants.TrockResult.CannotGo;
                 }

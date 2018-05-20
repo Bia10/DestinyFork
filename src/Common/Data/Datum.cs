@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-
-using MySql.Data.MySqlClient;
 
 namespace Destiny.Data
 {
@@ -22,7 +22,8 @@ namespace Destiny.Data
         public Datums(string table, string schema)
         {
             this.Table = table;
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes; SslMode=none;",
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+                                                  "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
                 Database.Username,
@@ -151,7 +152,8 @@ namespace Destiny.Data
         {
             this.Table = table;
             this.Dictionary = new Dictionary<string, object>();
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes; SslMode=none;",
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+                                                  "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
                 Database.Username,
@@ -169,7 +171,8 @@ namespace Destiny.Data
         {
             this.Table = table;
             this.Dictionary = dictionary;
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes; SslMode=none;",
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+                                                  "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
                 Database.Username,

@@ -27,6 +27,7 @@ namespace Destiny.Maple.Maps
         public string UniqueShuffledReactor { get; private set; }
         public bool IsShop { get; private set; }
         public bool NoPartyLeaderPass { get; private set; }
+        public int FieldLimit { get; set; }
 
         public MapCharacters Characters { get; private set; }
         public MapDrops Drops { get; private set; }
@@ -106,5 +107,7 @@ namespace Destiny.Maple.Maps
         {
             return ++mObjectIDs;
         }
-    }
+
+
+        }
 }

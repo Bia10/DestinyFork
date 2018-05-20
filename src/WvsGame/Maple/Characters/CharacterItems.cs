@@ -990,7 +990,6 @@ namespace Destiny.Maple.Characters
                         return item;
                     }
                 }
-
                 return null; // TODO: Should be keynotfoundexception, but I'm lazy.
             }
         }

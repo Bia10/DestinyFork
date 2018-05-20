@@ -7,8 +7,8 @@ namespace Destiny.IO
 {
     public static class Log
     {
-        private const byte LabelWidth = 11;
-        private static bool Entitled = false;
+        private const byte LabelWidth = 10;
+        private static bool Entitled;
 
         public static string Margin
         {
@@ -324,7 +324,7 @@ namespace Destiny.IO
 
         public static void Hex(string label, byte b, params object[] args)
         {
-            Log.Hex(label, new byte[] { b }, args);
+            Hex(label, new [] { b }, args);
         }
 
         public static LoadingIndicator Load(string header)

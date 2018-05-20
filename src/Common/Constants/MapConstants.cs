@@ -28,6 +28,28 @@
             Aran = 20,
         }
 
+        public enum FieldLimit : int
+        {
+            CannotJump = 0x01,
+            CannotUseMovementSkills = 0x02,
+            CannotUseSummons = 0x04,
+            CannotUseDoors = 0x08,
+            CannotChangeChannel = 0x10,
+            CannotUseVIPTrock = 0x40,
+            CannotUseMinigame = 0x80,
+            Unknown1 = 0x100, // APQ and a couple quest maps have this
+            CannotUseMounts = 0x200,
+            Unknown2 = 0x400, // Monster carnival?
+            Unknown3 = 0x800, // Monster carnival?
+            CannotUsePotion = 0x1000,
+            Unknown4 = 0x2000,
+            Unused = 0x4000, 
+            Unknown5 = 0x8000, // Ariant colosseum-related?
+            Unknown6 = 0x10000, 
+            CannotJumpDown = 0x20000,
+            Unknown7 = 0x40000 // Seems to .. disable Rush if 0x2 is set
+        }
+
         public enum MapTransferResult : byte
         {
             NoReason = 0,
