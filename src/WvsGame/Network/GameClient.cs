@@ -110,7 +110,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.TakeDamage:
-                    this.Character.Damage(iPacket);
+                    this.Character.DamageHandler(iPacket);
                     break;
 
                 case ClientOperationCode.PlayerChat:
@@ -198,7 +198,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.MesoDrop:
-                    this.Character.DropMeso(iPacket);
+                    this.Character.DropMesoHandler(iPacket);
                     break;
 
                 case ClientOperationCode.PlayerInformation:
@@ -222,7 +222,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.MultiChat:
-                    this.Character.MultiTalk(iPacket);
+                    this.Character.MultiTalkHandler(iPacket);
                     break;
 
                 case ClientOperationCode.Command:

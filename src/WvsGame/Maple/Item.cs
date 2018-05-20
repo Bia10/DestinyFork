@@ -95,7 +95,7 @@ namespace Destiny.Maple
 
         public List<Tuple<int, short>> Summons { get; private set; }
 
-        public ItemConstants.ItemType Type
+        public ItemConstants.ItemType ItemType
         {
             get
             {
@@ -425,7 +425,7 @@ namespace Destiny.Maple
         {
             this.MapleID = mapleID;
             this.MaxPerStack = this.CachedReference.MaxPerStack;
-            this.Quantity = (this.Type == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
+            this.Quantity = (this.ItemType == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
             if (equipped) this.Slot = (short)this.GetEquippedSlot();
 
             if (!expiration.HasValue)
@@ -443,7 +443,7 @@ namespace Destiny.Maple
             this.RequiredLevel = this.CachedReference.RequiredLevel;
             this.Meso = this.CachedReference.Meso;
 
-            if (this.Type == ItemConstants.ItemType.Equipment)
+            if (this.ItemType == ItemConstants.ItemType.Equipment)
             {
                 this.PreventsSlipping = this.CachedReference.PreventsSlipping;
                 this.PreventsColdness = this.CachedReference.PreventsColdness;
@@ -529,7 +529,7 @@ namespace Destiny.Maple
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
                 this.Meso = this.CachedReference.Meso;
 
-                if (this.Type == ItemConstants.ItemType.Equipment)
+                if (this.ItemType == ItemConstants.ItemType.Equipment)
                 {
                     this.AttackSpeed = this.CachedReference.AttackSpeed;
                     this.RecoveryRate = this.CachedReference.RecoveryRate;
@@ -721,7 +721,7 @@ namespace Destiny.Maple
 
         public void Equip()
         {
-            if (this.Type != ItemConstants.ItemType.Equipment)
+            if (this.ItemType != ItemConstants.ItemType.Equipment)
             {
                 throw new InvalidOperationException("Can only equip equipment items.");
             }
@@ -810,9 +810,9 @@ namespace Destiny.Maple
 
         public void Unequip(short destinationSlot = 0)
         {
-            if (this.Type != ItemConstants.ItemType.Equipment)
+            if (this.ItemType != ItemConstants.ItemType.Equipment)
             {
-                throw new InvalidOperationException("Cna only unequip equipment items.");
+                throw new InvalidOperationException("Can only unequip equipment items.");
             }
 
             short sourceSlot = this.Slot;
@@ -915,10 +915,10 @@ namespace Destiny.Maple
         {
             short sourceSlot = this.Slot;
 
-            Item destination = this.Parent[this.Type, destinationSlot];
+            Item destination = this.Parent[this.ItemType, destinationSlot];
 
             if (destination != null &&
-                this.Type != ItemConstants.ItemType.Equipment &&
+                this.ItemType != ItemConstants.ItemType.Equipment &&
                 this.MapleID == destination.MapleID &&
                 !this.IsRechargeable &&
                 destination.Quantity < destination.MaxPerStack)
@@ -1006,7 +1006,7 @@ namespace Destiny.Maple
                         slot -= 100;
                     }
 
-                    if (this.Type == ItemConstants.ItemType.Equipment)
+                    if (this.ItemType == ItemConstants.ItemType.Equipment)
                     {
                         oPacket.WriteShort(slot);
                     }
@@ -1017,7 +1017,7 @@ namespace Destiny.Maple
                 }
 
                 oPacket
-                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemConstants.ItemType.Equipment ? 1 : 2))
+                    .WriteByte((byte)(this.PetID != null ? 3 : this.ItemType == ItemConstants.ItemType.Equipment ? 1 : 2))
                     .WriteInt(this.MapleID)
                     .WriteBool(this.IsCash);
 
@@ -1032,7 +1032,7 @@ namespace Destiny.Maple
                 {
 
                 }
-                else if (this.Type == ItemConstants.ItemType.Equipment)
+                else if (this.ItemType == ItemConstants.ItemType.Equipment)
                 {
                     oPacket
                         .WriteByte(this.UpgradesAvailable)

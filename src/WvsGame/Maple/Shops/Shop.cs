@@ -1,7 +1,8 @@
-﻿using Destiny.Data;
+﻿using System.Collections.Generic;
+
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -119,7 +120,7 @@ namespace Destiny.Maple.Shops
                             price = item.PurchasePrice * quantity;
                         }
 
-                        if (customer.Items.SpaceTakenByItem(purchase) > customer.Items.GetRemainingSlots(purchase.Type))
+                        if (customer.Items.SpaceTakenByItem(purchase) > customer.Items.GetRemainingSlots(purchase.ItemType))
                         {
                             Character.Notify(customer, "Your inventory is full.", ServerConstants.NoticeType.Popup);
                         }

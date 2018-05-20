@@ -8,8 +8,9 @@ using Destiny.Data;
 using Destiny.Interoperability;
 using Destiny.IO;
 using Destiny.Maple;
+using Destiny.Network;
 
-namespace Destiny.Network
+namespace Destiny
 {
     public static class WvsLogin
     {
@@ -18,7 +19,7 @@ namespace Destiny.Network
         public static ManualResetEvent CenterConnectionDone = new ManualResetEvent(false);
 
         public static TcpListener Listener { get; private set; }
-        public static CenterServer CenterConnection { get; set; }
+        public static LoginToCenterServer CenterConnection { get; set; }
         public static Worlds Worlds { get; private set; }
         public static LoginClients Clients { get; private set; }
 
@@ -95,7 +96,7 @@ namespace Destiny.Network
             if (WvsLogin.IsAlive)
             {
                 WvsLogin.CenterConnectionDone.Reset();
-                new Thread(new ThreadStart(CenterServer.Main)).Start();
+                new Thread(new ThreadStart(LoginToCenterServer.Main)).Start();
                 WvsLogin.CenterConnectionDone.WaitOne();
             }
             else

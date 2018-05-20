@@ -80,7 +80,7 @@ namespace Destiny.Maple.Characters
                     else
                     {
                         item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
-                        item.Slot = this.GetNextFreeSlot(item.Type);
+                        item.Slot = this.GetNextFreeSlot(item.ItemType);
 
                         loopItem.Quantity = loopItem.MaxPerStack;
 
@@ -100,7 +100,7 @@ namespace Destiny.Maple.Characters
 
             if ((this.Parent.IsInitialized && item.Slot == 0) || forceGetSlot)
             {
-                item.Slot = this.GetNextFreeSlot(item.Type);
+                item.Slot = this.GetNextFreeSlot(item.ItemType);
             }
 
             this.Items.Add(item);
@@ -264,7 +264,7 @@ namespace Destiny.Maple.Characters
 
             foreach (Item item in this)
             {
-                if (item.Type == type)
+                if (item.ItemType == type)
                 {
                     count++;
                 }
@@ -279,7 +279,7 @@ namespace Destiny.Maple.Characters
 
             foreach (Item item in this)
             {
-                if (item.Type == type)
+                if (item.ItemType == type)
                 {
                     remaining--;
                 }
@@ -926,7 +926,7 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        ((Item)drop).Slot = this.GetNextFreeSlot(((Item)drop).Type); // TODO: Check for inv. full. 
+                        ((Item)drop).Slot = this.GetNextFreeSlot(((Item)drop).ItemType); // TODO: Check for inv. full. 
                         this.AddItemToInventory((Item)drop, true);
                     }
 
@@ -969,7 +969,7 @@ namespace Destiny.Maple.Characters
             {
                 foreach (Item item in this)
                 {
-                    if (item.Type == type && item.Slot == slot)
+                    if (item.ItemType == type && item.Slot == slot)
                     {
                         return item;
                     }
@@ -1001,7 +1001,7 @@ namespace Destiny.Maple.Characters
             {
                 foreach (Item item in this)
                 {
-                    if (item.Slot == slot && item.Type == Item.GetType(mapleId))
+                    if (item.Slot == slot && item.ItemType == Item.GetType(mapleId))
                     {
                         return item;
                     }
@@ -1017,7 +1017,7 @@ namespace Destiny.Maple.Characters
             {
                 foreach (Item loopItem in this.Items)
                 {
-                    if (loopItem.Type == type && !loopItem.IsEquipped)
+                    if (loopItem.ItemType == type && !loopItem.IsEquipped)
                     {
                         yield return loopItem;
                     }
@@ -1109,7 +1109,7 @@ namespace Destiny.Maple.Characters
 
             foreach (Item loopItem in items)
             {
-                spaceCount[loopItem.Type] += this.SpaceTakenByItem(loopItem, autoMerge);
+                spaceCount[loopItem.ItemType] += this.SpaceTakenByItem(loopItem, autoMerge);
             }
 
             foreach (KeyValuePair<ItemConstants.ItemType, int> loopSpaceCount in spaceCount)
@@ -1201,4 +1201,3 @@ namespace Destiny.Maple.Characters
         }
     }
 }
-

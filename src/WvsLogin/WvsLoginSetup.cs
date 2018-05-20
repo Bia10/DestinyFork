@@ -1,15 +1,20 @@
-﻿using Destiny.Data;
-using Destiny.IO;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
+
 using System;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
+
+using Destiny.Data;
+using Destiny.IO;
 using Destiny.Constants;
 
 namespace Destiny
 {
     internal static class WvsLoginSetup
     {
+        private const string LoginDBFileName = @"..\..\sql\LoginDB.sql";
+
         private static string databaseHost = string.Empty;
         private static string databaseSchema = string.Empty;
         private static string databaseUsername = string.Empty;
@@ -44,13 +49,27 @@ namespace Destiny
                     Log.SkipLine();
                     Log.Success("Connection to login database was tested and is ready to be populated with data!");
                     Log.SkipLine();
+                    Log.Inform("The setup will now check for a Login server database(LoginDB).");
+                    Log.Inform("It is assumed that the file for creation of Login server database(LoginDB) is present at path: " + LoginDBFileName);
+                    Log.SkipLine();
 
                     if (Log.YesNo("Populate the " + databaseSchema + " as your login server database? ", true))
                     {
                         Log.SkipLine();
-                        Log.Inform("Please wait...");
-                        PopulateDatabase();
-                        Log.Inform("Done populating login database '{0}'!", databaseSchema);
+                        Log.Inform("Please wait, trying to populate Login server DB...");
+
+                        if (PopulateDatabase())
+                        {
+                            Log.Inform("Done populating login database '{0}'!", databaseSchema);
+                        }
+                        else
+                        {
+                            Log.SkipLine();
+                            Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
+                            Console.ReadLine();
+                            Environment.Exit(-1);
+                        }
+
                     }
                 }
             }
@@ -252,59 +271,30 @@ namespace Destiny
             Log.Success("Configuration is done! Login server set up for use successfully.");
         }
 
-        private static void PopulateDatabase()
+        private static bool PopulateDatabase()
         {
-            Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-                            CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-                            USE `{0}`;
+            try
+            {                
+                //read sql script from file
+                string script = File.ReadAllText(LoginDBFileName);
+                //regexp {0} for databaseSchema
+                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                //execute script
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed,
+                    databaseSchema))
+                {
+                    return true;
+                }
+                return false;
+            }
 
-					        DROP TABLE IF EXISTS `accounts`;
-                            CREATE TABLE `accounts` (
-                              `ID` int(10) NOT NULL AUTO_INCREMENT,
-                              `Username` varchar(12) NOT NULL,
-                              `Password` varchar(128) NOT NULL,
-                              `Salt` varchar(32) NOT NULL,
-                              `EULA` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-                              `Gender` tinyint(3) UNSIGNED NOT NULL DEFAULT '10',
-                              `Pin` varchar(64) NOT NULL DEFAULT '',
-                              `Pic` varchar(64) NOT NULL DEFAULT '',
-                              `IsBanned` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-                              `IsMaster` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-                              `Birthday` date NOT NULL,
-                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              `MaxCharacters` int(11) NOT NULL DEFAULT '3',
-                               PRIMARY KEY (`ID`)
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-							  DROP TABLE IF EXISTS `banned_ip`;
-                            CREATE TABLE `banned_ip` (
-                              `Address` varchar(15) NOT NULL
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-							     DROP TABLE IF EXISTS `banned_mac`;
-                            CREATE TABLE `banned_mac` (
-                              `Address` varchar(17) NOT NULL
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-                            DROP TABLE IF EXISTS `master_ip`;
-                            CREATE TABLE `master_ip` (
-                              `IP` varchar(15) NOT NULL
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-                            ALTER TABLE `accounts`
-                              ADD KEY `username` (`Username`) USING BTREE;
-
-                            ALTER TABLE `banned_ip`
-                              ADD PRIMARY KEY (`Address`);
-
-                            ALTER TABLE `banned_mac`
-                              ADD PRIMARY KEY (`Address`);
-
-                            ALTER TABLE `master_ip`
-                              ADD PRIMARY KEY (`IP`);
-
-							INSERT INTO master_ip VALUES ('127.0.0.1');
-						", databaseSchema);
+            catch (Exception ex)
+            {
+                Log.SkipLine();
+                Log.Error(ex);
+                Log.SkipLine();
+                return false;
+            }
         }
     }
 }

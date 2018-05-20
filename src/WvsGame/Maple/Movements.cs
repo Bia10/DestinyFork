@@ -1,11 +1,11 @@
-﻿using Destiny.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
+using Destiny.IO;
 using Destiny.Constants;
 using Destiny.Network.Common;
 
 namespace Destiny.Maple
 {
-
     public sealed class Movement
     {
         public MapConstants.MovementType Type { get; set; }

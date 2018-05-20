@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 
 using Destiny.Data;
 using Destiny.IO;
@@ -51,13 +52,13 @@ namespace Destiny
                     Log.Success("Connection to game database was tested and is ready to be populated with data!");
                     Log.SkipLine();
                     Log.Inform("The setup will now check for a Game server database(GameDB).");
-                    Log.Inform("It is assumed that the file for creation of Game server database(GameDB) is present at path: " + GameDBFileName + "");
+                    Log.Inform("It is assumed that the file for creation of Game server database(GameDB) is present at path: " + GameDBFileName);
                     Log.SkipLine();
 
                     if (Log.YesNo("Populate the " + databaseSchema + " database as your game server DB? ", true))
                     {
                         Log.SkipLine();
-                        Log.Inform("Please wait..., trying to populate game server DB");
+                        Log.Inform("Please wait, trying to populate Game server DB...");
 
                         if (PopulateGameDatabase())
                         {
@@ -67,7 +68,7 @@ namespace Destiny
                         {
                             Log.SkipLine();
                             Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
-                            Console.ReadLine(); // console wait for enter to exit
+                            Console.ReadLine();
                             Environment.Exit(-1);
                         }
                     }
@@ -85,7 +86,7 @@ namespace Destiny
                     try
                     {
                         Log.SkipLine();
-                        Log.Inform("Please wait..., trying to populate game server DB.");
+                        Log.Inform("Please wait, trying to populate game server DB.");
 
                         if (PopulateGameDatabase())
                         {
@@ -268,8 +269,12 @@ namespace Destiny
         {
             try
             {
-                if (Database.ExecuteFile(databaseHost, databaseUsername, databasePassword,
-                    Application.ExecutablePath + McDBFileName))
+                //read sql script from file
+                string script = File.ReadAllText(McDBFileName);
+                //regexp {0} for databaseSchema
+                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                //execute script
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed, databaseSchema))
                 {
                     return true;
                 }
@@ -291,12 +296,16 @@ namespace Destiny
         {
             try
             {
-                if (Database.ExecuteFile(databaseHost, databaseUsername, databasePassword,
-                Application.ExecutablePath + GameDBFileName))
+                //read script from file
+                string script = File.ReadAllText(GameDBFileName);
+                //regexp {0} for databaseSchema
+                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                //execute script
+                if (Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed, databaseSchema))
                 {
                     return true;
                 }
-            return false;
+                return false;
             }
 
             catch (Exception ex)

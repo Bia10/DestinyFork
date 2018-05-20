@@ -277,9 +277,13 @@ namespace Destiny.Data
             return command;
         }
 
-        public static string ParameterizeCommandText(string namePrefix, string commandText, params object[] args) // TODO: rework fugly
+        public static string ParameterizeCommandText(string namePrefix, string commandText, params object[] args) 
         {
-            return commandText != null ? string.Format(commandText, args?.Select((v, i) => "@" + namePrefix + i).ToArray()) : string.Empty;
+            if (namePrefix == null) return string.Empty;
+            if (commandText == null) return string.Empty;
+            if (args == null) return string.Empty;
+
+            return string.Format(commandText, args.Select((v, i) => "@" + namePrefix + i).ToArray()); 
         }
 
         public static MySqlParameter[] ConstraintsToParameters(string namePrefix, string constraints, params object[] args)

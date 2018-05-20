@@ -1,14 +1,15 @@
-﻿using Destiny.Data;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+
+using Destiny.Data;
 using Destiny.Interoperability;
 using Destiny.IO;
 using Destiny.Maple.Data;
 using Destiny.Network;
 using Destiny.Shell;
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 
 namespace Destiny
 {
@@ -21,7 +22,7 @@ namespace Destiny
 
         public static TcpListener Listener { get; private set; }
         public static IPEndPoint RemoteEndPoint { get; set; }
-        public static CenterServer CenterConnection { get; set; }
+        public static GameToCenterServer CenterConnection { get; set; }
         public static GameClients Clients { get; private set; }
         public static int AutoRestartTime { get; set; }
 
@@ -71,44 +72,105 @@ namespace Destiny
             }
         }
 
+        private static void InitiateGameServerSetup()
+        {
+            Log.SkipLine();
+            Log.Inform("Initiating Destiny game server setup ...");
+            WvsGameSetup.Run();
+        }
+
+        private static void HaltOnFatalError()
+        {
+            Log.SkipLine();
+            Log.Error("Fatal error occurred cannot proceed, press ENTER to exit!");
+            Console.ReadLine(); // console wait for enter to exit
+            Environment.Exit(-1);
+        }
+
+        private static void CloseGameServer()
+        {
+            // Disconnect clients
+            foreach (GameClient client in WvsGame.Clients)
+            {
+                client.Stop();
+            }
+
+            // Dispose from thread
+            WvsGame.Dispose();
+
+            // Inform user
+            Log.SkipLine();
+            Log.Warn("Server stopped.");
+            Log.SkipLine();
+        }
+
         [STAThread]
         private static void Main(string[] args)
         {
-            if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "WvsGame.ini"))
+            if (args.Length > 0 && args[0].ToLower() == "setup")
             {
-                WvsGameSetup.Run();
+                InitiateGameServerSetup();
             }
 
-            start:
+            if (args.Length > 0 && args[0].ToLower() != "setup")
+            {
+                Log.Warn("Arguments found yet none were recognized! Arguments: " + args);
+
+                HaltOnFatalError();
+            }
+
+            if (!File.Exists(Application.ExecutablePath + "WvsGame.ini"))
+            {
+                Log.Warn("Could not find file WvsGame.ini at path: {0}", Application.ExecutablePath);
+
+                if (Log.YesNo("Would you like to initiate setup process for Destiny game server? ", true))
+                {
+                    InitiateGameServerSetup();
+                }
+                else
+                {
+                    Log.Warn("\n Argument setup was not found!" +
+                             "\n Neither was found WvsGame.ini!" +
+                             "\n And finally you chose not to setup game server!" +
+                             "\n What shall i do then? Make a prophecy about your intent?");
+
+                    HaltOnFatalError();
+                }
+            }
+          
+            start: 
             WvsGame.Clients = new GameClients();
 
             Log.Entitle("WvsGame v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
             try
             {
-                Settings.Initialize(Application.ExecutablePath + "WvsGame.ini");
-
+                // Read game-server settings from WvsGame.ini
+                Settings.Initialize(Application.ExecutablePath + "WvsGame.ini"); 
+                // Test connection to database
                 Database.Test();
+                // Parse thru MaplestoryDB
                 Database.Analyze(true);
-
+                // Create shortcut ??
                 Shortcuts.Apply();
-
+                // Set auto-reset
                 WvsGame.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
                 Log.Inform("Automatic restart time set to {0} seconds.", WvsGame.AutoRestartTime);
-
+                // Initiate data handler
                 DataProvider.Initialize();
-
+                // Success game-server is alive! 
                 WvsGame.IsAlive = true;
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                Log.SkipLine();
+                Tracer.TraceErrorMessage(ex, "Exception occurred during game-server initialization!");
             }
 
             if (WvsGame.IsAlive)
             {
                 WvsGame.CenterConnectionDone.Reset();
-                new Thread(new ThreadStart(CenterServer.Main)).Start();
+                new Thread(new ThreadStart(GameToCenterServer.Main)).Start();
                 WvsGame.CenterConnectionDone.WaitOne();
 #if DEBUG
                 string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");
@@ -122,7 +184,7 @@ namespace Destiny
             }
             else
             {
-                Log.Inform("Could not start server because of errors.");
+                HaltOnFatalError();
             }
 
             while (WvsGame.IsAlive)
@@ -132,17 +194,9 @@ namespace Destiny
                 WvsGame.AcceptDone.WaitOne();
             }
 
-            foreach (GameClient client in WvsGame.Clients)
-            {
-                client.Stop();
-            }
+            CloseGameServer();
 
-            WvsGame.Dispose();
-            Log.SkipLine();
-            Log.Warn("Server stopped.");
-            Log.SkipLine();
-
-            if (WvsGame.AutoRestartTime > 0)
+            if (WvsGame.AutoRestartTime > 0) // TODO: fugly rework
             {
                 Log.Inform("Attempting auto-restart in {0} seconds.", WvsGame.AutoRestartTime);
                 Thread.Sleep(WvsGame.AutoRestartTime * 1000);

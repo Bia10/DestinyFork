@@ -82,7 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interoperability\CenterServer.cs" />
+    <Compile Include="Interoperability\GameToCenterServer.cs" />
     <Compile Include="Maple\Account.cs" />
     <Compile Include="Maple\Attack.cs" />
     <Compile Include="Maple\Buff.cs" />

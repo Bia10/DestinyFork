@@ -112,7 +112,7 @@ namespace Destiny.Maple.Characters
                         }
 
                         // Do i actually have free inventory slot to place withdrawn item in?
-                        if (this.Parent.Items.IsInventoryFull(item.Type))
+                        if (this.Parent.Items.IsInventoryFull(item.ItemType))
                         {
                             this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorPlayerInventoryFull));
                             return;

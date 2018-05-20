@@ -1,8 +1,9 @@
-﻿using Destiny.Data;
+﻿using System;
+using System.Data;
+
+using Destiny.Data;
 using Destiny.IO;
 using Destiny.Network;
-using System;
-using System.Data;
 using Destiny.Constants;
 
 namespace Destiny.Maple
@@ -64,20 +65,21 @@ namespace Destiny.Maple
         
         public void Save()
         {
-            Datum datum = new Datum("accounts");
+            Datum datum = new Datum("accounts") {
+                ["Username"] = this.Username,
+                ["Password"] = this.Password,
+                ["Salt"] = this.Salt,
+                ["EULA"] = this.EULA,
+                ["Gender"] = (byte) this.Gender,
+                ["Pin"] = this.Pin,
+                ["Pic"] = this.Pic,
+                ["IsBanned"] = this.IsBanned,
+                ["IsMaster"] = this.IsMaster,
+                ["Birthday"] = this.Birthday,
+                ["Creation"] = this.Creation,
+                ["MaxCharacters"] = this.MaxCharacters
+            };
 
-            datum["Username"] = this.Username;
-            datum["Password"] = this.Password;
-            datum["Salt"] = this.Salt;
-            datum["EULA"] = this.EULA;
-            datum["Gender"] = (byte)this.Gender;
-            datum["Pin"] = this.Pin;
-            datum["Pic"] = this.Pic;
-            datum["IsBanned"] = this.IsBanned;
-            datum["IsMaster"] = this.IsMaster;
-            datum["Birthday"] = this.Birthday;
-            datum["Creation"] = this.Creation;
-            datum["MaxCharacters"] = this.MaxCharacters;
 
             if (this.Assigned)
             {

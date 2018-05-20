@@ -672,38 +672,39 @@ namespace Destiny.Maple.Characters
                 this.SpawnPoint = this.ClosestSpawnPoint.ID;
             }
 
-            Datum datum = new Datum("characters");
+            Datum datum = new Datum("characters") {
+                ["AccountID"] = this.AccountID,
+                ["WorldID"] = this.WorldID,
+                ["Name"] = this.Name,
+                ["Gender"] = (byte) this.Gender,
+                ["Skin"] = this.Skin,
+                ["Face"] = this.Face,
+                ["Hair"] = this.Hair,
+                ["Level"] = this.Level,
+                ["Job"] = (short) this.Job,
+                ["Strength"] = this.Strength,
+                ["Dexterity"] = this.Dexterity,
+                ["Intelligence"] = this.Intelligence,
+                ["Luck"] = this.Luck,
+                ["Health"] = this.Health,
+                ["MaxHealth"] = this.MaxHealth,
+                ["Mana"] = this.Mana,
+                ["MaxMana"] = this.MaxMana,
+                ["AbilityPoints"] = this.AbilityPoints,
+                ["SkillPoints"] = this.SkillPoints,
+                ["Experience"] = this.Experience,
+                ["Fame"] = this.Fame,
+                ["MapID"] = this.Map.MapleID,
+                ["SpawnPoint"] = this.SpawnPoint,
+                ["Meso"] = this.Meso,
+                ["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment],
+                ["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable],
+                ["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup],
+                ["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera],
+                ["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash]
+            };
 
-            datum["AccountID"] = this.AccountID;
-            datum["WorldID"] = this.WorldID;
-            datum["Name"] = this.Name;
-            datum["Gender"] = (byte)this.Gender;
-            datum["Skin"] = this.Skin;
-            datum["Face"] = this.Face;
-            datum["Hair"] = this.Hair;
-            datum["Level"] = this.Level;
-            datum["Job"] = (short)this.Job;
-            datum["Strength"] = this.Strength;
-            datum["Dexterity"] = this.Dexterity;
-            datum["Intelligence"] = this.Intelligence;
-            datum["Luck"] = this.Luck;
-            datum["Health"] = this.Health;
-            datum["MaxHealth"] = this.MaxHealth;
-            datum["Mana"] = this.Mana;
-            datum["MaxMana"] = this.MaxMana;
-            datum["AbilityPoints"] = this.AbilityPoints;
-            datum["SkillPoints"] = this.SkillPoints;
-            datum["Experience"] = this.Experience;
-            datum["Fame"] = this.Fame;
-            datum["MapID"] = this.Map.MapleID;
-            datum["SpawnPoint"] = this.SpawnPoint;
-            datum["Meso"] = this.Meso;
 
-            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment];
-            datum["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable];
-            datum["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup];
-            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera];
-            datum["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash];
 
             if (this.Assigned)
             {
@@ -1116,14 +1117,13 @@ namespace Destiny.Maple.Characters
         private const sbyte BumpDamage = -1;
         private const sbyte MapDamage = -2;
 
-        // NOTE: DamageHandler()
         // TODO: Separate incoming packetHanndler from validation and processing
-        public void Damage(Packet iPacket)
+        public void DamageHandler(Packet inPacket)
         {
-            iPacket.Skip(4); // NOTE: Ticks.
-            sbyte type = (sbyte)iPacket.ReadByte();
-            iPacket.ReadByte(); // NOTE: Elemental type.
-            int damage = iPacket.ReadInt();
+            inPacket.Skip(4); // NOTE: Ticks.
+            sbyte type = (sbyte)inPacket.ReadByte();
+            inPacket.ReadByte(); // NOTE: Elemental type.
+            int damage = inPacket.ReadInt();
             bool damageApplied = false;
             bool deadlyAttack = false;
             byte hit = 0;
@@ -1136,8 +1136,8 @@ namespace Destiny.Maple.Characters
 
             if (type != MapDamage)
             {
-                mobID = iPacket.ReadInt();
-                int mobObjectID = iPacket.ReadInt();
+                mobID = inPacket.ReadInt();
+                int mobObjectID = inPacket.ReadInt();
                 Mob mob;
 
                 try
@@ -1160,9 +1160,9 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            hit = iPacket.ReadByte();
-            byte reduction = iPacket.ReadByte();
-            iPacket.ReadByte(); // NOTE: Unknown.
+            hit = inPacket.ReadByte();
+            byte reduction = inPacket.ReadByte();
+            inPacket.ReadByte(); // NOTE: Unknown.
 
             if (reduction != 0)
             {
@@ -1171,12 +1171,12 @@ namespace Destiny.Maple.Characters
 
             if (type == MapDamage)
             {
-                level = iPacket.ReadByte();
-                disease = iPacket.ReadInt();
+                level = inPacket.ReadByte();
+                disease = inPacket.ReadInt();
             }
             else
             {
-                stance = iPacket.ReadByte();
+                stance = inPacket.ReadByte();
 
                 if (stance > 0)
                 {
@@ -1424,10 +1424,10 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void DropMeso(Packet iPacket) // NOTE: DropMesoHandler()
+        public void DropMesoHandler(Packet inPacket)
         {
-            iPacket.Skip(4); // NOTE: tRequestTime (ticks). // TODO: validate request by time
-            int amount = iPacket.ReadInt();
+            inPacket.Skip(4); // NOTE: tRequestTime (ticks). // TODO: validate request by time
+            int amount = inPacket.ReadInt();
 
             // TODO: add this to settings
             const int MIN_LIMIT = 10;
@@ -1499,20 +1499,20 @@ namespace Destiny.Maple.Characters
 
         // TODO: Should we refactor it in a way that sends it to the buddy/party/guild objects
         // instead of pooling the world for characters?
-        public void MultiTalk(Packet iPacket)
+        public void MultiTalkHandler(Packet inPacket)
         {
-            SocialConstants.MultiChatType type = (SocialConstants.MultiChatType)iPacket.ReadByte();
-            byte count = iPacket.ReadByte();
+            SocialConstants.MultiChatType type = (SocialConstants.MultiChatType)inPacket.ReadByte();
+            byte count = inPacket.ReadByte();
 
             List<int> recipients = new List<int>();
 
             while (count-- > 0)
             {
-                int recipientID = iPacket.ReadInt();
+                int recipientID = inPacket.ReadInt();
                 recipients.Add(recipientID);
             }
 
-            string text = iPacket.ReadString();
+            string text = inPacket.ReadString();
 
             switch (type)
             {

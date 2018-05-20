@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Destiny.Network.WvsLogin</StartupObject>
+    <StartupObject>Destiny.WvsLogin</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -82,7 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interoperability\CenterServer.cs" />
+    <Compile Include="Interoperability\LoginToCenterServer.cs" />
     <Compile Include="Maple\Account.cs" />
     <Compile Include="Maple\Channel.cs" />
     <Compile Include="Maple\NoAccountException.cs" />

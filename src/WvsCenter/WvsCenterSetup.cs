@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 using Destiny.Data;
 using Destiny.IO;
@@ -10,6 +11,8 @@ namespace Destiny
 {
     public static class WvsCenterSetup
     {
+        private const string CenterDBFileName = @"..\..\sql\CenterDB.sql";
+
         private static string databaseHost = string.Empty;
         private static string databaseSchema = string.Empty;
         private static string databaseUsername = string.Empty;
@@ -56,7 +59,7 @@ namespace Destiny
                     try
                     {
                         Log.SkipLine();
-                        Log.Inform("Please wait...");
+                        Log.Inform("Please wait, trying to populate Center server DB...");
                         PopulateCenterDatabase();
                         Log.Inform("Database '{0}' created.", databaseSchema);
                     }
@@ -91,7 +94,10 @@ namespace Destiny
             Log.Success("Center Server configured!");
 
             Log.Entitle("User Profile Setup");
-            Log.Inform("Please choose what detail of debug information you want to display.\n  A. Hide packets (recommended)[Default]\n  B. Show names\n  C. Show hex content (expert usage, spam)");
+            Log.Inform("Please choose what detail of debug information you want to display." +
+                       "\n A. Hide packets (recommended)[Default]" +
+                       "\n B. Show names" +
+                       "\n C. Show hex content (expert usage, spam)");
             Log.SkipLine();
 
             LogLevel logLevel;
@@ -151,11 +157,23 @@ namespace Destiny
 
         private static void PopulateCenterDatabase()
         {
-            Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-							CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-                            USE `{0}`;
-                            ", databaseSchema);
-        }
+            try
+            {
+                //read script from file
+                string script = File.ReadAllText(CenterDBFileName);
+                //regexp {0} for databaseSchema
+                string scripModed = Regex.Replace(script, "{0}", databaseSchema);
+                //execute script
+                Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scripModed,
+                    databaseSchema);
+            }
 
+            catch (Exception ex)
+            {
+                Log.SkipLine();
+                Log.Error(ex);
+                Log.SkipLine();
+            }
+        }
     }
 }

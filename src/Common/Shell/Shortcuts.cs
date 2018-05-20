@@ -25,12 +25,22 @@ namespace Destiny.Shell
 
                 jumpList.Apply();
 
-                if (System.Windows.Application.Current == null)
+                if (System.Windows.Application.Current != null)
                 {
-                    var newApplication = new System.Windows.Application();
+                    JumpList.SetJumpList(System.Windows.Application.Current, jumpList);
                 }
 
-                JumpList.SetJumpList(System.Windows.Application.Current, jumpList);
+                else if (System.Windows.Application.Current == null)
+                {
+                    var newApplication = new System.Windows.Application();
+                    JumpList.SetJumpList(newApplication, jumpList);
+                }
+
+                else
+                {
+                    Log.SkipLine();
+                    Tracer.TraceErrorMessage("Application not found!");
+                }
             }
         }
     }
