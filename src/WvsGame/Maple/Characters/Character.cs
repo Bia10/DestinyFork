@@ -764,6 +764,11 @@ namespace Destiny.Maple.Characters
             character.Client.Send(CharacterPackets.BroadcastMessage(type, message));
         }
 
+        public Character GetCharacterByName(string name)
+        {
+            return Name == name ? this : null;
+        }
+
         public void ChangeMapHandler(Packet inPacket)
         {
             byte portals = inPacket.ReadByte();
@@ -1942,11 +1947,11 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            if (false) // TODO: Check if portal is onlyOnce and player already used it.
+            /*if (false) // TODO: Check if portal is onlyOnce and player already used it.
             {
                 // TODO: Send a "closed for now" portal message.
                 return;
-            }
+            }*/
 
             try
             {
@@ -2006,9 +2011,9 @@ namespace Destiny.Maple.Characters
                 result = CharacterConstants.ReportResult.Success;
             }
             else
-            {
+            /*{
                 result = CharacterConstants.ReportResult.Max10TimesADay;
-            }
+            }*/
 
             using (Packet oPacket = new Packet(ServerOperationCode.SueCharacterResult))
             {

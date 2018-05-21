@@ -7,7 +7,7 @@ namespace Destiny.Network.PacketFactory
 {
     public class CharacterTrocksPackets : PacketFactoryManager
     {
-        public static Packet TrockInventoryUpdate(ItemConstants.TrockInventoryAction action, ItemConstants.TrockType type)
+        public static Packet TrockInventoryUpdate(ItemConstants.TrockMapAction action, ItemConstants.TrockType type)
         {
             Packet trockInventoryUpdatePacket = new Packet(ServerOperationCode.MapTransferResult);
 

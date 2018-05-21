@@ -100,12 +100,12 @@ namespace Destiny.Maple.Characters
 
         public void UpdateTrockHandler(Packet inPacket)
         {
-            ItemConstants.TrockInventoryAction action = (ItemConstants.TrockInventoryAction)inPacket.ReadByte();
+            ItemConstants.TrockMapAction action = (ItemConstants.TrockMapAction)inPacket.ReadByte();
             ItemConstants.TrockType type = (ItemConstants.TrockType)inPacket.ReadByte();
 
             switch (action)
             {
-                case ItemConstants.TrockInventoryAction.RemoveTrock:
+                case ItemConstants.TrockMapAction.RemoveMapTrock:
                     {
                         int mapID = inPacket.ReadInt();
 
@@ -129,30 +129,31 @@ namespace Destiny.Maple.Characters
                     }
                         break;
 
-                case ItemConstants.TrockInventoryAction.AddTrock:
+                case ItemConstants.TrockMapAction.AddMapTrock:
                     {
                         int mapID = TrockParent.Map.MapleID;
 
-                        // TODO: Check if the map field limits allow trocks (e.g. Maple Island is forbidden).
-
-                        if (true)
+                        if (this.TrockParent.Map.FieldLimit != (int)MapConstants.FieldLimit.CannotUseVIPTrock)
                         {
                             switch (type)
                             {
                                 case ItemConstants.TrockType.Regular:
+                                    if (RegularTrocks.Contains(mapID)) return;
+
                                     RegularTrocks.Add(mapID);
                                     break;
 
                                 case ItemConstants.TrockType.VIP:
+                                    if (VIPTrocks.Contains(mapID)) return;
+
                                     VIPTrocks.Add(mapID);
                                     break;
                             }
                         }
-
-                        /*else
+                        else
                         {
-                            return;
-                        }*/
+                            Character.Notify(TrockParent, "[TrockHandler] This map cannot be added to teleport rock!");
+                        }
                     }
                     break;
 
@@ -198,7 +199,7 @@ namespace Destiny.Maple.Characters
             {
                 string targetName = inPacket.ReadString();
 
-                Character target = null; // TrockParent.Client.Channel.Characters.GetCharacter(targetName);
+                Character target = TrockParent.GetCharacterByName(targetName);
 
                 if (target == null)
                 {
@@ -229,10 +230,10 @@ namespace Destiny.Maple.Characters
                 {
                     result = ItemConstants.TrockResult.AlreadyThere;
                 }
-                else if (false) // TODO: Continent check.
+                /*else if (false) // TODO: Continent check.
                 {
                     result = ItemConstants.TrockResult.CannotGo;
-                }
+                }*/
             }
             
             if (result == ItemConstants.TrockResult.Success)
