@@ -16,7 +16,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(fromDrop)
                 .WriteByte(1)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.AddItem)
-                .WriteByte((byte)item.Type)
+                .WriteByte((byte)item.ItemType)
                 .WriteShort(item.Slot)
                 .WriteBytes(item.ToByteArray(true)); // item data
 
@@ -33,7 +33,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(fromDrop)
                 .WriteByte(1)
                 .WriteByte((byte) ItemConstants.InventoryOperationType.RemoveItem)
-                .WriteByte((byte) item.Type)
+                .WriteByte((byte) item.ItemType)
                 .WriteShort(item.Slot);
 
             return removeItemFromInventoryPacket;

@@ -15,7 +15,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(1)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                .WriteByte((byte)item.Type)
+                .WriteByte((byte)item.ItemType)
                 .WriteShort(item.Slot)
                 .WriteShort(item.Quantity);
 
@@ -30,7 +30,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(1)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
-                .WriteByte((byte)item.Type)
+                .WriteByte((byte)item.ItemType)
                 .WriteShort(sourceSlot)
                 .WriteShort(destinationSlot)
                 .WriteByte(1);
@@ -46,7 +46,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(1)
                 .WriteByte((byte) ItemConstants.InventoryOperationType.ModifySlot)
-                .WriteByte((byte) item.Type)
+                .WriteByte((byte) item.ItemType)
                 .WriteShort(sourceSlot)
                 .WriteShort(destinationSlot);
 
@@ -61,7 +61,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(1)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
-                .WriteByte((byte)item.Type)
+                .WriteByte((byte)item.ItemType)
                 .WriteShort(item.Slot);
 
                 if (item.IsEquipped)
@@ -80,7 +80,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(1)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                .WriteByte((byte)item.Type)
+                .WriteByte((byte)item.ItemType)
                 .WriteShort(item.Slot)
                 .WriteShort(item.Quantity);
 
@@ -95,11 +95,11 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(2)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                .WriteByte((byte)itemFirst.Type)
+                .WriteByte((byte)itemFirst.ItemType)
                 .WriteShort(itemFirst.Slot)
                 .WriteShort(itemFirst.Quantity)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                .WriteByte((byte)itemSecond.Type)
+                .WriteByte((byte)itemSecond.ItemType)
                 .WriteShort(itemSecond.Slot)
                 .WriteShort(itemSecond.Quantity);
 
@@ -114,10 +114,10 @@ namespace Destiny.Network.PacketFactory
                 .WriteBool(true)
                 .WriteByte(2)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
-                .WriteByte((byte)itemFirst.Type)
+                .WriteByte((byte)itemFirst.ItemType)
                 .WriteShort(itemFirst.Slot)
                 .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                .WriteByte((byte)itemSecond.Type)
+                .WriteByte((byte)itemSecond.ItemType)
                 .WriteShort(itemSecond.Slot)
                 .WriteShort(itemSecond.Quantity);
 
