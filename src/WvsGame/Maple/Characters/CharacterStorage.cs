@@ -128,12 +128,20 @@ namespace Destiny.Maple.Characters
 
                         if (this.Parent.Meso >= costToWithdraw)
                         {
-                            Maple.Meso.giveMesos(this.Parent, costToWithdraw); // Devour mesos       
+                            // Devour character mesos   
+                            Maple.Meso.giveMesos(this.Parent, costToWithdraw);     
 
-                            this.Items.Remove(item); // Remove item from storage
-                            item.Delete(); // Delete item from Database
-                            item.IsStored = false; // Set stored flag to false
-                            this.Parent.Items.AddItemToInventory(item, forceGetSlot: true); // Add item to char. items
+                            // Remove item from storage
+                            this.Items.Remove(item); 
+
+                            // Delete item from Database
+                            Item.DeleteItemFromDB(item); 
+
+                            // Set stored flag to false
+                            item.IsStored = false; 
+
+                            // Add item to char. items
+                            this.Parent.Items.AddItemToInventory(item, forceGetSlot: true); 
 
                             // routine to get count of items of same type
                             List<Item> itemsByType = new List<Item>();
@@ -177,14 +185,23 @@ namespace Destiny.Maple.Characters
 
                         if (this.Parent.Meso >= this.Npc.StorageCost)
                         {
-                            this.Parent.Meso -= this.Npc.StorageCost; //devour mesos
-                            this.Parent.Items.RemoveItemFromInventory(item, true); // remove item form inventory
+                            //devour character mesos
+                            this.Parent.Meso -= this.Npc.StorageCost; 
 
-                            item.Parent = this.Parent.Items; // NOTE: This is needed because when we remove the item is sets parent to none.
-                            item.Slot = (short)this.Items.Count; // slot in storage is maxCount of items in it
-                            item.IsStored = true; // set flag on item
+                            // remove item form inventory
+                            this.Parent.Items.RemoveItemFromInventory(item, true);
 
-                            this.Items.Add(item); // add item to storage
+                            // NOTE: This is needed because when we remove the item is sets parent to none.
+                            item.Parent = this.Parent.Items;
+
+                            // slot in storage is maxCount of items in it
+                            item.Slot = (short)this.Items.Count;
+
+                            // set flag on item
+                            item.IsStored = true;
+
+                            // add item to storage
+                            this.Items.Add(item); 
 
                             // routine to get count of items of same type
                             List<Item> itemsByType = new List<Item>();

@@ -86,6 +86,7 @@
     <Compile Include="Application.cs" />
     <Compile Include="Collections\PendingKeyedQueue.cs" />
     <Compile Include="Constants\CharacterConstants.cs" />
+    <Compile Include="Constants\EquipmentConstants.cs" />
     <Compile Include="Constants\InteractionConstants.cs" />
     <Compile Include="Constants\ItemConstants.cs" />
     <Compile Include="Constants\KeyMapConstants.cs" />

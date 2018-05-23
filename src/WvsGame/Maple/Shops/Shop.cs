@@ -163,7 +163,7 @@ namespace Destiny.Maple.Shops
                         else if (quantity < item.Quantity)
                         {
                             item.Quantity -= quantity;
-                            item.Update();
+                            Item.UpdateItem(item);
                         }
 
                         if (item.IsRechargeable)
@@ -201,7 +201,8 @@ namespace Destiny.Maple.Shops
                             customer.Meso -= price;
 
                             item.Quantity = item.MaxPerStack;
-                            item.Update();
+
+                            Item.UpdateItem(item);
                         }
 
                         using (Packet oPacket = new Packet(ServerOperationCode.ConfirmShopTransaction))

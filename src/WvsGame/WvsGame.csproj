@@ -201,6 +201,7 @@
     <Compile Include="Network\PacketFactory\CharacterPackets.cs" />
     <Compile Include="Network\PacketFactory\CharacterSkillsPackets.cs" />
     <Compile Include="Network\PacketFactory\CharacterTrocksPackets.cs" />
+    <Compile Include="Network\PacketFactory\ItemPackets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WvsGame.cs" />
     <Compile Include="WvsGameSetup.cs" />

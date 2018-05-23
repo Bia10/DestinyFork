@@ -168,9 +168,9 @@ namespace Destiny.Constants
         public enum EquipmentSlot : sbyte
         {
             Hat = -1,
-            Face = -2,
-            Eye = -3,
-            Mantle = -4,
+            FaceAccessory = -2,
+            EyeAccessory = -3,
+            Earrings = -4,
             Top = -5,
             Bottom = -6,
             Shoes = -7,
@@ -184,7 +184,7 @@ namespace Destiny.Constants
             Ring3 = -15,
             Ring4 = -16,
             Necklace = -17,
-            Mount = -18,
+            MountEquip = -18,
             Saddle = -19,
             Medal = -49,
             Belt = -50,

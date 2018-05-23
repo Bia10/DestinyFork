@@ -70,7 +70,7 @@ namespace Destiny.Maple.Characters
                     if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
                     {
                         loopItem.Quantity += item.Quantity;
-                        loopItem.Update();
+                        Item.UpdateItem(loopItem);
 
                         item.Quantity = 0;
 
@@ -86,7 +86,7 @@ namespace Destiny.Maple.Characters
 
                         if (this.Parent.IsInitialized)
                         {
-                            loopItem.Update();
+                            Item.UpdateItem(loopItem);
                         }
 
                         break;
@@ -132,7 +132,7 @@ namespace Destiny.Maple.Characters
                     if (loopItem.Quantity > leftToRemove)
                     {
                         loopItem.Quantity -= leftToRemove;
-                        loopItem.Update();
+                        Item.UpdateItem(loopItem);
 
                         break;
                     }
@@ -164,7 +164,7 @@ namespace Destiny.Maple.Characters
 
             if (item.Assigned)
             {
-                item.Delete();
+                Item.DeleteItemFromDB(item);
             }
 
             item.Parent = null;
@@ -250,12 +250,40 @@ namespace Destiny.Maple.Characters
                 }
             }
 
+            NotifyInventoryIsFull(this.Parent, type);
             throw new InventoryFullException();
         }
 
-        public void NotifyFull()
+        public void NotifyInventoryIsFull(Character character, ItemConstants.ItemType inventoryType)
         {
+            switch (inventoryType)
+            {
+                case ItemConstants.ItemType.Equipment:
+                    Character.Notify(this.Parent, "Your equipment(EQP) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
 
+                case ItemConstants.ItemType.Etcetera:
+                    Character.Notify(this.Parent, "Your etcetera(ETC) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
+
+                case ItemConstants.ItemType.Usable:
+                    Character.Notify(this.Parent, "Your usable(USE) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
+
+                case ItemConstants.ItemType.Setup:
+                    Character.Notify(this.Parent, "Your setup inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
+
+                case ItemConstants.ItemType.Cash:
+                    Character.Notify(this.Parent, "Your cash inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
+
+                case ItemConstants.ItemType.Count:
+                    Character.Notify(this.Parent, "Your count inventory is full!.", ServerConstants.NoticeType.Popup);
+                    break;
+
+                default: throw new ArgumentOutOfRangeException(nameof(inventoryType), inventoryType, null);
+            }
         }
 
         public bool IsInventoryFull(ItemConstants.ItemType type)
@@ -290,55 +318,58 @@ namespace Destiny.Maple.Characters
 
         public void SortItemsHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             ItemConstants.ItemType type = (ItemConstants.ItemType)inPacket.ReadByte();
         }
 
         public void GatherItemsHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             ItemConstants.ItemType type = (ItemConstants.ItemType)inPacket.ReadByte();
         }
 
         public void CharItemsHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             ItemConstants.ItemType type = (ItemConstants.ItemType)inPacket.ReadByte();
-            short source = inPacket.ReadShort();
-            short destination = inPacket.ReadShort();
-            short quantity = inPacket.ReadShort();
+            short sourceSlot = inPacket.ReadShort();
+            short destinationSlot = inPacket.ReadShort();
+            short itemQuantity = inPacket.ReadShort();
 
             try
             {
-                Item item = this[type, source];
+                Item item = this[type, sourceSlot];
 
-                if (destination < 0)
+                // destinationSlot < 0 means "into equipable slot"
+                if (destinationSlot < 0)
                 {
-                    item.Equip();
+                    Item.EquipItem(item);
                 }
-                else if (source < 0 && destination > 0)
+                // sourceSlot < 0 means "from equipable slot" destinationSlot > 0 means "into inventory slot"
+                else if (sourceSlot < 0 && destinationSlot > 0)
                 {
-                    item.Unequip(destination);
+                    Item.UnequipItem(item, destinationSlot);
                 }
-                else if (destination == 0)
+                // destinationSlot == 0 means "neither to equipable slot nor to inventory slot"
+                else if (destinationSlot == 0)
                 {
-                    item.Drop(quantity);
+                    Item.DropItem(item, itemQuantity);
                 }
                 else
                 {
-                    item.Move(destination);
+                    Item.MoveItem(item, destinationSlot);
                 }
             }
 
             catch (InventoryFullException)
             {
-                this.NotifyFull();
+                NotifyInventoryIsFull(this.Parent, type);
             }
         }
 
         public void UseItemHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             short slot = inPacket.ReadShort();
             int itemID = inPacket.ReadInt();
 
@@ -384,7 +415,7 @@ namespace Destiny.Maple.Characters
 
         public void UseSummonBagHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             short slot = inPacket.ReadShort();
             int itemID = inPacket.ReadInt();
 
@@ -509,7 +540,7 @@ namespace Destiny.Maple.Characters
                     if (targetItem == null) return;
 
                     targetItem.Creator = this.Parent.Name;
-                    targetItem.Update(); // TODO: This does not seem to update the item's creator.
+                    Item.UpdateItem(targetItem);// TODO: This does not seem to update the item's creator.
 
                     itemUsed = true;
                 }
@@ -907,38 +938,60 @@ namespace Destiny.Maple.Characters
 
                     if (drop is Meso)
                     {
-                        long myPlusDropMesos = (long)this.Parent.Meso + (long)((Meso)drop).Amount;
+                        Meso mesoDrop = (Meso) drop;
 
+                        // get total mesos
+                        long myPlusDropMesos = (long)(this.Parent.Meso + mesoDrop.Amount);
+
+                        // if int32 overflow reset to limit
                         if (myPlusDropMesos > Meso.mesoLimit)
                         {
                             this.Parent.Meso = Meso.mesoLimit;
                         }
+
+                        // add mesos to chars mesos                       
                         else
                         {
-                            this.Parent.Meso += ((Meso)drop).Amount;
+                            this.Parent.Meso += mesoDrop.Amount;
                         }
                     }
+
                     else if (drop is Item)
                     {
-                        if (((Item)drop).OnlyOne)
+                        Item itemDrop = (Item) drop;
+
+                        // check if item is unique
+                        if (itemDrop.OnlyOne)
                         {
-                            // TODO: Appropriate message.
+                            // TODO: Check if i have such item in inventory, if so
+                            // TODO: Inform looter about ownership of such unique item
                             return;
                         }
 
-                        ((Item)drop).Slot = this.GetNextFreeSlot(((Item)drop).ItemType); // TODO: Check for inv. full. 
-                        this.AddItemToInventory((Item)drop, true);
+                        // try obtaining free slot for itemType of itemDrop
+                        itemDrop.Slot = this.GetNextFreeSlot(itemDrop.ItemType);
+
+                        if (itemDrop.Slot > 0)
+                        {
+                            // slot found add it into inventory
+                            this.AddItemToInventory(itemDrop, true);
+                        }
                     }
 
-                    this.Parent.Map.Drops.Remove(drop);                
+                    // remove item from map
+                    this.Parent.Map.Drops.Remove(drop);  
+                                  
+                    // show player his item gain
                     using (Packet oPacket = drop.GetShowGainPacket())
                     {
                         drop.Picker.Client.Send(oPacket);
                     }                      
                 }
+
+                // getNextFreeSlot failed to obtain slot to place item in
                 catch (InventoryFullException)
                 {
-                    this.NotifyFull();
+                    NotifyInventoryIsFull(this.Parent, ((Item)drop).ItemType);
                 }
             }
         }
@@ -948,18 +1001,29 @@ namespace Destiny.Maple.Characters
             inPacket.Skip(1); // ??
             inPacket.Skip(4); // ??
 
-            Point position = new Point(inPacket.ReadShort(), inPacket.ReadShort());
-
-            // TODO: Validate position relative to the picker.
-
-            int objectId = inPacket.ReadInt();
-
-            lock (this.Parent.Map.Drops)
+            Point itemObjectPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+            Point itemPickerPosition = new Point(this.Parent.Position.X, this.Parent.Position.Y);
+          
+            // try to check distance from char before loot, no vacuuming!
+            // TODO: needs proper check
+            if (itemPickerPosition.DistanceFrom(itemObjectPosition) < 5)
             {
-                if (this.Parent.Map.Drops.Contains(objectId))
+                int itemObjectID = inPacket.ReadInt();
+
+                lock (this.Parent.Map.Drops)
                 {
-                    this.Pickup(this.Parent.Map.Drops[objectId]);
+                    // check for drop itemObject on current char Map
+                    if (this.Parent.Map.Drops.Contains(itemObjectID))
+                    {
+                        // found so pick it up!
+                        this.Pickup(this.Parent.Map.Drops[itemObjectID]);
+                    }
                 }
+            }
+
+            else
+            {
+                // TODO: error your too far to loot!
             }
         }
 

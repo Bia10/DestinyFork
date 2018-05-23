@@ -8,11 +8,14 @@ using Destiny.Maple.Maps;
 using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
+using Destiny.Network.PacketFactory;
 using Destiny.Network.ServerHandler;
 
 namespace Destiny.Maple
 {
-    public class Item : Drop // TODO: too big and fugly; redo
+    // TODO: Try to separate the consumableItems
+    // TODO: Try to rework the heuristic hacks
+    public class Item : Drop 
     {
         public static ItemConstants.ItemType GetType(int mapleID)
         {
@@ -26,7 +29,7 @@ namespace Destiny.Maple
         public int MapleID { get; private set; }
         public short Slot { get; set; }
         private short maxPerStack;
-        private short quantity;
+        private static short quantity;
         public string Creator { get; set; }
         public DateTime Expiration { get; set; }
         public int? PetID { get; set; }
@@ -655,35 +658,37 @@ namespace Destiny.Maple
 
         public void Save()
         {
-            Datum datum = new Datum("items");
+            Datum datum = new Datum("items")
+            {
+                ["AccountID"] = this.Character.AccountID,
+                ["CharacterID"] = this.Character.ID,
+                ["MapleID"] = this.MapleID,
+                ["Quantity"] = this.Quantity,
+                ["Slot"] = this.Slot,
+                ["Creator"] = this.Creator,
+                ["UpgradesAvailable"] = this.UpgradesAvailable,
+                ["UpgradesApplied"] = this.UpgradesApplied,
+                ["Strength"] = this.Strength,
+                ["Dexterity"] = this.Dexterity,
+                ["Intelligence"] = this.Intelligence,
+                ["Luck"] = this.Luck,
+                ["Health"] = this.Health,
+                ["Mana"] = this.Mana,
+                ["WeaponAttack"] = this.WeaponAttack,
+                ["MagicAttack"] = this.MagicAttack,
+                ["WeaponDefense"] = this.WeaponDefense,
+                ["MagicDefense"] = this.MagicDefense,
+                ["Accuracy"] = this.Accuracy,
+                ["Avoidability"] = this.Avoidability,
+                ["Agility"] = this.Agility,
+                ["Speed"] = this.Speed,
+                ["Jump"] = this.Jump,
+                ["IsScissored"] = this.IsScissored,
+                ["IsStored"] = this.IsStored,
+                ["PreventsSlipping"] = this.PreventsSlipping,
+                ["PreventsColdness"] = this.PreventsColdness
+            };
 
-            datum["AccountID"] = this.Character.AccountID;
-            datum["CharacterID"] = this.Character.ID;
-            datum["MapleID"] = this.MapleID;
-            datum["Quantity"] = this.Quantity;
-            datum["Slot"] = this.Slot;
-            datum["Creator"] = this.Creator;
-            datum["UpgradesAvailable"] = this.UpgradesAvailable;
-            datum["UpgradesApplied"] = this.UpgradesApplied;
-            datum["Strength"] = this.Strength;
-            datum["Dexterity"] = this.Dexterity;
-            datum["Intelligence"] = this.Intelligence;
-            datum["Luck"] = this.Luck;
-            datum["Health"] = this.Health;
-            datum["Mana"] = this.Mana;
-            datum["WeaponAttack"] = this.WeaponAttack;
-            datum["MagicAttack"] = this.MagicAttack;
-            datum["WeaponDefense"] = this.WeaponDefense;
-            datum["MagicDefense"] = this.MagicDefense;
-            datum["Accuracy"] = this.Accuracy;
-            datum["Avoidability"] = this.Avoidability;
-            datum["Agility"] = this.Agility;
-            datum["Speed"] = this.Speed;
-            datum["Jump"] = this.Jump;
-            datum["IsScissored"] = this.IsScissored;
-            datum["IsStored"] = this.IsStored;
-            datum["PreventsSlipping"] = this.PreventsSlipping;
-            datum["PreventsColdness"] = this.PreventsColdness;
 
             if (this.Assigned)
             {
@@ -696,298 +701,339 @@ namespace Destiny.Maple
             }
         }
 
-        public void Delete()
+        public static void DeleteItemFromDB(Item item)
         {
-            Database.Delete("items", "ID = {0}", this.ID);
+            Database.Delete("items", "ID = {0}", item.ID);
 
-            this.Assigned = false;
+            item.Assigned = false;
         }
 
-        public void Update()
+        public static void UpdateItem(Item item)
         {
-            using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-            {
-                oPacket
-                    .WriteBool(true)
-                    .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                    .WriteByte((byte)this.Type)
-                    .WriteShort(this.Slot)
-                    .WriteShort(this.Quantity);
-
-                this.Character.Client.Send(oPacket);
-            }
+            item.Character.Client.Send(ItemPackets.UpdateItems(item));
         }
 
-        public void Equip()
+        public static void EquipItem(Item item)
         {
-            if (this.ItemType != ItemConstants.ItemType.Equipment)
+            // Check ItemType
+            if (item.ItemType != ItemConstants.ItemType.Equipment)
             {
                 throw new InvalidOperationException("Can only equip equipment items.");
             }
 
-            if ((this.Character.Strength < this.RequiredStrength ||
-                this.Character.Dexterity < this.RequiredDexterity ||
-                this.Character.Intelligence < this.RequiredIntelligence ||
-                this.Character.Luck < this.RequiredLuck) &&
-                !this.Character.IsMaster)
+            // If were not VIP user then check for requirements
+            if (!item.Character.IsMaster)
             {
-                return;
+                if (item.Character.Strength < item.RequiredStrength || item.Character.Dexterity < item.RequiredDexterity 
+                     || item.Character.Intelligence < item.RequiredIntelligence || item.Character.Luck < item.RequiredLuck
+                     || item.Character.Fame < item.RequiredFame)
+                { return; }
+            }
+            
+            // slot to move item from
+            short sourceSlot = item.Slot;
+            // slot to move item into
+            ItemConstants.EquipmentSlot destinationSlot = item.GetEquippedSlot();
+
+            // get char's items
+            Item top = item.Parent[ItemConstants.EquipmentSlot.Top];
+            Item bottom = item.Parent[ItemConstants.EquipmentSlot.Bottom];
+            Item weapon = item.Parent[ItemConstants.EquipmentSlot.Weapon];
+            Item shield = item.Parent[ItemConstants.EquipmentSlot.Shield];
+
+            // get item at char's destination slot
+            Item destination = item.Parent[destinationSlot]; 
+
+            // if there is an item
+            if (destination != null) 
+            {
+                // put it into slot of item to be replaced with
+                destination.Slot = sourceSlot; 
             }
 
-            short sourceSlot = this.Slot;
-            ItemConstants.EquipmentSlot destinationSlot = this.GetEquippedSlot();
+            // item to replace acquires destination slot
+            item.Slot = (short)destinationSlot;
 
-            Item top = this.Parent[ItemConstants.EquipmentSlot.Top];
-            Item bottom = this.Parent[ItemConstants.EquipmentSlot.Bottom];
-            Item weapon = this.Parent[ItemConstants.EquipmentSlot.Weapon];
-            Item shield = this.Parent[ItemConstants.EquipmentSlot.Shield];
-
-            Item destination = this.Parent[destinationSlot];
-
-            if (destination != null)
-            {
-                destination.Slot = sourceSlot;
-            }
-
-            this.Slot = (short)destinationSlot;
-
-            using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-            {
-                oPacket
-                    .WriteBool(true)
-                    .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
-                    .WriteByte((byte)this.Type)
-                    .WriteShort(sourceSlot)
-                    .WriteShort((short)destinationSlot)
-                    .WriteByte(1);
-
-                this.Character.Client.Send(oPacket);
-            }
-
+            // unequipped blocking items
             switch (destinationSlot)
             {
                 case ItemConstants.EquipmentSlot.Bottom:
+                {
+                    if (top != null && top.IsOverall)
                     {
-                        if (top != null && top.IsOverall)
-                        {
-                            top.Unequip();
-                        }
+                        UnequipItem(top);
                     }
+                }
                     break;
 
                 case ItemConstants.EquipmentSlot.Top:
+                {
+                    if (item.IsOverall && bottom != null)
                     {
-                        if (this.IsOverall && bottom != null)
-                        {
-                            bottom.Unequip();
-                        }
+                        UnequipItem(bottom);
                     }
+                }
                     break;
 
                 case ItemConstants.EquipmentSlot.Shield:
+                {
+                    if (weapon != null && weapon.IsTwoHanded)
                     {
-                        if (weapon != null && weapon.IsTwoHanded)
-                        {
-                            weapon.Unequip();
-                        }
+                        UnequipItem(weapon);
                     }
+                }
                     break;
 
                 case ItemConstants.EquipmentSlot.Weapon:
+                {
+                    if (item.IsTwoHanded && shield != null)
                     {
-                        if (this.IsTwoHanded && shield != null)
-                        {
-                            shield.Unequip();
-                        }
+                        UnequipItem(shield);
                     }
+                }
                     break;
             }
 
-            Character.UpdateApperance(this.Character);
+            // send packet to carry out the equipped action
+            item.Character.Client.Send(ItemPackets.EquipOrUnequipItems(item, sourceSlot, (short)destinationSlot));
+
+            // update char appearance
+            Character.UpdateApperance(item.Character);
         }
 
-        public void Unequip(short destinationSlot = 0)
+        public static void UnequipItem(Item item, short destinationSlot = 0)
         {
-            if (this.ItemType != ItemConstants.ItemType.Equipment)
+            //check for item type
+            if (item.ItemType != ItemConstants.ItemType.Equipment)
             {
                 throw new InvalidOperationException("Can only unequip equipment items.");
             }
 
-            short sourceSlot = this.Slot;
+            // slot to move item from
+            short sourceSlot = item.Slot;
 
+            // if no destination given then find first free slot for equip type
             if (destinationSlot == 0)
             {
-                destinationSlot = this.Parent.GetNextFreeSlot(ItemConstants.ItemType.Equipment);
+                destinationSlot = item.Parent.GetNextFreeSlot(ItemConstants.ItemType.Equipment);
             }
 
-            this.Slot = destinationSlot;
+            // change slot of item being unequipped to free equip slot
+            item.Slot = destinationSlot;
 
-            using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-            {
-                oPacket
-                    .WriteBool(true)
-                    .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
-                    .WriteByte((byte)this.Type)
-                    .WriteShort(sourceSlot)
-                    .WriteShort(destinationSlot)
-                    .WriteByte(1);
+            // send packet to carry out the un-equip item action
+            item.Character.Client.Send(ItemPackets.EquipOrUnequipItems(item, sourceSlot, destinationSlot));
 
-                this.Character.Client.Send(oPacket);
-            }
-
-            Character.UpdateApperance(this.Character);
+            // update char appearance
+            Character.UpdateApperance(item.Character);
         }
 
-        public void Drop(short dropQuantity)
+        public static void DropItem(Item item, short dropQuantity)
         {
-            if (this.IsRechargeable)
+            // cannot drop blocked items
+            if (item.IsBlocked)
             {
-                dropQuantity = this.Quantity;
-            }
-
-            if (this.IsBlocked)
-            {
+                // TODO: notify character
                 return;
             }
 
-            if (dropQuantity > this.Quantity)
+            // no multiplication of rechargeable items
+            if (item.IsRechargeable)
             {
+                dropQuantity = item.Quantity;
+            }
+
+            // cannot drop more then i have
+            if (dropQuantity > item.Quantity)
+            {
+                // TODO: notify character
                 return;
             }
-
-            if (dropQuantity == this.Quantity)
+              
+            if (dropQuantity == item.Quantity)
             {
-                using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-                {
-                    oPacket
-                        .WriteBool(true)
-                        .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
-                        .WriteByte((byte)this.Type)
-                        .WriteShort(this.Slot);
+                // send packet to carry out the remove item action
+                item.Character.Client.Send(ItemPackets.RemoveItem(item));
 
-                    if (this.IsEquipped)
-                    {
-                        oPacket.WriteByte(1);
-                    }
+                // update item ownership properties
+                item.Dropper = item.Character;
+                item.Owner = null;
 
-                    this.Character.Client.Send(oPacket);
-                }
+                // create drop on map
+                item.Character.Map.Drops.Add(item);
 
-                this.Dropper = this.Character;
-                this.Owner = null;
-
-                this.Character.Map.Drops.Add(this);
-
-                this.Parent.RemoveItemFromInventory(this, false);
+                // remove item from dropper's inventory
+                item.Parent.RemoveItemFromInventory(item, false);
             }
-            else if (dropQuantity < this.Quantity)
+            else if (dropQuantity < item.Quantity)
             {
-                this.Quantity -= dropQuantity;
+                // subtract the quantity to drop
+                item.Quantity -= dropQuantity;
 
-                using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
+                // send packet to carry out the item quantity update action
+                item.Character.Client.Send(ItemPackets.ModifyItemsQuantity(item));
+
+                // create new drop item with droppers properties
+                Item dropped = new Item(item.MapleID, quantity)
                 {
-                    oPacket
-                        .WriteBool(true)
-                        .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                        .WriteByte((byte)this.Type)
-                        .WriteShort(this.Slot)
-                        .WriteShort(this.Quantity);
-
-                    this.Character.Client.Send(oPacket);
-                }
-
-                Item dropped = new Item(this.MapleID, quantity)
-                {
-                    Dropper = this.Character,
+                    Dropper = item.Character,
                     Owner = null
                 };
 
-                this.Character.Map.Drops.Add(dropped);
+                // add dropped item to map
+                item.Character.Map.Drops.Add(dropped);
             }
         }
 
-        public void Move(short destinationSlot)
+        public static bool IsStackableNotRechargeable(Item item)
         {
-            short sourceSlot = this.Slot;
+            return !item.IsRechargeable && item.ItemType != ItemConstants.ItemType.Equipment && item.MaxPerStack > 0;
+        }
 
-            Item destination = this.Parent[this.ItemType, destinationSlot];
+        public static bool CanStackItems(Item itemToStack, Item itemToBeStackedOnto)
+        {
+            return itemToBeStackedOnto != null && itemToStack.MapleID == itemToBeStackedOnto.MapleID &&
+                   itemToBeStackedOnto.Quantity < itemToBeStackedOnto.MaxPerStack;
+        }
 
-            if (destination != null &&
-                this.ItemType != ItemConstants.ItemType.Equipment &&
-                this.MapleID == destination.MapleID &&
-                !this.IsRechargeable &&
-                destination.Quantity < destination.MaxPerStack)
+        public static void MoveItem(Item item, short destinationSlot)
+        {
+            // slot to move item from
+            short sourceSlot = item.Slot;
+
+            // item in slot to move item to
+            Item itemAtDestinationSlot = item.Parent[item.ItemType, destinationSlot];
+
+            // case of moving non-rechargeable non-equip stackable items
+            // TODO: proper treatment
+            if (IsStackableNotRechargeable(item) && CanStackItems(item, itemAtDestinationSlot))
             {
-                if (this.Quantity + destination.Quantity > destination.MaxPerStack)
+                int totalQuantity = item.Quantity + itemAtDestinationSlot.Quantity;
+
+                // Sub-case 1: stack at destination will overflow on addition
+                if (totalQuantity > itemAtDestinationSlot.MaxPerStack)
                 {
-                    this.Quantity -= (short)(destination.MaxPerStack - destination.Quantity);
+                    // subtract whats left at destination slot
+                    item.Quantity -= (short)(itemAtDestinationSlot.MaxPerStack-itemAtDestinationSlot.Quantity);
 
-                    using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-                    {
-                        oPacket
-                            .WriteBool(true)
-                            .WriteByte(2)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                            .WriteByte((byte)this.Type)
-                            .WriteShort(sourceSlot)
-                            .WriteShort(this.Quantity)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                            .WriteByte((byte)destination.Type)
-                            .WriteShort(destinationSlot)
-                            .WriteShort(destination.Quantity);
-
-                        this.Character.Client.Send(oPacket);
-                    }
+                    // send packet to do stacking action when stack at destination is full
+                    item.Character.Client.Send(ItemPackets.StackItemsFullStack(item, itemAtDestinationSlot));
                 }
+                // Sub-case 2: stack at destination wont overflow on addition
                 else
                 {
-                    destination.Quantity += this.Quantity;
+                    // add quantity of itemFirst to itemSecond
+                    itemAtDestinationSlot.Quantity += item.Quantity;
 
-                    using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-                    {
-                        oPacket
-                            .WriteBool(true)
-                            .WriteByte(2)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
-                            .WriteByte((byte)this.Type)
-                            .WriteShort(sourceSlot)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
-                            .WriteByte((byte)destination.Type)
-                            .WriteShort(destinationSlot)
-                            .WriteShort(destination.Quantity);
-
-                        this.Character.Client.Send(oPacket);
-                    }
+                    // send packet to do stacking action
+                    item.Character.Client.Send(ItemPackets.StackItems(item, itemAtDestinationSlot));
                 }
             }
+            // other cases
             else
             {
-                if (destination != null)
+                // if there is an item at destination slot move it to source slot
+                if (itemAtDestinationSlot != null)
                 {
-                    destination.Slot = sourceSlot;
+                    itemAtDestinationSlot.Slot = sourceSlot;
                 }
 
-                this.Slot = destinationSlot;
+                // move item to destination slot
+                item.Slot = destinationSlot;
 
-                using (Packet oPacket = new Packet(ServerOperationCode.InventoryOperation))
-                {
-                    oPacket
-                        .WriteBool(true)
-                        .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
-                        .WriteByte((byte)this.Type)
-                        .WriteShort(sourceSlot)
-                        .WriteShort(destinationSlot);
-
-                    this.Character.Client.Send(oPacket);
-                }
+                // send packet to do item move action
+                item.Character.Client.Send(ItemPackets.MoveItem(item, sourceSlot, destinationSlot));
             }
         }
+
+        private ItemConstants.EquipmentSlot GetEquippedSlot()
+        {
+            ItemConstants.EquipmentSlot slot = 0;
+
+            if (EquipmentConstants.HatsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Hat;
+            }
+            else if (EquipmentConstants.FaceAccMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.FaceAccessory;
+            }
+            else if (EquipmentConstants.EyeAccMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.EyeAccessory;
+            }
+            else if (EquipmentConstants.EarringsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Earrings;
+            }
+            else if (EquipmentConstants.TopsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Top;
+            }
+            else if (EquipmentConstants.BottomsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Bottom;
+            }
+            else if (EquipmentConstants.ShoesMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Shoes;
+            }
+            else if (EquipmentConstants.GlovesMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Gloves;
+            }
+            else if (EquipmentConstants.CapesMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Cape;
+            }
+            else if (EquipmentConstants.ShieldsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Shield;
+            }
+            else if (EquipmentConstants.WeaponsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Weapon;
+            }
+            else if (EquipmentConstants.RingsMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Ring1;
+            }
+            else if (EquipmentConstants.NecklacesMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.Necklace;
+            }
+            else if (EquipmentConstants.MountsEquipMapleIDs.Contains(this.MapleID))
+            {
+                slot = ItemConstants.EquipmentSlot.MountEquip;
+            }
+
+            if (this.IsCash)
+            {
+                slot -= 100;
+            }
+
+            return slot;
+        }
+
+        public override Packet GetShowGainPacket()
+        {
+            Packet oPacket = new Packet(ServerOperationCode.Message);
+
+            oPacket
+                .WriteByte((byte)ServerConstants.MessageType.DropPickup)
+                .WriteBool(false)
+                .WriteInt(this.MapleID)
+                .WriteInt(this.Quantity)
+                .WriteInt()
+                .WriteInt();
+
+            return oPacket;
+        }
+
+        /*public static Packet GetShowItemGainPacket(bool white, int itemID, int ammount, bool inChat)
+        {
+           return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, itemID, ammount, inChat, 0, 0);
+        }*/
 
         public byte[] ToByteArray(bool zeroPosition = false, bool leaveOut = false)
         {
@@ -1087,95 +1133,5 @@ namespace Destiny.Maple
                 return oPacket.GetContent();
             }
         }
-
-        private ItemConstants.EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
-        {
-            short slot = 0;
-
-            if (this.MapleID >= 1000000 && this.MapleID < 1010000)
-            {
-                slot -= 1;
-            }
-            else if (this.MapleID >= 1010000 && this.MapleID < 1020000)
-            {
-                slot -= 2;
-            }
-            else if (this.MapleID >= 1020000 && this.MapleID < 1030000)
-            {
-                slot -= 3;
-            }
-            else if (this.MapleID >= 1030000 && this.MapleID < 1040000)
-            {
-                slot -= 4;
-            }
-            else if (this.MapleID >= 1040000 && this.MapleID < 1060000)
-            {
-                slot -= 5;
-            }
-            else if (this.MapleID >= 1060000 && this.MapleID < 1070000)
-            {
-                slot -= 6;
-            }
-            else if (this.MapleID >= 1070000 && this.MapleID < 1080000)
-            {
-                slot -= 7;
-            }
-            else if (this.MapleID >= 1080000 && this.MapleID < 1090000)
-            {
-                slot -= 8;
-            }
-            else if (this.MapleID >= 1102000 && this.MapleID < 1103000)
-            {
-                slot -= 9;
-            }
-            else if (this.MapleID >= 1092000 && this.MapleID < 1100000)
-            {
-                slot -= 10;
-            }
-            else if (this.MapleID >= 1300000 && this.MapleID < 1800000)
-            {
-                slot -= 11;
-            }
-            else if (this.MapleID >= 1112000 && this.MapleID < 1120000)
-            {
-                slot -= 12;
-            }
-            else if (this.MapleID >= 1122000 && this.MapleID < 1123000)
-            {
-                slot -= 17;
-            }
-            else if (this.MapleID >= 1900000 && this.MapleID < 2000000)
-            {
-                slot -= 18;
-            }
-
-            if (this.IsCash)
-            {
-                slot -= 100;
-            }
-
-            return (ItemConstants.EquipmentSlot)slot;
-        }
-
-        public override Packet GetShowGainPacket()
-        {
-            Packet oPacket = new Packet(ServerOperationCode.Message);
-
-            oPacket
-                .WriteByte((byte)ServerConstants.MessageType.DropPickup)
-                .WriteBool(false)
-                .WriteInt(this.MapleID)
-                .WriteInt(this.Quantity)
-                .WriteInt()
-                .WriteInt();
-
-            return oPacket;
-        }
-
-        /*public static Packet GetShowItemGainPacket(bool white, int itemID, int ammount, bool inChat)
-        {
-           return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, itemID, ammount, inChat, 0, 0);
-        }*/
-
     }
 }

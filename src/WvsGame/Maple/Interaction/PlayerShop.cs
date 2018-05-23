@@ -100,7 +100,7 @@ namespace Destiny.Maple.Interaction
                         if (quantity < item.Quantity)
                         {
                             item.Quantity -= quantity;
-                            item.Update();
+                            Item.UpdateItem(item);
                         }
                         else
                         {
