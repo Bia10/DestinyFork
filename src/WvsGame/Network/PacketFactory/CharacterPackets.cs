@@ -83,15 +83,15 @@ namespace Destiny.Network.PacketFactory
                 switch (statistic)
                 {
                     case CharacterConstants.StatisticType.Skin:
-                        setStatsPacket.WriteByte(character.Skin);
+                        setStatsPacket.WriteByte(character.Appearance.Skin);
                         break;
 
                     case CharacterConstants.StatisticType.Face:
-                        setStatsPacket.WriteInt(character.Face);
+                        setStatsPacket.WriteInt(character.Appearance.Face);
                         break;
 
                     case CharacterConstants.StatisticType.Hair:
-                        setStatsPacket.WriteInt(character.Hair);
+                        setStatsPacket.WriteInt(character.Appearance.Hair);
                         break;
 
                     case CharacterConstants.StatisticType.Level:
@@ -99,7 +99,7 @@ namespace Destiny.Network.PacketFactory
                         break;
 
                     case CharacterConstants.StatisticType.Job:
-                        setStatsPacket.WriteShort((short)character.Job);
+                        setStatsPacket.WriteShort((short)character.Jobs.Job);
                         break;
 
                     case CharacterConstants.StatisticType.Strength:

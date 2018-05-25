@@ -175,7 +175,7 @@ namespace Destiny.Maple.Characters
 
             if (wasEquipped)
             {
-                Character.UpdateApperance(this.Parent);
+               CharacterAppearance.UpdateApperance(this.Parent);
             }
         }
 

@@ -4,18 +4,36 @@ namespace Destiny.Maple.Characters
 {
     public sealed class CharacterJobs
     {
-        public Character Parent { get; private set; }  
-        public CharacterJobs(Character parent)
-            : base()
+        public Character Parent { get; }  
+        public CharacterJobs(Character parent) : base()
         {
-            this.Parent = parent;
+            Parent = parent;
         }
-        public CharacterConstants.Job Job;
+
+        #region Job
+        private CharacterConstants.Job job;
+        private void SetJobTo(CharacterConstants.Job value)
+        {
+            job = value;
+
+            if (!Parent.IsInitialized) return;
+
+            CharacterStats.Update(Parent, CharacterConstants.StatisticType.Job);
+            CharacterBuffs.ShowRemoteUserEffect(Parent, CharacterConstants.UserEffect.JobChanged);
+        }
+
+        // TODO: Update party's properties.
+        public CharacterConstants.Job Job
+        {
+            get { return job; }
+            set { SetJobTo(value); }
+        }
+        #endregion
 
         #region AdventurerJobs
         public static bool IsAdventurerBeginner(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -28,7 +46,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsAdventurerFirstJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -49,7 +67,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsAdventurerSecondJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -89,7 +107,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsAdventurerThirdJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -110,7 +128,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsAdventurerFourthJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -139,7 +157,7 @@ namespace Destiny.Maple.Characters
         #region CygnusKnightJobs
         public static bool IsCygnusBeginner(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -152,7 +170,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsCygnusFirstJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -173,7 +191,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsCygnusSecondJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -194,7 +212,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsCygnusThirdJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -215,7 +233,7 @@ namespace Destiny.Maple.Characters
 
         public static bool IsCygnusFourthJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             switch (currentJob)
             {
@@ -244,35 +262,35 @@ namespace Destiny.Maple.Characters
         #region AranJobs
         public static bool IsAranBeginner(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.Aran;
         }
 
         public static bool IsAranFirstJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.Aran1;
         }
 
         public static bool IsAranSecondJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.Aran2;
         }
 
         public static bool IsAranThirdJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.Aran3;
         }
 
         public static bool IsAranFourthJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.Aran4;
         }
@@ -287,21 +305,21 @@ namespace Destiny.Maple.Characters
         #region UniqueJobs
         public static bool IsMapleleafBrigadierJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.MapleleafBrigadier;
         }
 
         public static bool IsGMJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.GM;
         }
 
         public static bool IsSuperGMJob(Character Player)
         {
-            CharacterConstants.Job currentJob = Player.Job;
+            CharacterConstants.Job currentJob = Player.Jobs.Job;
 
             return currentJob == CharacterConstants.Job.SuperGM;
         }

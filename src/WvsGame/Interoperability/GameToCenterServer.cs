@@ -281,20 +281,30 @@ namespace Destiny.Interoperability
                 AccountID = accountID,
                 WorldID = WvsGame.WorldID,
                 Name = name,
-                Gender = gender,
-                Skin = skin,
-                Face = face,
-                Hair = hair + hairColor,
-                Stats = { Level = 1, Experience = 0,
+                Appearance =
+                {
+                    Gender = gender,
+                    Skin = skin,
+                    Face = face,
+                    Hair = hair + hairColor
+                },
+                Stats =
+                {
+                    Level = 1, Experience = 0,
                     MaxHealth = 50, MaxMana = 5,
                     Health = 50, Mana = 5,
                     AbilityPoints = 0, SkillPoints = 0,
                     Strength = 12, Dexterity = 5,
                     Intelligence = 4, Luck = 4,
-                    Fame = 0, Meso = 0},
-                Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse :
-                    jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner :
-                    CharacterConstants.Job.Aran,                      
+                    Fame = 0, Meso = 0
+                },
+                Jobs =
+                {
+                    Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse 
+                      : jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner 
+                      : CharacterConstants.Job.Aran
+                },
+                                 
                 Map = DataProvider.Maps[
                     jobType == CharacterConstants.JobType.Cygnus ? 130030000 :
                     jobType == CharacterConstants.JobType.Explorer ? 10000 : 914000000],

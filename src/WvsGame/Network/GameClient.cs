@@ -98,15 +98,15 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:
-                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Melee);
+                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Melee);
                     break;
 
                 case ClientOperationCode.RangedAttack:
-                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Range);
+                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Range);
                     break;
 
                 case ClientOperationCode.MagicAttack:
-                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Magic);
+                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Magic);
                     break;
 
                 case ClientOperationCode.TakeDamage:
@@ -182,7 +182,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.HealOverTime:
-                    this.Character.HealOverTime(iPacket);
+                    this.Character.Stats.HealOverTime(iPacket);
                     break;
 
                 case ClientOperationCode.DistributeSP:
@@ -234,7 +234,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.AdminCommand:
-                    this.Character.UseAdminCommand(iPacket);
+                    this.Character.UseAdminCommandHandler(iPacket);
                     break;
 
                 case ClientOperationCode.NoteAction:

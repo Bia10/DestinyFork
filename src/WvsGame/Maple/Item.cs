@@ -798,7 +798,7 @@ namespace Destiny.Maple
             item.Character.Client.Send(ItemPackets.EquipOrUnequipItems(item, sourceSlot, (short)destinationSlot));
 
             // update char appearance
-            Character.UpdateApperance(item.Character);
+            CharacterAppearance.UpdateApperance(item.Character);
         }
 
         public static void UnequipItem(Item item, short destinationSlot = 0)
@@ -825,7 +825,7 @@ namespace Destiny.Maple
             item.Character.Client.Send(ItemPackets.EquipOrUnequipItems(item, sourceSlot, destinationSlot));
 
             // update char appearance
-            Character.UpdateApperance(item.Character);
+            CharacterAppearance.UpdateApperance(item.Character);
         }
 
         public static void DropItem(Item item, short dropQuantity)

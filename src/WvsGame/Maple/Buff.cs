@@ -254,7 +254,7 @@ namespace Destiny.Maple
 
             if (skill.Morph > 0)
             {
-                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Morph, (short)(skill.Morph + 100 * (int)this.Character.Gender));
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Morph, (short)(skill.Morph + 100 * (int)this.Character.Appearance.Gender));
             }
 
             switch (this.MapleID)

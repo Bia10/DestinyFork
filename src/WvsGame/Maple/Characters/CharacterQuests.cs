@@ -279,7 +279,7 @@ namespace Destiny.Maple.Characters
 
             foreach (KeyValuePair<Skill, CharacterConstants.Job> skill in quest.PostSkillRewards)
             {
-                if (this.Parent.Job == skill.Value)
+                if (this.Parent.Jobs.Job == skill.Value)
                 {
                     this.Parent.Skills.Add(skill.Key);
 

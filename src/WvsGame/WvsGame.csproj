@@ -87,6 +87,7 @@
     <Compile Include="Maple\Attack.cs" />
     <Compile Include="Maple\Buff.cs" />
     <Compile Include="Maple\Characters\Character.cs" />
+    <Compile Include="Maple\Characters\CharacterAppearance.cs" />
     <Compile Include="Maple\Characters\CharacterBuffs.cs" />
     <Compile Include="Maple\Characters\CharacterItems.cs" />
     <Compile Include="Maple\Characters\CharacterJobs.cs" />

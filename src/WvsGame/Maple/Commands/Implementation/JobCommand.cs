@@ -44,7 +44,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                     if (Enum.IsDefined(typeof(CharacterConstants.Job), jobID))
                     {
-                        caller.Job = (CharacterConstants.Job)jobID;
+                        caller.Jobs.Job = (CharacterConstants.Job)jobID;
                     }
                     else
                     {
@@ -55,7 +55,7 @@ namespace Destiny.Maple.Commands.Implementation
                 {
                     try
                     {
-                        caller.Job = (CharacterConstants.Job)Enum.Parse(typeof(CharacterConstants.Job), args[0], true);
+                        caller.Jobs.Job = (CharacterConstants.Job)Enum.Parse(typeof(CharacterConstants.Job), args[0], true);
                     }
                     catch (ArgumentException)
                     {

@@ -7,15 +7,20 @@ using Destiny.Network.PacketFactory;
 
 namespace Destiny.Maple.Characters
 {
-    public sealed class CharacterStats : KeyedCollection<int, CharacterStats>
+    public class CharacterStats : KeyedCollection<int, CharacterStats>
     {
-        public Character Parent { get; private set; }
+        public Character Parent { get; }
 
         public CharacterStats(Character parent): base()
         {
-            this.Parent = parent;
+            Parent = parent;
         }
+
         public CharacterConstants.StatisticType Statistic;
+
+        private DateTime LastHealthHealOverTime = new DateTime();
+        private DateTime LastManaHealOverTime = new DateTime();
+
 
         #region HealthRelated
         private short health;
@@ -85,7 +90,7 @@ namespace Destiny.Maple.Characters
         {
             if (character == null) return;
 
-            CharacterConstants.Job charJob = character.Job;
+            CharacterConstants.Job charJob = character.Jobs.Job;
             Random r = new Random();
 
             switch (charJob)
@@ -357,7 +362,7 @@ namespace Destiny.Maple.Characters
         {
             if (character == null) return;
 
-            CharacterConstants.Job charJob = character.Job;
+            CharacterConstants.Job charJob = character.Jobs.Job;
             Random r = new Random();
 
             switch (charJob)
@@ -560,7 +565,7 @@ namespace Destiny.Maple.Characters
         }
         #endregion
 
-        #region LevelRelated
+        #region Level
         private byte level;
         private void LevelIncrease(byte value)
         {
@@ -1012,6 +1017,30 @@ namespace Destiny.Maple.Characters
             Parent.Map.Drops.Add(meso);
         }
         #endregion
+
+        public void HealOverTime(Packet inPacket)
+        {
+            int ticks = inPacket.ReadInt();
+            inPacket.ReadInt(); // TODO: research
+            short healthAmount = inPacket.ReadShort(); // TODO: Validate 
+            short manaAmount = inPacket.ReadShort(); // TODO: Validate
+
+            if (healthAmount != 0)
+            {
+                if ((DateTime.Now - LastHealthHealOverTime).TotalSeconds < 2) return;
+
+                Health += healthAmount;
+                LastHealthHealOverTime = DateTime.Now;
+            }
+
+            if (manaAmount != 0)
+            {
+                if ((DateTime.Now - LastManaHealOverTime).TotalSeconds < 2) return;
+
+                Mana += manaAmount;
+                LastManaHealOverTime = DateTime.Now;
+            }
+        }
 
         public static void FillToFull(Character character, CharacterConstants.StatisticType typeToFill)
         {
