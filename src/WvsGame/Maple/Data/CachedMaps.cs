@@ -73,7 +73,6 @@ namespace Destiny.Maple.Data
             }
         }
 
-
         protected override int GetKeyForItem(Map item)
         {
             return item.MapleID;

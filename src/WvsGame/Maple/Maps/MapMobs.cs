@@ -56,7 +56,7 @@ namespace Destiny.Maple.Maps
                         owner = attacker.Key;
                     }
                     //TODO: more conditioning, exps buffs, exps debuffs
-                    attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * WvsGame.ExperienceRate;
+                    attacker.Key.Stats.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * WvsGame.ExperienceRate;
                     int expGained = (int)item.Experience * WvsGame.ExperienceRate;
                     Packet ExpGainOnMobDeath = Experience.GetShowExpGainPacket(true, expGained, false, 0, 0);
                     owner.Client.Send(ExpGainOnMobDeath);

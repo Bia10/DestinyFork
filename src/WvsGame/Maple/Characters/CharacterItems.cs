@@ -384,22 +384,22 @@ namespace Destiny.Maple.Characters
 
             if (item.CHealth > 0)
             {
-                this.Parent.Health += item.CHealth;
+                this.Parent.Stats.Health += item.CHealth;
             }
 
             if (item.CMana > 0)
             {
-                this.Parent.Mana += item.CMana;
+                this.Parent.Stats.Mana += item.CMana;
             }
 
             if (item.CHealthPercentage != 0)
             {
-                this.Parent.Health += (short)((item.CHealthPercentage * this.Parent.MaxHealth) / 100);
+                this.Parent.Stats.Health += (short)((item.CHealthPercentage * this.Parent.Stats.MaxHealth) / 100);
             }
 
             if (item.CManaPercentage != 0)
             {
-                this.Parent.Mana += (short)((item.CManaPercentage * this.Parent.MaxMana) / 100);
+                this.Parent.Stats.Mana += (short)((item.CManaPercentage * this.Parent.Stats.MaxMana) / 100);
             }
 
             if (item.CBuffTime > 0 && item.CProb == 0)
@@ -575,7 +575,7 @@ namespace Destiny.Maple.Characters
                 case (int)ItemConstants.UsableCashItems.CheapMegaphone:
                     {
                         // NOTE: You can't use a megaphone unless you're over level 10.
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
@@ -596,7 +596,7 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.Megaphone:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
@@ -617,7 +617,7 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.SuperMegaphone:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         bool whisper = inPacket.ReadBool();
@@ -641,55 +641,55 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.HeartMegaphone:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.SkullMegaphone:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVMessenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVStarMessenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVHeartMessenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.Megassenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.StarMegassenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.HeartMegassenger:
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.ItemMegaphone: // NOTE: Item Megaphone.
                     {
-                        if (this.Parent.Level < 11) return;
+                        if (this.Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         bool whisper = inPacket.ReadBool();
@@ -854,7 +854,7 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.GoldSackofMesos:
                     {
-                        this.Parent.Meso += item.Meso;
+                        this.Parent.Stats.Meso += item.Meso;
 
                         // TODO: We definitely need a GainMeso method with inChat parameter.
                         using (Packet oPacket = new Packet(ServerOperationCode.Message))
@@ -941,18 +941,18 @@ namespace Destiny.Maple.Characters
                         Meso mesoDrop = (Meso) drop;
 
                         // get total mesos
-                        long myPlusDropMesos = (long)(this.Parent.Meso + mesoDrop.Amount);
+                        long myPlusDropMesos = (long)(this.Parent.Stats.Meso + mesoDrop.Amount);
 
                         // if int32 overflow reset to limit
                         if (myPlusDropMesos > Meso.mesoLimit)
                         {
-                            this.Parent.Meso = Meso.mesoLimit;
+                            this.Parent.Stats.Meso = Meso.mesoLimit;
                         }
 
                         // add mesos to chars mesos                       
                         else
                         {
-                            this.Parent.Meso += mesoDrop.Amount;
+                            this.Parent.Stats.Meso += mesoDrop.Amount;
                         }
                     }
 

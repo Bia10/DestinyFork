@@ -36,7 +36,7 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Level = byte.Parse(args[0]);
+                caller.Stats.Level = byte.Parse(args[0]);
             }
         }
     }

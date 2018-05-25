@@ -96,7 +96,7 @@ namespace Destiny.Maple.Shops
 
                         ShopItem item = this.Items[index];
 
-                        if (customer.Meso < item.PurchasePrice * quantity)
+                        if (customer.Stats.Meso < item.PurchasePrice * quantity)
                         {
                             return;
                         }
@@ -126,7 +126,7 @@ namespace Destiny.Maple.Shops
                         }
                         else
                         {
-                            customer.Meso -= price;
+                            customer.Stats.Meso -= price;
                             customer.Items.AddItemToInventory(purchase);
                         }
 
@@ -168,11 +168,11 @@ namespace Destiny.Maple.Shops
 
                         if (item.IsRechargeable)
                         {
-                            customer.Meso += item.SalePrice + (int)(this.UnitPrices[item.MapleID] * item.Quantity);
+                            customer.Stats.Meso += item.SalePrice + (int)(this.UnitPrices[item.MapleID] * item.Quantity);
                         }
                         else
                         {
-                            customer.Meso += item.SalePrice * quantity;
+                            customer.Stats.Meso += item.SalePrice * quantity;
                         }
 
                         using (Packet oPacket = new Packet(ServerOperationCode.ConfirmShopTransaction))
@@ -192,13 +192,13 @@ namespace Destiny.Maple.Shops
 
                         int price = (int)(this.UnitPrices[item.MapleID] * (item.MaxPerStack - item.Quantity));
 
-                        if (customer.Meso < price)
+                        if (customer.Stats.Meso < price)
                         {
                             Character.Notify(customer, "You do not have enough mesos.", ServerConstants.NoticeType.Popup);
                         }
                         else
                         {
-                            customer.Meso -= price;
+                            customer.Stats.Meso -= price;
 
                             item.Quantity = item.MaxPerStack;
 

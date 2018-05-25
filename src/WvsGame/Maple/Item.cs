@@ -724,9 +724,9 @@ namespace Destiny.Maple
             // If were not VIP user then check for requirements
             if (!item.Character.IsMaster)
             {
-                if (item.Character.Strength < item.RequiredStrength || item.Character.Dexterity < item.RequiredDexterity 
-                     || item.Character.Intelligence < item.RequiredIntelligence || item.Character.Luck < item.RequiredLuck
-                     || item.Character.Fame < item.RequiredFame)
+                if (item.Character.Stats.Strength < item.RequiredStrength || item.Character.Stats.Dexterity < item.RequiredDexterity 
+                     || item.Character.Stats.Intelligence < item.RequiredIntelligence || item.Character.Stats.Luck < item.RequiredLuck
+                     || item.Character.Stats.Fame < item.RequiredFame)
                 { return; }
             }
             

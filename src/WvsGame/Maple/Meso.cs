@@ -20,15 +20,15 @@ namespace Destiny.Maple
 
         public static void giveMesos(Character character, int mesosGiven)
         {
-            long myPlusGiven = (long)character.Meso + (long)mesosGiven;  
+            long myPlusGiven = (long)character.Stats.Meso + (long)mesosGiven;  
 
             if (myPlusGiven > mesoLimit)
             {
-                character.Meso = mesoLimit;
+                character.Stats.Meso = mesoLimit;
             }
             else
             {
-                character.Meso += mesosGiven;
+                character.Stats.Meso += mesosGiven;
                 Packet showMesosGain = GetShowMesoGainPacket(true, mesosGiven, false);
                 character.Client.Send(showMesosGain);
             }                   

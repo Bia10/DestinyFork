@@ -175,15 +175,15 @@ namespace Destiny.Maple.Interaction
                             return;
                         }
 
-                        if (character.Meso < shopItem.MerchantPrice * quantity)
+                        if (character.Stats.Meso < shopItem.MerchantPrice * quantity)
                         {
                             return;
                         }
 
                         shopItem.Quantity -= quantity;
 
-                        character.Meso -= shopItem.MerchantPrice * quantity;
-                        this.Owner.Meso += shopItem.MerchantPrice * quantity;
+                        character.Stats.Meso -= shopItem.MerchantPrice * quantity;
+                        this.Owner.Stats.Meso += shopItem.MerchantPrice * quantity;
 
                         character.Items.AddItemToInventory(new Item(shopItem.MapleID, quantity));
 

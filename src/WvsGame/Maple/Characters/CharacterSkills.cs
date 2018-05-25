@@ -78,7 +78,7 @@ namespace Destiny.Maple.Characters
 
                             if (!target.IsAlive)
                             {
-                                target.Health = target.MaxHealth;
+                                target.Stats.Health = target.Stats.MaxHealth;
                             }
                         }
                     }

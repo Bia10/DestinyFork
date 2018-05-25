@@ -95,7 +95,7 @@ namespace Destiny.Network.PacketFactory
                         break;
 
                     case CharacterConstants.StatisticType.Level:
-                        setStatsPacket.WriteByte(character.Level);
+                        setStatsPacket.WriteByte(character.Stats.Level);
                         break;
 
                     case CharacterConstants.StatisticType.Job:
@@ -103,55 +103,55 @@ namespace Destiny.Network.PacketFactory
                         break;
 
                     case CharacterConstants.StatisticType.Strength:
-                        setStatsPacket.WriteShort(character.Strength);
+                        setStatsPacket.WriteShort(character.Stats.Strength);
                         break;
 
                     case CharacterConstants.StatisticType.Dexterity:
-                        setStatsPacket.WriteShort(character.Dexterity);
+                        setStatsPacket.WriteShort(character.Stats.Dexterity);
                         break;
 
                     case CharacterConstants.StatisticType.Intelligence:
-                        setStatsPacket.WriteShort(character.Intelligence);
+                        setStatsPacket.WriteShort(character.Stats.Intelligence);
                         break;
 
                     case CharacterConstants.StatisticType.Luck:
-                        setStatsPacket.WriteShort(character.Luck);
+                        setStatsPacket.WriteShort(character.Stats.Luck);
                         break;
 
                     case CharacterConstants.StatisticType.Health:
-                        setStatsPacket.WriteShort(character.Health);
+                        setStatsPacket.WriteShort(character.Stats.Health);
                         break;
 
                     case CharacterConstants.StatisticType.MaxHealth:
-                        setStatsPacket.WriteShort(character.MaxHealth);
+                        setStatsPacket.WriteShort(character.Stats.MaxHealth);
                         break;
 
                     case CharacterConstants.StatisticType.Mana:
-                        setStatsPacket.WriteShort(character.Mana);
+                        setStatsPacket.WriteShort(character.Stats.Mana);
                         break;
 
                     case CharacterConstants.StatisticType.MaxMana:
-                        setStatsPacket.WriteShort(character.MaxMana);
+                        setStatsPacket.WriteShort(character.Stats.MaxMana);
                         break;
 
                     case CharacterConstants.StatisticType.AbilityPoints:
-                        setStatsPacket.WriteShort(character.AbilityPoints);
+                        setStatsPacket.WriteShort(character.Stats.AbilityPoints);
                         break;
 
                     case CharacterConstants.StatisticType.SkillPoints:
-                        setStatsPacket.WriteShort(character.SkillPoints);
+                        setStatsPacket.WriteShort(character.Stats.SkillPoints);
                         break;
 
                     case CharacterConstants.StatisticType.Experience:
-                        setStatsPacket.WriteInt(character.Experience);
+                        setStatsPacket.WriteInt(character.Stats.Experience);
                         break;
 
                     case CharacterConstants.StatisticType.Fame:
-                        setStatsPacket.WriteShort(character.Fame);
+                        setStatsPacket.WriteShort(character.Stats.Fame);
                         break;
 
                     case CharacterConstants.StatisticType.Mesos:
-                        setStatsPacket.WriteInt(character.Meso);
+                        setStatsPacket.WriteInt(character.Stats.Meso);
                         break;
                 }
             }
@@ -333,7 +333,7 @@ namespace Destiny.Network.PacketFactory
                 .WriteByte()
                 .WriteInt(mapID)
                 .WriteByte(character.SpawnPoint)
-                .WriteShort(character.Health)
+                .WriteShort(character.Stats.Health)
                 .WriteBool(fromPosition);
 
             if (fromPosition)

@@ -285,35 +285,28 @@ namespace Destiny.Interoperability
                 Skin = skin,
                 Face = face,
                 Hair = hair + hairColor,
-                Level = 1,
+                Stats = { Level = 1, Experience = 0,
+                    MaxHealth = 50, MaxMana = 5,
+                    Health = 50, Mana = 5,
+                    AbilityPoints = 0, SkillPoints = 0,
+                    Strength = 12, Dexterity = 5,
+                    Intelligence = 4, Luck = 4,
+                    Fame = 0, Meso = 0},
                 Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse :
                     jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner :
-                    CharacterConstants.Job.Aran,
-                Strength = 12,
-                Dexterity = 5,
-                Intelligence = 4,
-                Luck = 4,
-                MaxHealth = 50,
-                MaxMana = 5,
-                Health = 50,
-                Mana = 5,
-                AbilityPoints = 0,
-                SkillPoints = 0,
-                Experience = 0,
-                Fame = 0,
+                    CharacterConstants.Job.Aran,                      
                 Map = DataProvider.Maps[
                     jobType == CharacterConstants.JobType.Cygnus ? 130030000 :
                     jobType == CharacterConstants.JobType.Explorer ? 10000 : 914000000],
-                SpawnPoint = 0,
-                Meso = 0
+                SpawnPoint = 0,              
             };
-
 
             character.Items.AddItemToInventory(new Item(topID, equipped: true));
             character.Items.AddItemToInventory(new Item(bottomID, equipped: true));
             character.Items.AddItemToInventory(new Item(shoesID, equipped: true));
             character.Items.AddItemToInventory(new Item(weaponID, equipped: true));
-            character.Items.AddItemToInventory(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
+            character.Items.AddItemToInventory(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 
+                : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
             character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.One, KeyMapConstants.KeymapAction.AllChat));
             character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Two, KeyMapConstants.KeymapAction.PartyChat));

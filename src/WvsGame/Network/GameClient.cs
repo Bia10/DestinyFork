@@ -174,11 +174,11 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.DistributeAP:
-                    this.Character.CharDistributeAPHandler(iPacket);
+                    this.Character.Stats.CharDistributeAPHandler(iPacket);
                     break;
 
                 case ClientOperationCode.AutoDistributeAP:
-                    this.Character.AutoDistributeAP(iPacket);
+                    this.Character.Stats.AutoDistributeAP(iPacket);
                     break;
 
                 case ClientOperationCode.HealOverTime:
@@ -186,7 +186,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.DistributeSP:
-                    this.Character.DistributeSPHandler(iPacket);
+                    this.Character.Stats.DistributeSPHandler(iPacket);
                     break;
 
                 case ClientOperationCode.UseSkill:
@@ -198,7 +198,7 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.MesoDrop:
-                    this.Character.DropMesoHandler(iPacket);
+                    this.Character.Stats.DropMesoHandler(iPacket);
                     break;
 
                 case ClientOperationCode.PlayerInformation:

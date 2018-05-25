@@ -23,15 +23,15 @@ namespace Destiny.Maple
 
         public static void giveExp(Character character, int exp)
         {
-            long myPlusGivenExp = (long)character.Experience + (long)exp;
+            long myPlusGivenExp = (long)character.Stats.Experience + (long)exp;
 
             if (myPlusGivenExp > GivenExpLimit)
             {
-                character.Experience = GivenExpLimit;
+                character.Stats.Experience = GivenExpLimit;
             }
             else
             {
-                character.Experience += exp;
+                character.Stats.Experience += exp;
                 Packet ShowGivenExp = GetShowExpGainPacket(true, exp, false, 0, 0);
                 character.Client.Send(ShowGivenExp);
             }

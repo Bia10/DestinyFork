@@ -45,7 +45,7 @@ namespace Destiny.Maple.Commands.Implementation
                             {
                                 if (character != caller && !character.IsMaster)
                                 {
-                                    character.Health = 0;
+                                    character.Stats.Health = 0;
                                 }
                             }
                         }
@@ -75,7 +75,7 @@ namespace Destiny.Maple.Commands.Implementation
                                 return;
                             }
 
-                            target.Health = 0;
+                            target.Stats.Health = 0;
                         }
                         break;
 

@@ -33,7 +33,7 @@ namespace Destiny.Maple.Characters
         public short Foothold { get; set; }
         public byte Portals { get; set; }
         public int Chair { get; set; }
-        public int? GuildRank { get; set; }
+        public int GuildRank { get; set; }
 
         public CharacterItems Items { get; private set; }
         public CharacterJobs Jobs { get; private set; }
@@ -58,21 +58,7 @@ namespace Destiny.Maple.Characters
         private byte skin;
         private int face;
         private int hair;
-        private byte level;
         private CharacterConstants.Job job;
-        private short strength;
-        private short dexterity;
-        private short intelligence;
-        private short luck;
-        private short health;
-        private short maxHealth;
-        private short mana;
-        private short maxMana;
-        private short abilityPoints;
-        private short skillPoints;
-        private int experience;
-        private short fame;
-        private int meso;
         private Npc lastNpc;
         private Quest lastQuest;
         private string chalkboard;
@@ -179,45 +165,6 @@ namespace Destiny.Maple.Characters
         }
 
         // TODO: Update party's properties.
-        public byte Level
-        {
-            get { return level; }
-            set
-            {
-                if (value > 200)
-                {
-                    throw new ArgumentException("Level cannot exceed 200.");
-                }
-
-                int delta = value - this.Level;
-
-                if (!this.IsInitialized)
-                {
-                    level = value;
-                }
-                else
-                {
-                    if (delta < 0)
-                    {
-                        level = value;
-
-                        CharacterStats.Update(this, CharacterConstants.StatisticType.Level);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < delta; i++)
-                        {
-                            CharacterStats.LevelUP(this, true);
-                        }
-
-                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Health);
-                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Mana);
-                    }
-                }
-            }
-        }
-
-        // TODO: Update party's properties.
         public CharacterConstants.Job Job
         {
             get { return job; }
@@ -233,241 +180,9 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public short Strength
-        {
-            get { return strength; }
-            set
-            {
-                strength = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Strength);
-                }
-            }
-        }
-
-        public short Dexterity
-        {
-            get { return dexterity; }
-            set
-            {
-                dexterity = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Dexterity);
-                }
-            }
-        }
-
-        public short Intelligence
-        {
-            get { return intelligence; }
-            set
-            {
-                intelligence = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Intelligence);
-                }
-            }
-        }
-
-        public short Luck
-        {
-            get { return luck; }
-            set
-            {
-                luck = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Luck);
-                }
-            }
-        }
-
-        public short Health
-        {
-            get { return health; }
-            set
-            {
-                if (value < 0)
-                {
-                    health = 0;
-                }
-                else if (value > this.MaxHealth)
-                {
-                    health = this.MaxHealth;
-                }
-                else
-                {
-                    health = value;
-                }
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Health);
-                }
-            }
-        }
-
-        public short MaxHealth
-        {
-            get { return maxHealth; }
-            set
-            {
-                maxHealth = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.MaxHealth);
-                }
-            }
-        }
-
-        public short Mana
-        {
-            get { return mana; }
-            set
-            {
-                if (value < 0)
-                {
-                    mana = 0;
-                }
-                else if (value > this.MaxMana)
-                {
-                    mana = this.MaxMana;
-                }
-                else
-                {
-                    mana = value;
-                }
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Mana);
-                }
-            }
-        }
-
-        public short MaxMana
-        {
-            get { return maxMana; }
-            set
-            {
-                maxMana = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.MaxMana);
-                }
-            }
-        }
-
-        public short AbilityPoints
-        {
-            get { return abilityPoints; }
-            set
-            {
-                abilityPoints = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.AbilityPoints);
-                }
-            }
-        }
-
-        public short SkillPoints
-        {
-            get { return skillPoints; }
-            set
-            {
-                skillPoints = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.SkillPoints);
-                }
-            }
-        }
-
-        public int Experience
-        {
-            get { return experience; }
-            set
-            {
-                int delta = value - experience;
-                experience = value;
-
-                if (true) // NOTE: A server setting for multi-leveling.
-                {
-                    while (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
-                    {
-                        experience -= CharacterConstants.ExperienceTables.CharacterLevel[this.Level];
-
-                        this.Level++;
-                    }
-                }
-
-                /*
-                else
-                {
-                    if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
-                    {
-                        experience -= CharacterConstants.ExperienceTables.CharacterLevel[this.Level];
-
-                        this.Level++;
-                    }
-
-                    if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
-                    {
-                        experience = CharacterConstants.ExperienceTables.CharacterLevel[this.Level] - 1;
-                    }
-                }
-                */
-
-                if (this.IsInitialized && delta != 0)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Experience);
-                }
-            }
-        }
-
-        public short Fame
-        {
-            get { return fame; }
-            set
-            {
-                fame = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Fame);
-                }
-            }
-        }
-
-        public int Meso
-        {
-            get { return meso; }
-            set
-            {
-                meso = value;
-
-                if (this.IsInitialized)
-                {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Mesos);
-                }
-            }
-        }
-
         public bool IsAlive
         {
-            get { return this.Health > 0; }
+            get { return this.Stats.Health > 0; }
         }
 
         public bool IsMaster
@@ -487,7 +202,7 @@ namespace Destiny.Maple.Characters
 
         public bool IsRanked
         {
-            get { return this.Level >= 30; }
+            get { return this.Stats.Level >= 30; }
         }
 
         public Npc LastNpc
@@ -631,23 +346,23 @@ namespace Destiny.Maple.Characters
             this.Skin = (byte)datum["Skin"];
             this.Face = (int)datum["Face"];
             this.Hair = (int)datum["Hair"];
-            this.Level = (byte)datum["Level"];
+            this.Stats.Level = (byte)datum["Level"];
             this.Job = (CharacterConstants.Job)datum["Job"];
-            this.Strength = (short)datum["Strength"];
-            this.Dexterity = (short)datum["Dexterity"];
-            this.Intelligence = (short)datum["Intelligence"];
-            this.Luck = (short)datum["Luck"];
-            this.MaxHealth = (short)datum["MaxHealth"];
-            this.MaxMana = (short)datum["MaxMana"];
-            this.Health = (short)datum["Health"];
-            this.Mana = (short)datum["Mana"];
-            this.AbilityPoints = (short)datum["AbilityPoints"];
-            this.SkillPoints = (short)datum["SkillPoints"];
-            this.Experience = (int)datum["Experience"];
-            this.Fame = (short)datum["Fame"];
+            this.Stats.Strength = (short)datum["Strength"];
+            this.Stats.Dexterity = (short)datum["Dexterity"];
+            this.Stats.Intelligence = (short)datum["Intelligence"];
+            this.Stats.Luck = (short)datum["Luck"];
+            this.Stats.MaxHealth = (short)datum["MaxHealth"];
+            this.Stats.MaxMana = (short)datum["MaxMana"];
+            this.Stats.Health = (short)datum["Health"];
+            this.Stats.Mana = (short)datum["Mana"];
+            this.Stats.AbilityPoints = (short)datum["AbilityPoints"];
+            this.Stats.SkillPoints = (short)datum["SkillPoints"];
+            this.Stats.Experience = (int)datum["Experience"];
+            this.Stats.Fame = (short)datum["Fame"];
             this.Map = DataProvider.Maps[(int)datum["MapID"]];
             this.SpawnPoint = (byte)datum["SpawnPoint"];
-            this.Meso = (int)datum["Meso"];
+            this.Stats.Meso = (int)datum["Meso"];
 
             this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte)datum["EquipmentSlots"];
             this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte)datum["UsableSlots"];
@@ -680,31 +395,29 @@ namespace Destiny.Maple.Characters
                 ["Skin"] = this.Skin,
                 ["Face"] = this.Face,
                 ["Hair"] = this.Hair,
-                ["Level"] = this.Level,
+                ["Level"] = this.Stats.Level,
                 ["Job"] = (short) this.Job,
-                ["Strength"] = this.Strength,
-                ["Dexterity"] = this.Dexterity,
-                ["Intelligence"] = this.Intelligence,
-                ["Luck"] = this.Luck,
-                ["Health"] = this.Health,
-                ["MaxHealth"] = this.MaxHealth,
-                ["Mana"] = this.Mana,
-                ["MaxMana"] = this.MaxMana,
-                ["AbilityPoints"] = this.AbilityPoints,
-                ["SkillPoints"] = this.SkillPoints,
-                ["Experience"] = this.Experience,
-                ["Fame"] = this.Fame,
+                ["Strength"] = this.Stats.Strength,
+                ["Dexterity"] = this.Stats.Dexterity,
+                ["Intelligence"] = this.Stats.Intelligence,
+                ["Luck"] = this.Stats.Luck,
+                ["Health"] = this.Stats.Health,
+                ["MaxHealth"] = this.Stats.MaxHealth,
+                ["Mana"] = this.Stats.Mana,
+                ["MaxMana"] = this.Stats.MaxMana,
+                ["AbilityPoints"] = this.Stats.AbilityPoints,
+                ["SkillPoints"] = this.Stats.SkillPoints,
+                ["Experience"] = this.Stats.Experience,
+                ["Fame"] = this.Stats.Fame,
                 ["MapID"] = this.Map.MapleID,
                 ["SpawnPoint"] = this.SpawnPoint,
-                ["Meso"] = this.Meso,
+                ["Meso"] = this.Stats.Meso,
                 ["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment],
                 ["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable],
                 ["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup],
                 ["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera],
                 ["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash]
             };
-
-
 
             if (this.Assigned)
             {
@@ -729,13 +442,13 @@ namespace Destiny.Maple.Characters
 
         public void InitializeCharacter()
         {
-            this.Client.Send(CharacterPackets.InitializeCharacterSetFieldPacket(this));
-            this.Client.Send(CharacterPackets.InitializeCharacterSrvrStatusChng());
+            Client.Send(CharacterPackets.InitializeCharacterSetFieldPacket(this));
+            Client.Send(CharacterPackets.InitializeCharacterSrvrStatusChng());
 
-            this.IsInitialized = true;
-            this.Map.Characters.Add(this);
-            this.Keymap.Send();
-            this.Memos.Send();
+            IsInitialized = true;
+            Map.Characters.Add(this);
+            Keymap.Send();
+            Memos.Send();
         }
 
         public static void InitializeCharacter(Character character)
@@ -793,7 +506,7 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        this.Health = 50;
+                        this.Stats.Health = 50;
                         this.SendChangeMapRequest(this.Map.ReturnMapID);
                     }
                     break;
@@ -1214,12 +927,12 @@ namespace Destiny.Maple.Characters
                     }
                     else
                     {
-                        this.Health -= (short)damage;
+                        this.Stats.Health -= (short)damage;
                     }
 
                     if (mpBurn > 0)
                     {
-                        this.Mana -= (short)mpBurn;
+                        this.Stats.Mana -= (short)mpBurn;
                     }
                 }
 
@@ -1322,42 +1035,6 @@ namespace Destiny.Maple.Characters
             this.LastNpc.Converse(this);
         }
 
-        public void CharDistributeAPHandler(Packet inPacket)
-        {
-            if (this.AbilityPoints == 0) return;
-
-            inPacket.ReadInt(); // NOTE: Ticks.
-            CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) inPacket.ReadInt();
-
-            CharacterStats.DistributeAP(this, type);
-            this.AbilityPoints--;
-        }
-
-        public void AutoDistributeAP(Packet iPacket)
-        {
-            iPacket.ReadInt(); // NOTE: Ticks.
-            int count = iPacket.ReadInt(); // NOTE: There are always 2 primary stats for each job, but still.
-
-            int total = 0;
-
-            for (int i = 0; i < count; i++)
-            {
-                CharacterConstants.StatisticType type = (CharacterConstants.StatisticType)iPacket.ReadInt();
-                int amount = iPacket.ReadInt();
-
-                if (amount > this.AbilityPoints || amount < 0)
-                {
-                    return;
-                }
-
-                CharacterStats.DistributeAP(this, type, (short)amount);
-
-                total += amount;
-            }
-
-            this.AbilityPoints -= (short)total;
-        }
-
         public void HealOverTime(Packet iPacket)
         {
             iPacket.ReadInt(); // NOTE: Ticks.
@@ -1373,7 +1050,7 @@ namespace Destiny.Maple.Characters
                 }
                 else
                 {
-                    this.Health += healthAmount;
+                    this.Stats.Health += healthAmount;
                     this.LastHealthHealOverTime = DateTime.Now;
                 }
             }
@@ -1386,73 +1063,10 @@ namespace Destiny.Maple.Characters
                 }
                 else
                 {
-                    this.Mana += manaAmount;
+                    this.Stats.Mana += manaAmount;
                     this.LastManaHealOverTime = DateTime.Now;
                 }
             }
-        }
-
-        public void DistributeSPHandler(Packet inPacket)
-        {
-            if (this.SkillPoints == 0)
-            {
-                return;
-            }
-
-            inPacket.ReadInt(); // NOTE: Ticks.
-            int mapleID = inPacket.ReadInt();
-
-            if (!this.Skills.Contains(mapleID))
-            {
-                this.Skills.Add(new Skill(mapleID));
-            }
-
-            Skill skill = this.Skills[mapleID];
-
-            // TODO: Check for skill requirements.
-
-            if (Skill.IsFromBeginner(skill))
-            {
-                // TODO: Handle beginner skills.
-            }
-
-            if (skill.CurrentLevel + 1 <= skill.MaxLevel)
-            {
-                if (!Skill.IsFromBeginner(skill))
-                {
-                    this.SkillPoints--;
-                }
-
-                Release(this);
-
-                skill.CurrentLevel++;
-            }
-        }
-
-        public void DropMesoHandler(Packet inPacket)
-        {
-            inPacket.Skip(4); // NOTE: tRequestTime (ticks). // TODO: validate request by time
-            int amount = inPacket.ReadInt();
-
-            // TODO: add this to settings
-            const int MIN_LIMIT = 10;
-            const int MAX_LIMIT = 50000;
-
-            if (amount > this.Meso || amount < MIN_LIMIT || amount > MAX_LIMIT)
-            {
-                return;
-            }
-
-            // take char mesos
-            this.Meso -= amount;
-            // create new mesos
-            Meso meso = new Meso(amount)
-            {
-                Dropper = this,
-                Owner = null
-            };
-            // add it to current map
-            this.Map.Drops.Add(meso);
         }
 
         public void InformOnCharacter(Packet iPacket)
@@ -1480,9 +1094,9 @@ namespace Destiny.Maple.Characters
             {
                 oPacket
                     .WriteInt(target.ID)
-                    .WriteByte(target.Level)
+                    .WriteByte(target.Stats.Level)
                     .WriteShort((short)target.Job)
-                    .WriteShort(target.Fame)
+                    .WriteShort(target.Stats.Fame)
                     .WriteBool(false) // NOTE: Marriage.
                     .WriteString("-") // NOTE: Guild name.
                     .WriteString("-") // NOTE: Alliance name.
@@ -1745,7 +1359,7 @@ namespace Destiny.Maple.Characters
                     {
                         int amount = iPacket.ReadInt();
 
-                        this.Experience += amount; // Unsafe
+                        this.Stats.Experience += amount; // Unsafe
                     }
                     break;
 
@@ -2066,20 +1680,20 @@ namespace Destiny.Maple.Characters
                     .WriteLong()
                     .WriteLong()
                     .WriteLong()
-                    .WriteByte(this.Level)
+                    .WriteByte(this.Stats.Level)
                     .WriteShort((short)this.Job)
-                    .WriteShort(this.Strength)
-                    .WriteShort(this.Dexterity)
-                    .WriteShort(this.Intelligence)
-                    .WriteShort(this.Luck)
-                    .WriteShort(this.Health)
-                    .WriteShort(this.MaxHealth)
-                    .WriteShort(this.Mana)
-                    .WriteShort(this.MaxMana)
-                    .WriteShort(this.AbilityPoints)
-                    .WriteShort(this.SkillPoints)
-                    .WriteInt(this.Experience)
-                    .WriteShort(this.Fame)
+                    .WriteShort(this.Stats.Strength)
+                    .WriteShort(this.Stats.Dexterity)
+                    .WriteShort(this.Stats.Intelligence)
+                    .WriteShort(this.Stats.Luck)
+                    .WriteShort(this.Stats.Health)
+                    .WriteShort(this.Stats.MaxHealth)
+                    .WriteShort(this.Stats.Mana)
+                    .WriteShort(this.Stats.MaxMana)
+                    .WriteShort(this.Stats.AbilityPoints)
+                    .WriteShort(this.Stats.SkillPoints)
+                    .WriteInt(this.Stats.Experience)
+                    .WriteShort(this.Stats.Fame)
                     .WriteInt()
                     .WriteInt(this.Map.MapleID)
                     .WriteByte(this.SpawnPoint)
@@ -2171,7 +1785,7 @@ namespace Destiny.Maple.Characters
                     .WriteBytes(this.StatisticsToByteArray())
                     .WriteByte(20) // NOTE: Max buddylist size.
                     .WriteBool(false) // NOTE: Blessing of Fairy.
-                    .WriteInt(this.Meso)
+                    .WriteInt(this.Stats.Meso)
                     .WriteBytes(this.Items.ItemToByteArray())
                     .WriteBytes(this.Skills.ToByteArray())
                     .WriteBytes(this.Quests.ToByteArray())
@@ -2286,7 +1900,7 @@ namespace Destiny.Maple.Characters
 
             oPacket
                 .WriteInt(this.ID)
-                .WriteByte(this.Level)
+                .WriteByte(this.Stats.Level)
                 .WriteString(this.Name);
 
             if (false) // ??

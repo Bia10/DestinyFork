@@ -208,9 +208,9 @@ namespace Destiny.Maple.Characters
                 this.Started[quest.MapleID].Add(requiredKills.Key, 0);
             }
 
-            this.Parent.Experience += quest.ExperienceReward[0];
-            this.Parent.Fame += (short)quest.FameReward[0];
-            this.Parent.Meso += quest.MesoReward[0] * WvsGame.MesoRate;
+            this.Parent.Stats.Experience += quest.ExperienceReward[0];
+            this.Parent.Stats.Fame += (short)quest.FameReward[0];
+            this.Parent.Stats.Meso += quest.MesoReward[0] * WvsGame.MesoRate;
 
             // TODO: Skill and pet rewards.
 
@@ -247,7 +247,7 @@ namespace Destiny.Maple.Characters
                 this.Parent.Items.RemoveItemFromInventoryByID(item.Key, item.Value);
             }
 
-            this.Parent.Experience += quest.ExperienceReward[1];
+            this.Parent.Stats.Experience += quest.ExperienceReward[1];
 
             using (Packet oPacket = new Packet(ServerOperationCode.Message))
             {
@@ -269,11 +269,11 @@ namespace Destiny.Maple.Characters
                 this.Parent.Client.Send(oPacket);
             }
 
-            this.Parent.Fame += (short)quest.FameReward[1];
+            this.Parent.Stats.Fame += (short)quest.FameReward[1];
 
             // TODO: Fame gain packet in chat.
 
-            this.Parent.Meso += quest.MesoReward[1] * WvsGame.MesoRate;
+            this.Parent.Stats.Meso += quest.MesoReward[1] * WvsGame.MesoRate;
 
             // TODO: Meso gain packet in chat.
 

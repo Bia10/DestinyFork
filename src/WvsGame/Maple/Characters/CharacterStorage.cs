@@ -120,13 +120,13 @@ namespace Destiny.Maple.Characters
 
                         // Even if i do, still i may not have enough mesos to demand this payed service :(
                         int costToWithdraw = 1000; // TODO: how is the cost actually calculated?
-                        if (this.Parent.Meso < costToWithdraw)
+                        if (this.Parent.Stats.Meso < costToWithdraw)
                         {
                             this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
-                        if (this.Parent.Meso >= costToWithdraw)
+                        if (this.Parent.Stats.Meso >= costToWithdraw)
                         {
                             // Devour character mesos   
                             Maple.Meso.giveMesos(this.Parent, costToWithdraw);     
@@ -177,16 +177,16 @@ namespace Destiny.Maple.Characters
                         }
 
                         // not enough mesos to pay for deposit
-                        if (this.Parent.Meso <= this.Npc.StorageCost)
+                        if (this.Parent.Stats.Meso <= this.Npc.StorageCost)
                         {
                             this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
-                        if (this.Parent.Meso >= this.Npc.StorageCost)
+                        if (this.Parent.Stats.Meso >= this.Npc.StorageCost)
                         {
                             //devour character mesos
-                            this.Parent.Meso -= this.Npc.StorageCost; 
+                            this.Parent.Stats.Meso -= this.Npc.StorageCost; 
 
                             // remove item form inventory
                             this.Parent.Items.RemoveItemFromInventory(item, true);
@@ -238,7 +238,7 @@ namespace Destiny.Maple.Characters
                         }
 
                         this.Meso -= meso;
-                        this.Parent.Meso += meso;
+                        this.Parent.Stats.Meso += meso;
 
                         this.Parent.Client.Send(CharacterPackets.StorageChangeMesos(this.Parent));
                     }

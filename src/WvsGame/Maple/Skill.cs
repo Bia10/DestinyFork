@@ -380,8 +380,8 @@ namespace Destiny.Maple
             if (!this.Character.IsAlive) return;       
             if (this.IsCoolingDown) return;
 
-            this.Character.Health -= this.CostHP;
-            this.Character.Mana -= this.CostMP;
+            this.Character.Stats.Health -= this.CostHP;
+            this.Character.Stats.Mana -= this.CostMP;
 
             if (this.Cooldown > 0)
             {

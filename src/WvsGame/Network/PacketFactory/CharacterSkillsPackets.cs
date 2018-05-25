@@ -8,7 +8,7 @@ namespace Destiny.Network.PacketFactory
     {
         public static Packet UpdateSkill(Skill skill)
         {
-            Packet updateSkillPacket = new Packet(ServerOperationCode.SetGender);
+            Packet updateSkillPacket = new Packet(ServerOperationCode.ChangeSkillRecordResult);
 
             updateSkillPacket
                 .WriteByte(1)

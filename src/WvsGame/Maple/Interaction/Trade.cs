@@ -238,7 +238,7 @@ namespace Destiny.Maple.Interaction
                     {
                         int meso = iPacket.ReadInt();
 
-                        if (meso < 0 || meso > character.Meso)
+                        if (meso < 0 || meso > character.Stats.Meso)
                         {
                             return;
                         }
@@ -261,7 +261,7 @@ namespace Destiny.Maple.Interaction
                                 }
 
                                 this.OwnerMeso += meso;
-                                this.Owner.Meso -= meso;
+                                this.Owner.Stats.Meso -= meso;
 
                                 this.Owner.Client.Send(oPacket);
                             }
@@ -273,7 +273,7 @@ namespace Destiny.Maple.Interaction
                                 }
 
                                 this.VisitorMeso += meso;
-                                this.Visitor.Meso -= meso;
+                                this.Visitor.Stats.Meso -= meso;
 
                                 this.Visitor.Client.Send(oPacket);
                             }
@@ -408,8 +408,8 @@ namespace Destiny.Maple.Interaction
             if (this.Owner.Items.CouldReceiveItems(this.VisitorItems) 
                 && this.Visitor.Items.CouldReceiveItems(this.OwnerItems))
             {
-                this.Owner.Meso += this.VisitorMeso;
-                this.Visitor.Meso += this.OwnerMeso;
+                this.Owner.Stats.Meso += this.VisitorMeso;
+                this.Visitor.Stats.Meso += this.OwnerMeso;
 
                 this.Owner.Items.AddRangeOfItems(this.VisitorItems);
                 this.Visitor.Items.AddRangeOfItems(this.OwnerItems);
@@ -422,8 +422,8 @@ namespace Destiny.Maple.Interaction
 
         public void Cancel()
         {
-            this.Owner.Meso += this.OwnerMeso;
-            this.Visitor.Meso += this.VisitorMeso;
+            this.Owner.Stats.Meso += this.OwnerMeso;
+            this.Visitor.Stats.Meso += this.VisitorMeso;
 
             this.Owner.Items.AddRangeOfItems(this.OwnerItems);
             this.Visitor.Items.AddRangeOfItems(this.VisitorItems);
