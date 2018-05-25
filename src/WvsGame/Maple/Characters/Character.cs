@@ -200,6 +200,7 @@ namespace Destiny.Maple.Characters
             this.Items = new CharacterItems(this, START_EQP_SLOTS, START_USE_SLOTS, START_SETUP_SLOTS, START_ETC_SLOTS, START_CASH_SLOTS);
             this.Jobs = new CharacterJobs(this);
             this.Stats = new CharacterStats(this);
+            this.Appearance = new CharacterAppearance(this);
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
             this.Buffs = new CharacterBuffs(this);

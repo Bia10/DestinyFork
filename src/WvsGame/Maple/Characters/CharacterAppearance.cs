@@ -31,6 +31,11 @@ namespace Destiny.Maple.Characters
             get { return gender; }
             set { SetGenderTo(value);  }
         }
+
+        public static void ChangeGender(Character character, CharacterConstants.Gender newGender)
+        {
+            character?.Appearance.SetGenderTo(newGender);
+        }
         #endregion
 
         #region Skin
@@ -54,6 +59,11 @@ namespace Destiny.Maple.Characters
         {
             get { return skin; }
             set { SetSkinTo(value); }
+        }
+
+        public static void ChangeSkin(Character character, byte newSkin)
+        {
+            character?.Appearance.SetSkinTo(newSkin);
         }
         #endregion
 
@@ -80,6 +90,7 @@ namespace Destiny.Maple.Characters
             get { return face; }
             set { SetFaceTo(value); }
         }
+
         public int FaceStyleOffset
         {
             get
@@ -91,6 +102,11 @@ namespace Destiny.Maple.Characters
         public int FaceColorOffset
         {
             get { return ((Face / 100) - (10 * (Face / 1000))) * 100; }
+        }
+
+        public static void ChangeFace(Character character, int newFace)
+        {
+            character?.Appearance.SetFaceTo(newFace);
         }
         #endregion
 
@@ -126,6 +142,11 @@ namespace Destiny.Maple.Characters
         public int HairColorOffset
         {
             get { return Hair - (10 * (Hair / 10)); }
+        }
+
+        public static void ChangeHair(Character character, int newHair)
+        {
+            character?.Appearance.SetHairTo(newHair);
         }
         #endregion
 

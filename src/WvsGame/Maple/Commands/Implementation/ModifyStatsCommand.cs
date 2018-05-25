@@ -3,13 +3,13 @@ using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class ModifyStatCommand : Command
+    public sealed class ModifyStatsCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "modify";
+                return "stats";
             }
         }
 
