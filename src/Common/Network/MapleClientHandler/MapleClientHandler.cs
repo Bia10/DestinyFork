@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 
 using Destiny.IO;
 using Destiny.Network.ClientHandler;
@@ -10,13 +11,13 @@ namespace Destiny.Network.MapleClientHandler
 {
     public abstract class MapleClientHandler : ClientHandler<ClientOperationCode, ServerOperationCode, MapleCryptograph>
     {
-        public MapleClientHandler(Socket socket) : base(socket, "Client") { }
+        protected MapleClientHandler(Socket socket) : base(socket, "Client") { }
 
         protected override void Initialize()
         {
-            byte[] initialization = this.Cryptograph.Initialize();
+            byte[] initialization = Cryptograph.Initialize();
 
-            this.Socket.Send(initialization);
+            Socket.Send(initialization);
 
             switch (Packet.LogLevel)
             {
@@ -27,6 +28,12 @@ namespace Destiny.Network.MapleClientHandler
                 case LogLevel.Full:
                     Log.Hex("Sent Initialization packet (unencrypted): ", initialization);
                     break;
+
+                case LogLevel.None:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

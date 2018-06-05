@@ -18,8 +18,8 @@ namespace Destiny.Maple.Characters
 
         public CharacterConstants.StatisticType Statistic;
 
-        private DateTime LastHealthHealOverTime = new DateTime();
-        private DateTime LastManaHealOverTime = new DateTime();
+        private DateTime LastHealthHealOverTime;
+        private DateTime LastManaHealOverTime;
 
 
         #region HealthRelated

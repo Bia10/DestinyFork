@@ -9,25 +9,24 @@ using Destiny.Security;
 
 namespace Destiny.Network.ServerHandler
 {
-    public abstract class ServerHandler<TReceiveOP, TSendOP, TCryptograph>
-        : NetworkConnector<TReceiveOP, TSendOP, TCryptograph>, IDisposable where TCryptograph : Cryptograph, new()
+    public abstract class ServerHandler<TReceiveOP, TSendOP, TCryptograph> : NetworkConnector<TReceiveOP, TSendOP, TCryptograph>, IDisposable where TCryptograph : Cryptograph, new()
     {
-        protected string Title { get; private set; }
+        protected string Title { get; }
 
         protected abstract void StopServer();
         protected virtual void Initialize(params object[] args) { }
 
-        public ServerHandler(IPEndPoint remoteEP, string title = "Server", params object[] args)
+        protected ServerHandler(IPEndPoint remoteEP, string title = "Server", params object[] args)
         {
-            this.Title = title;
+            Title = title;
 
-            Log.Inform("Connecting to {0} at {1}...", this.Title.ToLower(), remoteEP.Address);
+            Log.Inform("Connecting to {0} at {1}...", Title.ToLower(), remoteEP.Address);
 
-            this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this.Cryptograph = new TCryptograph();
-            this.IsAlive = true;
+            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Cryptograph = new TCryptograph();
+            IsAlive = true;
 
-            this.Prepare();
+            Prepare();
 
             bool connected = false;
             int tries = 0;
@@ -41,12 +40,12 @@ namespace Destiny.Network.ServerHandler
                         Thread.Sleep(2000);
                     }
 
-                    this.Socket.Connect(remoteEP);
+                    Socket.Connect(remoteEP);
                     connected = true;
                 }
                 catch
                 {
-                    Log.Warn("Could not connect to {0} at {1}.", this.Title.ToLower(), remoteEP.ToString());
+                    Log.Warn("Could not connect to {0} at {1}.", Title.ToLower(), remoteEP.ToString());
                     tries++;
                 }
             }
@@ -54,94 +53,99 @@ namespace Destiny.Network.ServerHandler
             if (!connected)
             {
                 Log.SkipLine();
-                throw new NetworkException(string.Format("{0} connection failed.", this.Title));
+                throw new NetworkException(string.Format("{0} connection failed.", Title));
             }
 
             Log.SkipLine();
-            Log.Success("Connected to {0} on thread {1}.", this.Title.ToLower(), Thread.CurrentThread.ManagedThreadId);
+            Log.Success("Connected to {0} on thread {1}.", Title.ToLower(), Thread.CurrentThread.ManagedThreadId);
             Log.SkipLine();
 
-            this.Initialize(args);
+            Initialize(args);
         }
 
-        public void Loop()
+        protected void Loop()
         {
-            while (this.IsAlive)// && this.IsServerAlive)
+            while (IsAlive)// && IsServerAlive)
             {
-                this.ReceiveDone.Reset();
+                ReceiveDone.Reset();
 
                 ByteBuffer buffer = new ByteBuffer();
 
-                this.Socket.BeginReceive(buffer.Array, buffer.Position, buffer.Capacity, SocketFlags.None, new AsyncCallback(this.OnReceive), buffer);
+                Socket.BeginReceive(buffer.Array, buffer.Position, buffer.Capacity, SocketFlags.None, new AsyncCallback(OnReceive), buffer);
 
-                this.ReceiveDone.WaitOne();
+                ReceiveDone.WaitOne();
             }
 
-            this.Dispose();
+            Dispose();
 
-            this.StopServer();
+            StopServer();
         }
 
         protected void OnReceive(IAsyncResult ar)
         {
-            if (this.IsAlive)
+            if (!IsAlive) return;
+
+            using (ByteBuffer buffer = (ByteBuffer)ar.AsyncState)
             {
-                using (ByteBuffer buffer = (ByteBuffer)ar.AsyncState)
+                buffer.Position = 0;
+
+                try
                 {
-                    buffer.Position = 0;
+                    buffer.Limit = Socket.EndReceive(ar);
 
-                    try
+                    if (buffer.Limit == 0)
                     {
-                        buffer.Limit = this.Socket.EndReceive(ar);
-
-                        if (buffer.Limit == 0)
+                        Stop();
+                    }
+                    else
+                    {
+                        using (Packet inPacket = new Packet(Cryptograph.Decrypt(buffer.GetContent())))
                         {
-                            this.Stop();
-                        }
-                        else
-                        {
-                            using (Packet inPacket = new Packet(this.Cryptograph.Decrypt(buffer.GetContent())))
+                            if (Enum.IsDefined(typeof(TReceiveOP), inPacket.OperationCode))
                             {
-                                if (Enum.IsDefined(typeof(TReceiveOP), inPacket.OperationCode))
+                                switch (Packet.LogLevel)
                                 {
-                                    switch (Packet.LogLevel)
-                                    {
-                                        case LogLevel.Name:
-                                            Log.Inform("Received {0} packet.", Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
-                                            break;
+                                    case LogLevel.Name:
+                                        Log.Inform("Received {0} packet.", Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
+                                        break;
 
-                                        case LogLevel.Full:
-                                            Log.Hex("Received {0} packet: ", inPacket.Array, Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    Log.SkipLine();
-                                    Log.Hex("Received unknown (0x{0:X2}) packet: ", inPacket.Array, inPacket.OperationCode);
-                                    Log.SkipLine();
-                                }
+                                    case LogLevel.Full:
+                                        Log.Hex("Received {0} packet: ", inPacket.Array, Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
+                                        break;
 
-                                this.Dispatch(inPacket);
+                                    case LogLevel.None:
+                                        break;
+
+                                    default:
+                                        throw new ArgumentOutOfRangeException();
+                                }
                             }
-                        }
+                            else
+                            {
+                                Log.SkipLine();
+                                Log.Hex("Received unknown (0x{0:X2}) packet: ", inPacket.Array, inPacket.OperationCode);
+                                Log.SkipLine();
+                            }
 
-                        this.ReceiveDone.Set();
+                            Dispatch(inPacket);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Log.SkipLine();
-                        Log.Error("Uncatched fatal error on {0}: ", e, this.Title.ToLower());
-                        this.Stop();
-                    }
+
+                    ReceiveDone.Set();
+                }
+                catch (Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Error("Uncatched fatal error on {0}: ", e, Title.ToLower());
+                    Stop();
                 }
             }
         }
 
-        public void Send(Packet Packet)
+        protected void Send(Packet Packet)
         {
             Packet.SafeFlip();
-            this.Socket.Send(this.Cryptograph.Encrypt(Packet.GetContent()));
+            Socket.Send(Cryptograph.Encrypt(Packet.GetContent()));
 
             if (Enum.IsDefined(typeof(TSendOP), Packet.OperationCode))
             {
@@ -154,6 +158,12 @@ namespace Destiny.Network.ServerHandler
                     case LogLevel.Full:
                         Log.Hex("Sent {0} packet: ", Packet.GetContent(), Enum.GetName(typeof(TSendOP), Packet.OperationCode));
                         break;
+
+                    case LogLevel.None:
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
             else
@@ -164,16 +174,16 @@ namespace Destiny.Network.ServerHandler
 
         public void Dispose()
         {
-            this.Terminate();
+            Terminate();
 
-            this.Socket.Dispose();
+            Socket.Dispose();
 
-            this.Cryptograph.Dispose();
-            this.ReceiveDone.Dispose(); // TODO: Figure out why this crashes.
+            Cryptograph.Dispose();
+            ReceiveDone.Dispose(); // TODO: Figure out why this crashes.
 
-            this.CustomDispose();
+            CustomDispose();
 
-            Log.Inform("{0} disposed.", this.Title);
+            Log.Inform("{0} disposed.", Title);
         }
     }
 }

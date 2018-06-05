@@ -1,15 +1,15 @@
-﻿using Destiny.Data;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
-using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Data
 {
     public sealed class CachedMaps : KeyedCollection<int, Map>
     {
-        public CachedMaps()
-            : base()
+        public CachedMaps() : base()
         {
             using (Log.Load("Maps"))
             {
@@ -50,9 +50,7 @@ namespace Destiny.Maple.Data
                             switch ((string)datum["life_type"])
                             {
                                 case "npc":
-                                    {
-                                        this[key].Npcs.Add(new Npc(datum));
-                                    }
+                                    this[key].Npcs.Add(new Npc(datum));
                                     break;
 
                                 case "mob":
@@ -65,10 +63,8 @@ namespace Destiny.Maple.Data
                             }
                         }
                     }
-
                     this[key].SpawnPoints.Spawn();
                 }
-
                 return base[key];
             }
         }

@@ -12,13 +12,13 @@ namespace Destiny.Maple.Characters
 {
     public sealed class CharacterBuffs : IEnumerable<Buff>
     {
-        public Character Parent { get; private set; }
-        private List<Buff> Buffs { get; set; }
+        public Character Parent { get; }
+        private List<Buff> Buffs { get; }
         public Buff this[int mapleId]
         {
             get
             {
-                foreach (Buff loopBuff in this.Buffs)
+                foreach (Buff loopBuff in Buffs)
                 {
                     if (loopBuff.MapleID == mapleId)
                     {
@@ -30,30 +30,29 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public CharacterBuffs(Character parent)
-            : base()
+        public CharacterBuffs(Character parent) : base()
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.Buffs = new List<Buff>();
+            Buffs = new List<Buff>();
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("buffs").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("buffs").Populate("CharacterID = {0}", Parent.ID))
             {
                 if ((DateTime)datum["End"] > DateTime.Now)
                 {
-                    this.AddBuff(new Buff(this, datum));
+                    AddBuff(new Buff(this, datum));
                 }
             }
         }
 
         public void Save()
         {
-            this.Delete();
+            Delete();
 
-            foreach (Buff loopBuff in this.Buffs)
+            foreach (Buff loopBuff in Buffs)
             {
                 loopBuff.Save();
             }
@@ -61,17 +60,17 @@ namespace Destiny.Maple.Characters
 
         public void Delete()
         {
-            Database.Delete("buffs", "CharacterID = {0}", this.Parent.ID);
+            Database.Delete("buffs", "CharacterID = {0}", Parent.ID);
         }
 
         public bool Contains(Buff buff)
         {
-            return this.Buffs.Contains(buff);
+            return Buffs.Contains(buff);
         }
 
         public bool Contains(int mapleId)
         {
-            foreach (Buff loopBuff in this.Buffs)
+            foreach (Buff loopBuff in Buffs)
             {
                 if (loopBuff.MapleID == mapleId)
                 {
@@ -84,44 +83,41 @@ namespace Destiny.Maple.Characters
 
         public void AddBuffBySkill(Skill skill, int value)
         {
-            this.AddBuff(new Buff(this, skill, value));
+            AddBuff(new Buff(this, skill, value));
         }
 
         public void AddBuff(Buff buff)
         {
-            foreach (Buff loopBuff in this.Buffs)
+            foreach (Buff loopBuff in Buffs)
             {
-                if (loopBuff.MapleID == buff.MapleID)
-                {
-                    this.RemoveBuff(loopBuff);
+                if (loopBuff.MapleID != buff.MapleID) continue;
 
-                    break;
-                }
+                RemoveBuff(loopBuff);
+
+                break;
             }
 
             buff.Parent = this;
 
-            this.Buffs.Add(buff);
+            Buffs.Add(buff);
 
-            if (this.Parent.IsInitialized && buff.Type == 1)
-            {
-                buff.Apply();
-            }
+            if (!Parent.IsInitialized || buff.Type != 1) return;
+
+            buff.Apply();
         }
 
         public void RemoveBuffByID(int mapleId)
         {
-            this.RemoveBuff(this[mapleId]);
+            RemoveBuff(this[mapleId]);
         }
 
         public void RemoveBuff(Buff buff)
         {
-            this.Buffs.Remove(buff);
+            Buffs.Remove(buff);
 
-            if (this.Parent.IsInitialized)
-            {
-                buff.Cancel();
-            }
+            if (!Parent.IsInitialized) return;
+
+            buff.Cancel();
         }
 
         public void CancelBuffHandler(Packet inPacket)
@@ -132,19 +128,19 @@ namespace Destiny.Maple.Characters
             {
                 // TODO: Handle special skills.
                 default:
-                    this.RemoveBuffByID(mapleID);
+                    RemoveBuffByID(mapleID);
                     break;
             }
         }
 
         public IEnumerator<Buff> GetEnumerator()
         {
-            return this.Buffs.GetEnumerator();
+            return Buffs.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)this.Buffs).GetEnumerator();
+            return ((IEnumerable)Buffs).GetEnumerator();
         }
 
         public static void ShowOwnBuffEffect(Character character, Skill skill)
@@ -183,24 +179,24 @@ namespace Destiny.Maple.Characters
                 long mask = 0;
                 int value = 0;
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Rogue.DarkSight))
+                if (Contains((int)CharacterConstants.SkillNames.Rogue.DarkSight))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.DarkSight;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Crusader.ComboAttack))
+                if (Contains((int)CharacterConstants.SkillNames.Crusader.ComboAttack))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.Combo;
                     value = this[(int)CharacterConstants.SkillNames.Crusader.ComboAttack].Value;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hermit.ShadowPartner))
+                if (Contains((int)CharacterConstants.SkillNames.Hermit.ShadowPartner))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.ShadowPartner;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) 
-                    || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
+                if (Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) 
+                    || Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.SoulArrow;
                 }
@@ -239,6 +235,7 @@ namespace Destiny.Maple.Characters
                     .WriteByte();
 
                 oPacket.Flip();
+
                 return oPacket.GetContent();
             }
         }

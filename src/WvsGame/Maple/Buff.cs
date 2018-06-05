@@ -110,14 +110,16 @@ namespace Destiny.Maple
 
         public void Save()
         {
-            Datum datum = new Datum("buffs");
+            Datum datum = new Datum("buffs")
+            {
+                ["CharacterID"] = this.Character.ID,
+                ["MapleID"] = this.MapleID,
+                ["SkillLevel"] = this.SkillLevel,
+                ["Type"] = this.Type,
+                ["Value"] = this.Value,
+                ["End"] = this.End
+            };
 
-            datum["CharacterID"] = this.Character.ID;
-            datum["MapleID"] = this.MapleID;
-            datum["SkillLevel"] = this.SkillLevel;
-            datum["Type"] = this.Type;
-            datum["Value"] = this.Value;
-            datum["End"] = this.End;
 
             datum.Insert();
         }

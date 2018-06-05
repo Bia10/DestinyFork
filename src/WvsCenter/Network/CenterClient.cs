@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+
 using Destiny.Constants;
 using Destiny.Maple;
 using Destiny.IO;
 using Destiny.Security;
 using Destiny.Network.ClientHandler;
 using Destiny.Network.Common;
+using Destiny.Network.PacketFactory;
 
 namespace Destiny.Network
 {
@@ -31,10 +33,10 @@ namespace Destiny.Network
             }
         }
 
-        protected override void Prepare(params object[] args)
+        /*protected override void Prepare(params object[] args)
         {
             base.Prepare(args);
-        }
+        }*/
 
         protected override void Register()
         {
@@ -43,7 +45,7 @@ namespace Destiny.Network
 
         protected override void Terminate()
         {
-            switch (this.Type)
+            switch (Type)
             {
                 case ServerConstants.ServerType.Login:
                     {
@@ -57,32 +59,45 @@ namespace Destiny.Network
 
                 case ServerConstants.ServerType.Channel:
                     {
-                        this.World.Remove(this);
+                        World.Remove(this);
 
                         using (Packet Packet = new Packet(InteroperabilityOperationCode.UpdateChannel))
                         {
-                            Packet.WriteByte(this.World.ID);
+                            Packet.WriteByte(World.ID);
                             Packet.WriteBool(false);
-                            Packet.WriteByte(this.ID);
+                            Packet.WriteByte(ID);
 
                             WvsCenter.Login?.Send(Packet);
                         }
                         Log.SkipLine();
-                        Log.Warn("Unregistered Channel Server ({0}-{1}).", this.World.Name, (this.ID + 1));
+                        Log.Warn("Unregistered Channel Server ({0}-{1}).", World.Name, (ID + 1));
                         Log.SkipLine();
                     }
                     break;
 
                 case ServerConstants.ServerType.Shop:
                     {
-                        this.World.Shop = null;
+                        World.Shop = null;
 
                         Log.SkipLine();
-                        Log.Warn("Unregistered Shop Server ({0}).", this.World.Name);
+                        Log.Warn("Unregistered Shop Server ({0}).", World.Name);
                         Log.SkipLine();
 
                         break;
                     }
+
+                case ServerConstants.ServerType.None:
+                    break;
+
+                case ServerConstants.ServerType.ITC:
+                    break;
+
+                default:
+                    Log.SkipLine();
+                    Log.Warn(" Unhandled Termination request!" +
+                             " \n Argument: {0}", Type);
+                    Log.SkipLine();
+                    break;
             }
         }
 
@@ -96,47 +111,67 @@ namespace Destiny.Network
             switch ((InteroperabilityOperationCode)inPacket.OperationCode)
             {
                 case InteroperabilityOperationCode.RegistrationRequest:
-                    this.Register(inPacket);
+                    Register(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.UpdateChannelPopulation:
-                    this.UpdateChannelPopulation(inPacket);
+                    UpdateChannelPopulation(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterNameCheckRequest:
-                    this.CharacterNameCheckRequest(inPacket);
+                    CharacterNameCheckRequest(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterNameCheckResponse:
-                    this.CharacterNameCheckResponse(inPacket);
+                    CharacterNameCheckResponse(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterEntriesRequest:
-                    this.CharacterEntriesRequest(inPacket);
+                    CharacterEntriesRequest(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterEntriesResponse:
-                    this.CharacterEntiresResponse(inPacket);
+                    CharacterEntiresResponse(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterCreationRequest:
-                    this.CharacterCreationRequest(inPacket);
+                    CharacterCreationRequest(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterCreationResponse:
-                    this.CharacterCreationResponse(inPacket);
+                    CharacterCreationResponse(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.MigrationRegisterRequest:
-                    this.Migrate(inPacket);
+                    Migrate(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.MigrationRequest:
-                    this.MigrateRequest(inPacket);
+                    MigrateRequest(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.ChannelPortRequest:
-                    this.ChannelPortRequest(inPacket);
+                    ChannelPortRequest(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.RegistrationResponse:
+                    break;
+                case InteroperabilityOperationCode.UpdateChannel:
+                    break;
+                case InteroperabilityOperationCode.UpdateChannelID:
+                    break;
+                case InteroperabilityOperationCode.MigrationRegisterResponse:
+                    break;
+                case InteroperabilityOperationCode.MigrationResponse:
+                    break;
+                case InteroperabilityOperationCode.ChannelPortResponse:
+                    break;
+
+                default:
+                    Log.SkipLine();
+                    Log.Warn(" Unhandled InteroperabilityOperationCode encountered!" +
+                             " \n Argument: {0}", inPacket.OperationCode);
+                    Log.SkipLine();
                     break;
             }
         }
@@ -196,52 +231,64 @@ namespace Destiny.Network
                                 }
                                 else
                                 {
-                                    this.World = world;
+                                    World = world;
 
                                     switch (type)
                                     {
                                         case ServerConstants.ServerType.Channel:
-                                            this.World.Add(this);
+                                            World.Add(this);
                                             break;
 
                                         case ServerConstants.ServerType.Shop:
-                                            this.World.Shop = this;
+                                            World.Shop = this;
                                             break;
                                     }
 
                                     Packet.WriteByte((byte)ServerRegsitrationResponse.Valid);
-                                    Packet.WriteByte(this.World.ID);
-                                    Packet.WriteString(this.World.Name);
+                                    Packet.WriteByte(World.ID);
+                                    Packet.WriteString(World.Name);
 
                                     if (type == ServerConstants.ServerType.Channel)
                                     {
-                                        Packet.WriteString(this.World.TickerMessage);
-                                        Packet.WriteByte(this.ID);
+                                        Packet.WriteString(World.TickerMessage);
+                                        Packet.WriteByte(ID);
                                     }
 
-                                    Packet.WriteUShort(this.Port);
+                                    Packet.WriteUShort(Port);
 
                                     if (type == ServerConstants.ServerType.Channel)
                                     {
-                                        Packet.WriteBool(this.World.AllowMultiLeveling);
-                                        Packet.WriteInt(this.World.ExperienceRate);
-                                        Packet.WriteInt(this.World.QuestExperienceRate);
-                                        Packet.WriteInt(this.World.PartyQuestExperienceRate);
-                                        Packet.WriteInt(this.World.MesoRate);
-                                        Packet.WriteInt(this.World.DropRate);
+                                        Packet.WriteBool(World.AllowMultiLeveling);
+                                        Packet.WriteInt(World.ExperienceRate);
+                                        Packet.WriteInt(World.QuestExperienceRate);
+                                        Packet.WriteInt(World.PartyQuestExperienceRate);
+                                        Packet.WriteInt(World.MesoRate);
+                                        Packet.WriteInt(World.DropRate);
                                     }
                                 }
                             }
                             break;
+
+                        case ServerConstants.ServerType.None:
+                            break;
+
+                        case ServerConstants.ServerType.ITC:
+                            break;
+                        default:
+                            Log.SkipLine();
+                            Log.Warn(" Unhandled Registration request!" +
+                                     " \n Argument: {0}", Type);
+                            Log.SkipLine();
+                            break;
                     }
                 }
 
-                this.Send(Packet);
+                Send(Packet);
             }
 
             if (valid)
             {
-                this.Type = type;
+                Type = type;
 
                 switch (type)
                 {
@@ -285,16 +332,16 @@ namespace Destiny.Network
                         {
                             using (Packet Packet = new Packet(InteroperabilityOperationCode.UpdateChannel))
                             {
-                                Packet.WriteByte(this.World.ID);
+                                Packet.WriteByte(World.ID);
                                 Packet.WriteBool(true);
-                                Packet.WriteByte(this.ID);
-                                Packet.WriteUShort(this.Port);
-                                Packet.WriteInt(this.Population);
+                                Packet.WriteByte(ID);
+                                Packet.WriteUShort(Port);
+                                Packet.WriteInt(Population);
 
                                 WvsCenter.Login.Send(Packet);
                             }
                             Log.SkipLine();
-                            Log.Success("Registered Channel Server ({0}-{1}).", this.World.Name, (this.ID + 1));
+                            Log.Success("Registered Channel Server ({0}-{1}).", World.Name, (ID + 1));
                             Log.SkipLine();
                         }
                         break;
@@ -302,7 +349,7 @@ namespace Destiny.Network
                     case ServerConstants.ServerType.Shop:
                         {
                             Log.SkipLine();
-                            Log.Success("Registered Shop Server ({0}).", this.World.Name);
+                            Log.Success("Registered Shop Server ({0}).", World.Name);
                             Log.SkipLine();
                         }
                         break;
@@ -314,57 +361,33 @@ namespace Destiny.Network
         {
             int population = inPacket.ReadInt();
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.UpdateChannelPopulation))
-            {
-                outPacket.WriteByte(this.World.ID);
-                outPacket.WriteByte(this.ID);
-                outPacket.WriteInt(population);
-
-                WvsCenter.Login.Send(outPacket);
-            }
+            WvsCenter.Login.Send(CenterClientsPackets.UpdateChannelPopulation(this, population));
         }
 
-        private void CharacterNameCheckRequest(Packet inPacket)
+        private static void CharacterNameCheckRequest(Packet inPacket)
         {
             string name = inPacket.ReadString();
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckRequest))
-            {
-                outPacket.WriteString(name);
-
-                WvsCenter.Worlds[0][0].Send(outPacket);
-            }
+            WvsCenter.Worlds[0][0].Send(CenterClientsPackets.CharacterNameCheckRequest(name));
         }
 
-        private void CharacterNameCheckResponse(Packet inPacket)
+        private static void CharacterNameCheckResponse(Packet inPacket)
         {
             string name = inPacket.ReadString();
             bool unusable = inPacket.ReadBool();
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckResponse))
-            {
-                outPacket
-                    .WriteString(name)
-                    .WriteBool(unusable);
-
-                WvsCenter.Login.Send(outPacket);
-            }
+            WvsCenter.Login.Send(CenterClientsPackets.CharacterNameCheckResponse(name, unusable));
         }
 
-        private void CharacterEntriesRequest(Packet inPacket)
+        private static void CharacterEntriesRequest(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
             int accountID = inPacket.ReadInt();
-
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterEntriesRequest))
-            {
-                outPacket.WriteInt(accountID);
-
-                WvsCenter.Worlds[worldID].RandomChannel.Send(outPacket);
-            }
+        
+            WvsCenter.Worlds[worldID].RandomChannel.Send(CenterClientsPackets.CharacterEntriesRequest(accountID));
         }
 
-        private void CharacterEntiresResponse(Packet inPacket)
+        private static void CharacterEntiresResponse(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
             List<byte[]> entires = new List<byte[]>();
@@ -374,47 +397,24 @@ namespace Destiny.Network
                 entires.Add(inPacket.ReadBytes(inPacket.ReadByte()));
             }
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterEntriesResponse))
-            {
-                outPacket.WriteInt(accountID);
-
-                foreach (var entry in entires)
-                {
-                    outPacket.WriteByte((byte)entry.Length);
-                    outPacket.WriteBytes(entry);
-                }
-
-                WvsCenter.Login.Send(outPacket);
-            }
+            WvsCenter.Login.Send(CenterClientsPackets.CharacterEntriesResponse(accountID, entires));
         }
 
-        private void CharacterCreationRequest(Packet inPacket)
+        private static void CharacterCreationRequest(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
             int accountID = inPacket.ReadInt();
             byte[] characterData = inPacket.ReadBytes(inPacket.Remaining);
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationRequest))
-            {
-                outPacket.WriteInt(accountID);
-                outPacket.WriteBytes(characterData);
-
-                WvsCenter.Worlds[worldID].RandomChannel.Send(outPacket);
-            }
+            WvsCenter.Worlds[worldID].RandomChannel.Send(CenterClientsPackets.CharacterCreationRequest(accountID, characterData));
         }
 
-        private void CharacterCreationResponse(Packet inPacket)
+        private static void CharacterCreationResponse(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
             byte[] characterData = inPacket.ReadBytes(inPacket.Remaining);
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationResponse))
-            {
-                outPacket.WriteInt(accountID);
-                outPacket.WriteBytes(characterData);
-
-                WvsCenter.Login.Send(outPacket);
-            }
+            WvsCenter.Login.Send(CenterClientsPackets.CharacterCreationResponse(accountID, characterData));
         }
 
         private void Migrate(Packet inPacket)
@@ -429,6 +429,7 @@ namespace Destiny.Network
             {
                 valid = false;
             }
+
             else
             {
                 valid = true;
@@ -442,7 +443,7 @@ namespace Destiny.Network
                     .WriteString(host)
                     .WriteBool(valid);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -459,7 +460,7 @@ namespace Destiny.Network
                     .WriteString(host)
                     .WriteInt(accountID);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -470,9 +471,9 @@ namespace Destiny.Network
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.ChannelPortResponse))
             {
                 outPacket.WriteByte(id);
-                outPacket.WriteUShort(this.World[id].Port);
+                outPacket.WriteUShort(World[id].Port);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
     }

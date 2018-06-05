@@ -17,38 +17,38 @@ namespace Destiny.Maple.Characters
 {
     public sealed class CharacterItems : IEnumerable<Item>
     {
-        public Character Parent { get; private set; }
-        public Dictionary<ItemConstants.ItemType, byte> MaxSlots { get; private set; }
-        private List<Item> Items { get; set; }
+        public Character Parent { get; }
+        public Dictionary<ItemConstants.ItemType, byte> MaxSlots { get; }
+        private List<Item> Items { get; }
 
-        public CharacterItems(Character parent, byte equipmentSlots, byte usableSlots, byte setupSlots, byte etceteraSlots, byte cashSlots)
-            : base()
+        public CharacterItems(Character parent, byte equipmentSlots, byte usableSlots, byte setupSlots, byte etceteraSlots, byte cashSlots) : base()
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.MaxSlots = new Dictionary<ItemConstants.ItemType, byte>(Enum.GetValues(typeof(ItemConstants.ItemType)).Length);
+            MaxSlots = new Dictionary<ItemConstants.ItemType, byte>(Enum.GetValues(typeof(ItemConstants.ItemType)).Length)
+                {
+                    {ItemConstants.ItemType.Equipment, equipmentSlots},
+                    {ItemConstants.ItemType.Usable, usableSlots},
+                    {ItemConstants.ItemType.Setup, setupSlots},
+                    {ItemConstants.ItemType.Etcetera, etceteraSlots},
+                    {ItemConstants.ItemType.Cash, cashSlots}
+                };
 
-            this.MaxSlots.Add(ItemConstants.ItemType.Equipment, equipmentSlots);
-            this.MaxSlots.Add(ItemConstants.ItemType.Usable, usableSlots);
-            this.MaxSlots.Add(ItemConstants.ItemType.Setup, setupSlots);
-            this.MaxSlots.Add(ItemConstants.ItemType.Etcetera, etceteraSlots);
-            this.MaxSlots.Add(ItemConstants.ItemType.Cash, cashSlots);
-
-            this.Items = new List<Item>();
+            Items = new List<Item>();
         }
 
         public void LoadInventory()
         {
             // TODO: Use JOIN with the pets table.
-            foreach (Datum datum in new Datums("items").Populate("CharacterID = {0} AND IsStored = 0", this.Parent.ID))
+            foreach (Datum datum in new Datums("items").Populate("CharacterID = {0} AND IsStored = 0", Parent.ID))
             {
                 Item item = new Item(datum);
 
-                this.AddItemToInventory(item);
+                AddItemToInventory(item);
 
                 if (item.PetID != null)
                 {
-                    //this.Parent.Pets.Add(new Pet(item));
+                    //Parent.Pets.Add(new Pet(item));
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace Destiny.Maple.Characters
 
         public void AddItemToInventory(Item item, bool fromDrop = false, bool autoMerge = true, bool forceGetSlot = false)
         {
-            if (this.InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
+            if (InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
                 foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
                 {
@@ -77,20 +77,17 @@ namespace Destiny.Maple.Characters
                         break;
                     }
 
-                    else
+                    item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
+                    item.Slot = GetNextFreeSlot(item.ItemType);
+
+                    loopItem.Quantity = loopItem.MaxPerStack;
+
+                    if (Parent.IsInitialized)
                     {
-                        item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
-                        item.Slot = this.GetNextFreeSlot(item.ItemType);
-
-                        loopItem.Quantity = loopItem.MaxPerStack;
-
-                        if (this.Parent.IsInitialized)
-                        {
-                            Item.UpdateItem(loopItem);
-                        }
-
-                        break;
+                        Item.UpdateItem(loopItem);
                     }
+
+                    break;
                 }
             }
 
@@ -98,16 +95,16 @@ namespace Destiny.Maple.Characters
 
             item.Parent = this;
 
-            if ((this.Parent.IsInitialized && item.Slot == 0) || forceGetSlot)
+            if (Parent.IsInitialized && item.Slot == 0 || forceGetSlot)
             {
-                item.Slot = this.GetNextFreeSlot(item.ItemType);
+                item.Slot = GetNextFreeSlot(item.ItemType);
             }
 
-            this.Items.Add(item);
+            Items.Add(item);
 
-            if (this.Parent.IsInitialized)
+            if (Parent.IsInitialized)
             {
-                this.Parent.Client.Send(CharacterItemsPackets.AddItemToInventoryPacket(item));
+                Parent.Client.Send(CharacterItemsPackets.AddItemToInventoryPacket(item));
             }
         }
 
@@ -115,7 +112,7 @@ namespace Destiny.Maple.Characters
         {
             foreach (Item loopItem in items)
             {
-                this.AddItemToInventory(loopItem, fromDrop, autoMerge);
+                AddItemToInventory(loopItem, fromDrop, autoMerge);
             }
         }
 
@@ -127,26 +124,23 @@ namespace Destiny.Maple.Characters
 
             foreach (Item loopItem in this)
             {
-                if (loopItem.MapleID == mapleId)
-                {
-                    if (loopItem.Quantity > leftToRemove)
-                    {
-                        loopItem.Quantity -= leftToRemove;
-                        Item.UpdateItem(loopItem);
+                if (loopItem.MapleID != mapleId) continue;
 
-                        break;
-                    }
-                    else
-                    {
-                        leftToRemove -= loopItem.Quantity;
-                        toRemove.Add(loopItem);
-                    }
+                if (loopItem.Quantity > leftToRemove)
+                {
+                    loopItem.Quantity -= leftToRemove;
+                    Item.UpdateItem(loopItem);
+
+                    break;
                 }
+
+                leftToRemove -= loopItem.Quantity;
+                toRemove.Add(loopItem);             
             }
 
             foreach (Item loopItem in toRemove)
             {
-                this.RemoveItemFromInventory(loopItem, true);
+                RemoveItemFromInventory(loopItem, true);
             }
         }
 
@@ -159,7 +153,7 @@ namespace Destiny.Maple.Characters
 
             if (removeFromSlot)
             {
-                this.Parent.Client.Send(CharacterItemsPackets.RemoveItemFromInventory(item));
+                Parent.Client.Send(CharacterItemsPackets.RemoveItemFromInventory(item));
             }
 
             if (item.Assigned)
@@ -171,11 +165,11 @@ namespace Destiny.Maple.Characters
 
             bool wasEquipped = item.IsEquipped;
 
-            this.Items.Remove(item);
+            Items.Remove(item);
 
             if (wasEquipped)
             {
-               CharacterAppearance.UpdateApperance(this.Parent);
+               CharacterAppearance.UpdateApperance(Parent);
             }
         }
 
@@ -192,7 +186,7 @@ namespace Destiny.Maple.Characters
             {
                 if (!(loopItem.IsEquipped && removeFromSlot))
                 {
-                    this.RemoveItemFromInventory(loopItem, removeFromSlot);
+                    RemoveItemFromInventory(loopItem, removeFromSlot);
                 }
             }
         }
@@ -242,7 +236,7 @@ namespace Destiny.Maple.Characters
 
         public sbyte GetNextFreeSlot(ItemConstants.ItemType type)
         {
-            for (sbyte i = 1; i <= this.MaxSlots[type]; i++)
+            for (sbyte i = 1; i <= MaxSlots[type]; i++)
             {
                 if (this[type, i] == null)
                 {
@@ -250,7 +244,7 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            NotifyInventoryIsFull(this.Parent, type);
+            NotifyInventoryIsFull(Parent, type);
             throw new InventoryFullException();
         }
 
@@ -259,27 +253,27 @@ namespace Destiny.Maple.Characters
             switch (inventoryType)
             {
                 case ItemConstants.ItemType.Equipment:
-                    Character.Notify(this.Parent, "Your equipment(EQP) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your equipment(EQP) inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 case ItemConstants.ItemType.Etcetera:
-                    Character.Notify(this.Parent, "Your etcetera(ETC) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your etcetera(ETC) inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 case ItemConstants.ItemType.Usable:
-                    Character.Notify(this.Parent, "Your usable(USE) inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your usable(USE) inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 case ItemConstants.ItemType.Setup:
-                    Character.Notify(this.Parent, "Your setup inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your setup inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 case ItemConstants.ItemType.Cash:
-                    Character.Notify(this.Parent, "Your cash inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your cash inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 case ItemConstants.ItemType.Count:
-                    Character.Notify(this.Parent, "Your count inventory is full!.", ServerConstants.NoticeType.Popup);
+                    Character.Notify(character, "Your count inventory is full!.", ServerConstants.NoticeType.Popup);
                     break;
 
                 default: throw new ArgumentOutOfRangeException(nameof(inventoryType), inventoryType, null);
@@ -298,12 +292,12 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            return (count == this.MaxSlots[type]);
+            return (count == MaxSlots[type]);
         }
 
         public int GetRemainingSlots(ItemConstants.ItemType type)
         {
-            short remaining = this.MaxSlots[type];
+            short remaining = MaxSlots[type];
 
             foreach (Item item in this)
             {
@@ -363,7 +357,7 @@ namespace Destiny.Maple.Characters
 
             catch (InventoryFullException)
             {
-                NotifyInventoryIsFull(this.Parent, type);
+                NotifyInventoryIsFull(Parent, type);
             }
         }
 
@@ -380,26 +374,26 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            this.RemoveItemFromInventoryByID(itemID, 1);
+            RemoveItemFromInventoryByID(itemID, 1);
 
             if (item.CHealth > 0)
             {
-                this.Parent.Stats.Health += item.CHealth;
+                Parent.Stats.Health += item.CHealth;
             }
 
             if (item.CMana > 0)
             {
-                this.Parent.Stats.Mana += item.CMana;
+                Parent.Stats.Mana += item.CMana;
             }
 
             if (item.CHealthPercentage != 0)
             {
-                this.Parent.Stats.Health += (short)((item.CHealthPercentage * this.Parent.Stats.MaxHealth) / 100);
+                Parent.Stats.Health += (short)((item.CHealthPercentage * Parent.Stats.MaxHealth) / 100);
             }
 
             if (item.CManaPercentage != 0)
             {
-                this.Parent.Stats.Mana += (short)((item.CManaPercentage * this.Parent.Stats.MaxMana) / 100);
+                Parent.Stats.Mana += (short)((item.CManaPercentage * Parent.Stats.MaxMana) / 100);
             }
 
             if (item.CBuffTime > 0 && item.CProb == 0)
@@ -426,7 +420,7 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            this.RemoveItemFromInventoryByID(itemID, 1);
+            RemoveItemFromInventoryByID(itemID, 1);
 
             foreach (Tuple<int, short> summon in item.Summons)
             {
@@ -434,7 +428,7 @@ namespace Destiny.Maple.Characters
                 {
                     if (DataProvider.Mobs.Contains(summon.Item1))
                     {
-                        this.Parent.Map.Mobs.Add(new Mob(summon.Item1, this.Parent.Position));
+                        Parent.Map.Mobs.Add(new Mob(summon.Item1, Parent.Position));
                     }
                 }
             }
@@ -464,7 +458,7 @@ namespace Destiny.Maple.Characters
 
                 case (int) ItemConstants.UsableCashItems.VIPTeleportRock:
                 {
-                    itemUsed = this.Parent.Trocks.UseTrockHandler(itemID, inPacket);
+                    itemUsed = Parent.Trocks.UseTrockHandler(itemID, inPacket);
                 }
                     break;
                 #endregion
@@ -475,8 +469,8 @@ namespace Destiny.Maple.Characters
                     CharacterConstants.StatisticType statDestination = (CharacterConstants.StatisticType)inPacket.ReadInt();
                     CharacterConstants.StatisticType statSource = (CharacterConstants.StatisticType)inPacket.ReadInt();
 
-                    CharacterStats.AddAbility(this.Parent, statDestination, 1, true);
-                    CharacterStats.AddAbility(this.Parent, statSource, -1, true);
+                    CharacterStats.AddAbility(Parent, statDestination, 1, true);
+                    CharacterStats.AddAbility(Parent, statSource, -1, true);
 
                     itemUsed = true;
                 }
@@ -484,7 +478,7 @@ namespace Destiny.Maple.Characters
 
                 case (int) ItemConstants.UsableCashItems.SPReset1stJob:
                      {
-                        if (!CharacterJobs.IsFirstJob(this.Parent)) return;
+                        if (!CharacterJobs.IsFirstJob(Parent)) return;
 
                          int SPTo = inPacket.ReadInt();
                          int SPFrom = inPacket.ReadInt();
@@ -497,8 +491,8 @@ namespace Destiny.Maple.Characters
 
                          if (curLevelSPTo < skillSPTo.MaxLevel && curLevelSPFrom > 0)
                          {
-                             CharacterSkills.ModifySkillLevel(this.Parent, skillSPFrom, (byte)(curLevelSPFrom - 1), skillSPFrom.MaxLevel);
-                             CharacterSkills.ModifySkillLevel(this.Parent, skillSPTo, (byte)(curLevelSPTo + 1), skillSPTo.MaxLevel);
+                             CharacterSkills.ModifySkillLevel(Parent, skillSPFrom, (byte)(curLevelSPFrom - 1), skillSPFrom.MaxLevel);
+                             CharacterSkills.ModifySkillLevel(Parent, skillSPTo, (byte)(curLevelSPTo + 1), skillSPTo.MaxLevel);
                         }
 
                         itemUsed = true;
@@ -507,7 +501,7 @@ namespace Destiny.Maple.Characters
 
                 case (int) ItemConstants.UsableCashItems.SPReset2stJob:
                     {
-                        if (!CharacterJobs.IsSecondJob(this.Parent)) return;
+                        if (!CharacterJobs.IsSecondJob(Parent)) return;
                         //TODO: skill change
                         itemUsed = true;
                     }
@@ -515,7 +509,7 @@ namespace Destiny.Maple.Characters
 
                 case (int) ItemConstants.UsableCashItems.SPReset3stJob:
                     {
-                        if (!CharacterJobs.IsThirdJob(this.Parent)) return;
+                        if (!CharacterJobs.IsThirdJob(Parent)) return;
                         //TODO: skill change
                         itemUsed = true;
                     }
@@ -523,7 +517,7 @@ namespace Destiny.Maple.Characters
 
                 case (int) ItemConstants.UsableCashItems.SPReset4stJob:
                     {
-                        if (!CharacterJobs.IsFourthJob(this.Parent)) return;
+                        if (!CharacterJobs.IsFourthJob(Parent)) return;
                         //TODO: skill change
                         itemUsed = true;
                     }
@@ -539,7 +533,7 @@ namespace Destiny.Maple.Characters
                     Item targetItem = this[ItemConstants.ItemType.Equipment, targetSlot];
                     if (targetItem == null) return;
 
-                    targetItem.Creator = this.Parent.Name;
+                    targetItem.Creator = Parent.Name;
                     Item.UpdateItem(targetItem);// TODO: This does not seem to update the item's creator.
 
                     itemUsed = true;
@@ -575,10 +569,10 @@ namespace Destiny.Maple.Characters
                 case (int)ItemConstants.UsableCashItems.CheapMegaphone:
                     {
                         // NOTE: You can't use a megaphone unless you're over level 10.
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
-                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+                        string message = string.Format($"{Parent.Name} : {text}"); // TODO: Include medal name.
 
                         // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
@@ -587,7 +581,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte((byte)ServerConstants.NoticeType.Megaphone)
                                 .WriteString(message);
 
-                            //this.Parent.Client.Channel.Broadcast(oPacket);
+                            //Parent.Client.Channel.Broadcast(oPacket);
                         }
 
                         itemUsed = true;
@@ -596,10 +590,10 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.Megaphone:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
-                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+                        string message = string.Format($"{Parent.Name} : {text}"); // TODO: Include medal name.
 
                         // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
@@ -608,7 +602,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte((byte) ServerConstants.NoticeType.Megaphone)
                                 .WriteString(message);
 
-                            //this.Parent.Client.Channel.Broadcast(oPacket);
+                            //Parent.Client.Channel.Broadcast(oPacket);
                         }
 
                         itemUsed = true;
@@ -617,12 +611,12 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.SuperMegaphone:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         bool whisper = inPacket.ReadBool();
 
-                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+                        string message = string.Format($"{Parent.Name} : {text}"); // TODO: Include medal name.
 
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
@@ -632,7 +626,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte(WvsGame.ChannelID)
                                 .WriteBool(whisper);
 
-                            //this.Parent.Client.World.Broadcast(oPacket);
+                            //Parent.Client.World.Broadcast(oPacket);
                         }
 
                         itemUsed = true;
@@ -641,55 +635,55 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.HeartMegaphone:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.SkullMegaphone:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVMessenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVStarMessenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.MapleTVHeartMessenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.Megassenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.StarMegassenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.HeartMegassenger:
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
                     }
                     break;
 
                 case (int)ItemConstants.UsableCashItems.ItemMegaphone: // NOTE: Item Megaphone.
                     {
-                        if (this.Parent.Stats.Level < 11) return;
+                        if (Parent.Stats.Level < 11) return;
 
                         string text = inPacket.ReadString();
                         bool whisper = inPacket.ReadBool();
@@ -710,7 +704,7 @@ namespace Destiny.Maple.Characters
                             }
                         }
 
-                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+                        string message = string.Format($"{Parent.Name} : {text}"); // TODO: Include medal name.
 
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
@@ -726,7 +720,7 @@ namespace Destiny.Maple.Characters
                                 oPacket.WriteBytes(targetItem.ToByteArray(true));
                             }
 
-                            //this.Parent.Client.World.Broadcast(oPacket);
+                            //Parent.Client.World.Broadcast(oPacket);
                         }
 
                         itemUsed = true;
@@ -762,7 +756,7 @@ namespace Destiny.Maple.Characters
                         //string targetName = iPacket.ReadString();
                         //string message = iPacket.ReadString();
 
-                        //if (this.Parent.Client.World.IsCharacterOnline(targetName))
+                        //if (Parent.Client.World.IsCharacterOnline(targetName))
                         //{
                         //    using (Packet oPacket = new Packet(ServerOperationCode.MemoResult))
                         //    {
@@ -770,7 +764,7 @@ namespace Destiny.Maple.Characters
                         //            .WriteByte((byte)MemoResult.Error)
                         //            .WriteByte((byte)MemoError.ReceiverOnline);
 
-                        //        this.Parent.Client.Send(oPacket);
+                        //        Parent.Client.Send(oPacket);
                         //    }
                         //}
                         //else if (!Database.Exists("characters", "Name = {0}", targetName))
@@ -781,7 +775,7 @@ namespace Destiny.Maple.Characters
                         //            .WriteByte((byte)MemoResult.Error)
                         //            .WriteByte((byte)MemoError.ReceiverInvalidName);
 
-                        //        this.Parent.Client.Send(oPacket);
+                        //        Parent.Client.Send(oPacket);
                         //    }
                         //}
                         //else if (false) // TODO: Receiver's inbox is full. I believe the maximum amount is 5, but need to verify.
@@ -792,7 +786,7 @@ namespace Destiny.Maple.Characters
                         //            .WriteByte((byte)MemoResult.Error)
                         //            .WriteByte((byte)MemoError.ReceiverInboxFull);
 
-                        //        this.Parent.Client.Send(oPacket);
+                        //        Parent.Client.Send(oPacket);
                         //    }
                         //}
                         //else
@@ -800,7 +794,7 @@ namespace Destiny.Maple.Characters
                         //    Datum datum = new Datum("memos");
 
                         //    datum["CharacterID"] = Database.Fetch("characters", "ID", "Name = {0}", targetName);
-                        //    datum["Sender"] = this.Parent.Name;
+                        //    datum["Sender"] = Parent.Name;
                         //    datum["Message"] = message;
                         //    datum["Received"] = DateTime.Now;
 
@@ -810,7 +804,7 @@ namespace Destiny.Maple.Characters
                         //    {
                         //        oPacket.WriteByte((byte)MemoResult.Sent);
 
-                        //        this.Parent.Client.Send(oPacket);
+                        //        Parent.Client.Send(oPacket);
                         //    }
 
                         //    used = true;
@@ -832,12 +826,12 @@ namespace Destiny.Maple.Characters
                             //using (Packet oPacket = new Packet(ServerOperationCode.PetNameChanged))
                             //{
                             //    oPacket
-                            //        .WriteInt(this.Parent.ID)
+                            //        .WriteInt(Parent.ID)
                             //        .WriteByte() // NOTE: Index.
                             //        .WriteString(name)
                             //        .WriteByte();
 
-                            //    this.Parent.Map.Broadcast(oPacket);
+                            //    Parent.Map.Broadcast(oPacket);
                             //}
                         }
                     break;
@@ -854,7 +848,7 @@ namespace Destiny.Maple.Characters
 
                 case (int)ItemConstants.UsableCashItems.GoldSackofMesos:
                     {
-                        this.Parent.Stats.Meso += item.Meso;
+                        Parent.Stats.Meso += item.Meso;
 
                         // TODO: We definitely need a GainMeso method with inChat parameter.
                         using (Packet oPacket = new Packet(ServerOperationCode.Message))
@@ -864,7 +858,7 @@ namespace Destiny.Maple.Characters
                                 .WriteInt(item.Meso)
                                 .WriteShort();
 
-                            this.Parent.Client.Send(oPacket);
+                            Parent.Client.Send(oPacket);
                         }
 
                         itemUsed = true;
@@ -894,7 +888,7 @@ namespace Destiny.Maple.Characters
                 case (int)ItemConstants.UsableCashItems.ChalkBoard2:
                     {
                         string text = inPacket.ReadString();
-                        this.Parent.Chalkboard = text;
+                        Parent.Chalkboard = text;
                     }
                     break;
 
@@ -910,8 +904,8 @@ namespace Destiny.Maple.Characters
                 #endregion
             }
 
-            if (itemUsed) this.RemoveItemFromInventoryByID(itemID, 1);
-            else Character.Release(this.Parent); // TODO: Blank inventory update.
+            if (itemUsed) RemoveItemFromInventoryByID(itemID, 1);
+            else Character.Release(Parent); // TODO: Blank inventory update.
         }
 
         public void UseReturnScrollHandler(Packet inPacket)
@@ -923,9 +917,9 @@ namespace Destiny.Maple.Characters
             Item item = this[itemID, slot];
             if (item == null) return;
 
-            this.RemoveItemFromInventoryByID(itemID, 1);
+            RemoveItemFromInventoryByID(itemID, 1);
 
-            this.Parent.SendChangeMapRequest(item.CMoveTo);
+            Parent.SendChangeMapRequest(item.CMoveTo);
         }
 
         public void Pickup(Drop drop)
@@ -934,25 +928,25 @@ namespace Destiny.Maple.Characters
             {
                 try
                 {
-                    drop.Picker = this.Parent;
+                    drop.Picker = Parent;
 
                     if (drop is Meso)
                     {
                         Meso mesoDrop = (Meso) drop;
 
                         // get total mesos
-                        long myPlusDropMesos = (long)(this.Parent.Stats.Meso + mesoDrop.Amount);
+                        long myPlusDropMesos = (long)(Parent.Stats.Meso + mesoDrop.Amount);
 
                         // if int32 overflow reset to limit
                         if (myPlusDropMesos > Meso.mesoLimit)
                         {
-                            this.Parent.Stats.Meso = Meso.mesoLimit;
+                            Parent.Stats.Meso = Meso.mesoLimit;
                         }
 
                         // add mesos to chars mesos                       
                         else
                         {
-                            this.Parent.Stats.Meso += mesoDrop.Amount;
+                            Parent.Stats.Meso += mesoDrop.Amount;
                         }
                     }
 
@@ -969,17 +963,17 @@ namespace Destiny.Maple.Characters
                         }
 
                         // try obtaining free slot for itemType of itemDrop
-                        itemDrop.Slot = this.GetNextFreeSlot(itemDrop.ItemType);
+                        itemDrop.Slot = GetNextFreeSlot(itemDrop.ItemType);
 
                         if (itemDrop.Slot > 0)
                         {
                             // slot found add it into inventory
-                            this.AddItemToInventory(itemDrop, true);
+                            AddItemToInventory(itemDrop, true);
                         }
                     }
 
                     // remove item from map
-                    this.Parent.Map.Drops.Remove(drop);  
+                    Parent.Map.Drops.Remove(drop);  
                                   
                     // show player his item gain
                     using (Packet oPacket = drop.GetShowGainPacket())
@@ -991,7 +985,7 @@ namespace Destiny.Maple.Characters
                 // getNextFreeSlot failed to obtain slot to place item in
                 catch (InventoryFullException)
                 {
-                    NotifyInventoryIsFull(this.Parent, ((Item)drop).ItemType);
+                    NotifyInventoryIsFull(Parent, ((Item)drop).ItemType);
                 }
             }
         }
@@ -1002,7 +996,7 @@ namespace Destiny.Maple.Characters
             inPacket.Skip(4); // ??
 
             Point itemObjectPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
-            Point itemPickerPosition = new Point(this.Parent.Position.X, this.Parent.Position.Y);
+            Point itemPickerPosition = new Point(Parent.Position.X, Parent.Position.Y);
           
             // try to check distance from char before loot, no vacuuming!
             // TODO: needs proper check
@@ -1010,13 +1004,13 @@ namespace Destiny.Maple.Characters
             {
                 int itemObjectID = inPacket.ReadInt();
 
-                lock (this.Parent.Map.Drops)
+                lock (Parent.Map.Drops)
                 {
                     // check for drop itemObject on current char Map
-                    if (this.Parent.Map.Drops.Contains(itemObjectID))
+                    if (Parent.Map.Drops.Contains(itemObjectID))
                     {
                         // found so pick it up!
-                        this.Pickup(this.Parent.Map.Drops[itemObjectID]);
+                        Pickup(Parent.Map.Drops[itemObjectID]);
                     }
                 }
             }
@@ -1078,7 +1072,7 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                foreach (Item loopItem in this.Items)
+                foreach (Item loopItem in Items)
                 {
                     if (loopItem.ItemType == type && !loopItem.IsEquipped)
                     {
@@ -1090,7 +1084,7 @@ namespace Destiny.Maple.Characters
 
         public IEnumerable<Item> GetStored()
         {
-            foreach (Item loopItem in this.Items)
+            foreach (Item loopItem in Items)
             {
                 if (loopItem.IsStored)
                 {
@@ -1101,7 +1095,7 @@ namespace Destiny.Maple.Characters
 
         public IEnumerable<Item> GetEquipped(ItemConstants.EquippedQueryMode mode = ItemConstants.EquippedQueryMode.Any)
         {
-            foreach (Item loopItem in this.Items)
+            foreach (Item loopItem in Items)
             {
                 if (!loopItem.IsEquipped) continue;
 
@@ -1134,29 +1128,19 @@ namespace Destiny.Maple.Characters
 
         public int SpaceTakenByItem(Item item, bool autoMerge = true)
         {
-            if (item.Quantity < 0)
-                return 0;
+            if (item.Quantity < 0) return 0;
 
-            if (this.InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
+            if (InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
                 foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
                 {
-                    if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return 1;
-                    }
+                    return loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack ? 0 : 1;
                 }
 
                 return 1;
             }
-            else
-            {
-                return 1;
-            }
+
+            return 1;
         }
 
         public bool CouldReceiveItems(IEnumerable<Item> items, bool autoMerge = true)
@@ -1172,12 +1156,12 @@ namespace Destiny.Maple.Characters
 
             foreach (Item loopItem in items)
             {
-                spaceCount[loopItem.ItemType] += this.SpaceTakenByItem(loopItem, autoMerge);
+                spaceCount[loopItem.ItemType] += SpaceTakenByItem(loopItem, autoMerge);
             }
 
             foreach (KeyValuePair<ItemConstants.ItemType, int> loopSpaceCount in spaceCount)
             {
-                if (this.GetRemainingSlots(loopSpaceCount.Key) < loopSpaceCount.Value)
+                if (GetRemainingSlots(loopSpaceCount.Key) < loopSpaceCount.Value)
                 {
                     return false;
                 }
@@ -1191,21 +1175,21 @@ namespace Destiny.Maple.Characters
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Equipment])
-                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Usable])
-                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Setup])
-                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Etcetera])
-                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Cash])
+                    .WriteByte(MaxSlots[ItemConstants.ItemType.Equipment])
+                    .WriteByte(MaxSlots[ItemConstants.ItemType.Usable])
+                    .WriteByte(MaxSlots[ItemConstants.ItemType.Setup])
+                    .WriteByte(MaxSlots[ItemConstants.ItemType.Etcetera])
+                    .WriteByte(MaxSlots[ItemConstants.ItemType.Cash])
                     .WriteLong(); // NOTE: Unknown.
 
-                foreach (Item item in this.GetEquipped(ItemConstants.EquippedQueryMode.Normal))
+                foreach (Item item in GetEquipped(ItemConstants.EquippedQueryMode.Normal))
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
 
                 oPacket.WriteShort();
 
-                foreach (Item item in this.GetEquipped(ItemConstants.EquippedQueryMode.Cash))
+                foreach (Item item in GetEquipped(ItemConstants.EquippedQueryMode.Cash))
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
@@ -1255,12 +1239,12 @@ namespace Destiny.Maple.Characters
 
         public IEnumerator<Item> GetEnumerator()
         {
-            return this.Items.GetEnumerator();
+            return Items.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)this.Items).GetEnumerator();
+            return ((IEnumerable)Items).GetEnumerator();
         }
     }
 }

@@ -19,7 +19,9 @@ namespace Destiny.Maple.Characters
             if (!Parent.IsInitialized) return;
 
             CharacterStats.Update(Parent, CharacterConstants.StatisticType.Job);
-            CharacterBuffs.ShowRemoteUserEffect(Parent, CharacterConstants.UserEffect.JobChanged);
+
+            CharacterBuffs.ShowLocalUserEffect(Parent, CharacterConstants.UserEffect.JobChanged);
+            //CharacterBuffs.ShowRemoteUserEffect(Parent, CharacterConstants.UserEffect.JobChanged); // TODO: crashes client
         }
 
         // TODO: Update party's properties.

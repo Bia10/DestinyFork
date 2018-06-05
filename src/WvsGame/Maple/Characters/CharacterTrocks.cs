@@ -77,7 +77,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public bool Contains(int mapID)
+        public static bool Contains(int mapID)
         {
             foreach (int map in VIPTrocks)
             {
@@ -148,8 +148,12 @@ namespace Destiny.Maple.Characters
 
                                     VIPTrocks.Add(mapID);
                                     break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
+
                         else
                         {
                             Character.Notify(TrockParent, "[TrockHandler] This map cannot be added to teleport rock!");
@@ -172,13 +176,16 @@ namespace Destiny.Maple.Characters
 
             switch (trockID)
             {
-                case (int)ItemConstants.UsableCashItems.TeleportRock:
+                case (int) ItemConstants.UsableCashItems.TeleportRock:
                     type = ItemConstants.TrockType.Regular;
                     break;
 
-                case (int)ItemConstants.UsableCashItems.VIPTeleportRock:
+                case (int) ItemConstants.UsableCashItems.VIPTeleportRock:
                     type = ItemConstants.TrockType.VIP;
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             int destinationMapID = -1;
@@ -188,13 +195,14 @@ namespace Destiny.Maple.Characters
             {
                 int mapID = inPacket.ReadInt();
 
-                if (!TrockParent.Trocks.Contains(mapID))
+                if (!Contains(mapID))
                 {
                     result = ItemConstants.TrockResult.CannotGo;
                 }
 
                 destinationMapID = mapID;
             }
+
             else if (action == (int)ItemConstants.TrockUseAction.TeleportToIGN)
             {
                 string targetName = inPacket.ReadString();
@@ -242,6 +250,7 @@ namespace Destiny.Maple.Characters
 
                 used = true;
             }
+
             else
             {
                 TrockParent.Client.Send(CharacterTrocksPackets.TrockTransferResult(result, type));

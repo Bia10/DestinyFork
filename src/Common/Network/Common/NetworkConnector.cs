@@ -10,7 +10,7 @@ namespace Destiny.Network.Common
     public abstract class NetworkConnector<TReceiveOP, TSendOP, TCryptograph> : MarshalByRefObject where TCryptograph : Cryptograph, new()
     {
         protected bool isAlive;
-        protected ManualResetEvent ReceiveDone = new ManualResetEvent(false);
+        protected readonly ManualResetEvent ReceiveDone = new ManualResetEvent(false);
 
         protected Socket Socket { get; set; }
         protected TCryptograph Cryptograph { get; set; }
@@ -21,7 +21,7 @@ namespace Destiny.Network.Common
             {
                 return isAlive;
             }
-            set
+            protected set
             {
                 isAlive = value;
 
@@ -32,7 +32,7 @@ namespace Destiny.Network.Common
             }
         }
 
-        public IPEndPoint RemoteEndPoint
+        protected IPEndPoint RemoteEndPoint
         {
             get
             {

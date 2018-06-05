@@ -62,10 +62,11 @@ namespace Destiny.Maple.Characters
 
         public void Save()
         {
-            Datum datum = new Datum("storages");
-
-            datum["Slots"] = this.Slots;
-            datum["Meso"] = this.Meso;
+            Datum datum = new Datum("storages")
+            {
+                ["Slots"] = this.Slots,
+                ["Meso"] = this.Meso
+            };
 
             datum.Update("AccountID = {0}", this.Parent.AccountID);
 
@@ -248,6 +249,9 @@ namespace Destiny.Maple.Characters
                     {
                         this.Save();
                     }
+                    break;
+
+                case NPCsConstants.StorageAction.OpenStorage:
                     break;
 
                 default: throw new ArgumentOutOfRangeException();

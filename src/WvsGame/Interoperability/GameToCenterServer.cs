@@ -17,7 +17,8 @@ namespace Destiny.Interoperability
 {
     public class GameToCenterServer : ServerHandler<InteroperabilityOperationCode, InteroperabilityOperationCode, BlankCryptograph>
     {
-        public GameToCenterServer(IPEndPoint remoteEP, string code) : base(remoteEP, "Center server", new object[] { code }) { }
+        public GameToCenterServer(IPEndPoint remoteEP, string code) 
+            : base(remoteEP, "Center server", new object[] { code }) { }
 
         protected override bool IsServerAlive
         {
@@ -43,12 +44,14 @@ namespace Destiny.Interoperability
 
                 WvsGame.CenterConnection.Loop();
             }
+
             catch (Exception e)
             {
-                Log.Error("Server connection failed: \n{0}", e.Message);
+                Log.Error("Server connection failed: \n {0}", e.Message);
 
                 WvsGame.Stop();
             }
+
             finally
             {
                 WvsGame.CenterConnectionDone.Set();
@@ -62,7 +65,7 @@ namespace Destiny.Interoperability
                 Packet.WriteByte((byte)ServerConstants.ServerType.Channel);
                 Packet.WriteString((string)args[0]);
 
-                this.Send(Packet);
+                Send(Packet);
             }
         }
 
@@ -76,36 +79,60 @@ namespace Destiny.Interoperability
             switch ((InteroperabilityOperationCode)inPacket.OperationCode)
             {
                 case InteroperabilityOperationCode.RegistrationResponse:
-                    this.Register(inPacket);
+                    Register(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.UpdateChannelID:
-                    this.UpdateChannelID(inPacket);
+                    UpdateChannelID(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterNameCheckRequest:
-                    this.CheckCharacterName(inPacket);
+                    CheckCharacterName(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterEntriesRequest:
-                    this.SendCharacters(inPacket);
+                    SendCharacters(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterCreationRequest:
-                    this.CreateCharacter(inPacket);
+                    CreateCharacter(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.MigrationResponse:
-                    this.Migrate(inPacket);
+                    Migrate(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.ChannelPortResponse:
-                    this.ChannelPortResponse(inPacket);
+                    ChannelPortResponse(inPacket);
                     break;
+
+                case InteroperabilityOperationCode.RegistrationRequest:
+                    break;
+                case InteroperabilityOperationCode.UpdateChannel:
+                    break;
+                case InteroperabilityOperationCode.UpdateChannelPopulation:
+                    break;
+                case InteroperabilityOperationCode.CharacterEntriesResponse:
+                    break;
+                case InteroperabilityOperationCode.CharacterCreationResponse:
+                    break;
+                case InteroperabilityOperationCode.MigrationRegisterRequest:
+                    break;
+                case InteroperabilityOperationCode.MigrationRegisterResponse:
+                    break;
+                case InteroperabilityOperationCode.CharacterNameCheckResponse:
+                    break;
+                case InteroperabilityOperationCode.MigrationRequest:
+                    break;
+                case InteroperabilityOperationCode.ChannelPortRequest:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        private void Register(Packet inPacket)
+        private static void Register(Packet inPacket)
         {
             ServerRegsitrationResponse response = (ServerRegsitrationResponse)inPacket.ReadByte();
 
@@ -141,6 +168,13 @@ namespace Destiny.Interoperability
                     }
                     break;
 
+                case ServerRegsitrationResponse.InvalidType:
+                    break;
+                case ServerRegsitrationResponse.InvalidCode:
+                    break;
+                case ServerRegsitrationResponse.Full:
+                    break;
+
                 default:
                     {
                         Log.SkipLine();
@@ -155,7 +189,7 @@ namespace Destiny.Interoperability
             WvsGame.CenterConnectionDone.Set();
         }
 
-        private void UpdateChannelID(Packet inPacket)
+        private static void UpdateChannelID(Packet inPacket)
         {
             WvsGame.ChannelID = inPacket.ReadByte();
         }
@@ -171,7 +205,7 @@ namespace Destiny.Interoperability
                     .WriteString(name)
                     .WriteBool(unusable);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -194,7 +228,7 @@ namespace Destiny.Interoperability
                     outPacket.WriteBytes(entry);
                 }
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -202,10 +236,13 @@ namespace Destiny.Interoperability
         {
             // exception charName too short!
             if(charName.Length < 4) return true;
+
             // exception charName too long!
             if (charName.Length > 12) return true;
+
             // exception charName already in use!
             if (Database.Exists("characters", "Name = {0}", charName)) return true;
+
             // exception charName is in ForbiddenNames!
             if (DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord =>
                 charName.ToLowerInvariant().Contains(forbiddenWord))) return false;
@@ -218,7 +255,7 @@ namespace Destiny.Interoperability
         {
             int accountID = inPacket.ReadInt();
             string name = inPacket.ReadString();
-            CharacterConstants.JobType jobType = (CharacterConstants.JobType)inPacket.ReadInt();
+            CharacterConstants.JobType jobType = (CharacterConstants.JobType) inPacket.ReadInt();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
             int hairColor = inPacket.ReadInt();
@@ -227,7 +264,7 @@ namespace Destiny.Interoperability
             int bottomID = inPacket.ReadInt();
             int shoesID = inPacket.ReadInt();
             int weaponID = inPacket.ReadInt();
-            CharacterConstants.Gender gender = (CharacterConstants.Gender)inPacket.ReadByte();
+            CharacterConstants.Gender gender = (CharacterConstants.Gender) inPacket.ReadByte();
 
             bool error = false;
 
@@ -261,6 +298,12 @@ namespace Destiny.Interoperability
                             error = true;
                         break;
 
+                    case CharacterConstants.Gender.Both:
+                        break;
+
+                    case CharacterConstants.Gender.Unset:
+                        break;
+
                     default:
                         error = false;
                         break;
@@ -281,6 +324,7 @@ namespace Destiny.Interoperability
                 AccountID = accountID,
                 WorldID = WvsGame.WorldID,
                 Name = name,
+
                 Appearance =
                 {
                     Gender = gender,
@@ -288,6 +332,7 @@ namespace Destiny.Interoperability
                     Face = face,
                     Hair = hair + hairColor
                 },
+
                 Stats =
                 {
                     Level = 1, Experience = 0,
@@ -298,6 +343,7 @@ namespace Destiny.Interoperability
                     Intelligence = 4, Luck = 4,
                     Fame = 0, Meso = 0
                 },
+
                 Jobs =
                 {
                     Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse 
@@ -315,49 +361,26 @@ namespace Destiny.Interoperability
             character.Items.AddItemToInventory(new Item(bottomID, equipped: true));
             character.Items.AddItemToInventory(new Item(shoesID, equipped: true));
             character.Items.AddItemToInventory(new Item(weaponID, equipped: true));
-            character.Items.AddItemToInventory(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 
-                : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.One, KeyMapConstants.KeymapAction.AllChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Two, KeyMapConstants.KeymapAction.PartyChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Three, KeyMapConstants.KeymapAction.BuddyChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Four, KeyMapConstants.KeymapAction.GuildChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Five, KeyMapConstants.KeymapAction.AllianceChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Six, KeyMapConstants.KeymapAction.SpouseChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Q, KeyMapConstants.KeymapAction.QuestMenu));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.W, KeyMapConstants.KeymapAction.WorldMap));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.E, KeyMapConstants.KeymapAction.EquipmentMenu));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.R, KeyMapConstants.KeymapAction.BuddyList));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.I, KeyMapConstants.KeymapAction.ItemMenu));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.O, KeyMapConstants.KeymapAction.PartySearch));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.P, KeyMapConstants.KeymapAction.PartyList));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.BracketLeft, KeyMapConstants.KeymapAction.Shortcut));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.BracketRight, KeyMapConstants.KeymapAction.QuickSlot));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.LeftCtrl, KeyMapConstants.KeymapAction.Attack));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.S, KeyMapConstants.KeymapAction.AbilityMenu));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F, KeyMapConstants.KeymapAction.FamilyList));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.G, KeyMapConstants.KeymapAction.GuildList));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.H, KeyMapConstants.KeymapAction.WhisperChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.K, KeyMapConstants.KeymapAction.SkillMenu));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.L, KeyMapConstants.KeymapAction.QuestHelper));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Semicolon, KeyMapConstants.KeymapAction.Medal));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Quote, KeyMapConstants.KeymapAction.ExpandChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Backtick, KeyMapConstants.KeymapAction.CashShop));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Backslash, KeyMapConstants.KeymapAction.SetKey));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Z, KeyMapConstants.KeymapAction.PickUp));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.X, KeyMapConstants.KeymapAction.Sit));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.C, KeyMapConstants.KeymapAction.Messenger));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.B, KeyMapConstants.KeymapAction.MonsterBook));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.M, KeyMapConstants.KeymapAction.MiniMap));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.LeftAlt, KeyMapConstants.KeymapAction.Jump));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.Space, KeyMapConstants.KeymapAction.NpcChat));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F1, KeyMapConstants.KeymapAction.Cockeyed));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F2, KeyMapConstants.KeymapAction.Happy));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F3, KeyMapConstants.KeymapAction.Sarcastic));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F4, KeyMapConstants.KeymapAction.Crying));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F5, KeyMapConstants.KeymapAction.Outraged));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F6, KeyMapConstants.KeymapAction.Shocked));
-            character.Keymap.Add(new Shortcut(KeyMapConstants.KeymapKey.F7, KeyMapConstants.KeymapAction.Annoyed));
+            switch (jobType)
+            {
+                case CharacterConstants.JobType.Cygnus:
+                    character.Items.AddItemToInventory(new Item(4161047)); // Noblesse Guide
+                    break;
+
+                case CharacterConstants.JobType.Explorer:
+                    character.Items.AddItemToInventory(new Item(4161001)); // Beginner's Guide
+                    break;
+
+                case CharacterConstants.JobType.Aran: // Legend
+                    character.Items.AddItemToInventory(new Item(4161048)); // Legend's Guide
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            character.Keymap.InitiateDefaultKeymap();
 
             character.Save();
 
@@ -366,7 +389,7 @@ namespace Destiny.Interoperability
                 outPacket.WriteInt(accountID);
                 outPacket.WriteBytes(character.ToByteArray());
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -375,7 +398,7 @@ namespace Destiny.Interoperability
             byte id = inPacket.ReadByte();
             ushort port = inPacket.ReadUShort();
 
-            this.ChannelPortPool.Enqueue(id, port);
+            ChannelPortPool.Enqueue(id, port);
         }
 
         public void UpdatePopulation(int population)
@@ -384,11 +407,11 @@ namespace Destiny.Interoperability
             {
                 outPacket.WriteInt(population);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
-        private PendingKeyedQueue<byte, ushort> ChannelPortPool = new PendingKeyedQueue<byte, ushort>();
+        private readonly PendingKeyedQueue<byte, ushort> ChannelPortPool = new PendingKeyedQueue<byte, ushort>();
 
         public ushort GetChannelPort(byte channelID)
         {
@@ -396,13 +419,13 @@ namespace Destiny.Interoperability
             {
                 outPacket.WriteByte(channelID);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.ChannelPortPool.Dequeue(channelID);
+            return ChannelPortPool.Dequeue(channelID);
         }
 
-        private PendingKeyedQueue<string, int> MigrationValidationPool = new PendingKeyedQueue<string, int>();
+        private readonly PendingKeyedQueue<string, int> MigrationValidationPool = new PendingKeyedQueue<string, int>();
 
         public int ValidateMigration(string host, int characterID)
         {
@@ -412,10 +435,10 @@ namespace Destiny.Interoperability
                     .WriteString(host)
                     .WriteInt(characterID);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.MigrationValidationPool.Dequeue(host);
+            return MigrationValidationPool.Dequeue(host);
         }
 
         private void Migrate(Packet inPacket)
@@ -423,7 +446,7 @@ namespace Destiny.Interoperability
             string host = inPacket.ReadString();
             int accountID = inPacket.ReadInt();
 
-            this.MigrationValidationPool.Enqueue(host, accountID);
+            MigrationValidationPool.Enqueue(host, accountID);
         }
     }
 }

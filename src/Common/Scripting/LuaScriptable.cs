@@ -1,14 +1,17 @@
 ﻿using MoonSharp.Interpreter;
 
+using System;
 using System.Threading;
+
+using Destiny.IO;
 
 namespace Destiny.Scripting
 {
     public abstract class LuaScriptable
     {
-        private string mPath;
-        private Script mScript;
-        private bool mUseThread;
+        private readonly string mPath;
+        private readonly Script mScript;
+        private readonly bool mUseThread;
 
         protected LuaScriptable(string path, bool useThread = false)
         {
@@ -21,7 +24,17 @@ namespace Destiny.Scripting
         {
             if (mUseThread)
             {
-                new Thread(new ThreadStart(() => mScript.DoFile(mPath))).Start();
+                try
+                {
+                    new Thread(new ThreadStart(() => mScript.DoFile(mPath))).Start();
+                }
+
+                catch (Exception ex)
+                {
+                    Log.SkipLine();
+                    Tracer.TraceErrorMessage(ex, "Script thread could not be created!");
+                    Log.SkipLine();
+                }
             }
             else
             {

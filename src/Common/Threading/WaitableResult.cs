@@ -6,7 +6,7 @@ namespace Destiny.Threading
     {
         private T mValue;
 
-        private ManualResetEvent mEvent;
+        private readonly ManualResetEvent mEvent;
 
         public WaitableResult()
         {

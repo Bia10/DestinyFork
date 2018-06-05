@@ -121,7 +121,7 @@ namespace Destiny.Constants
         {
             Cygnus = 0,
             Explorer = 1,
-            Aran = 2
+            Aran = 2 // generally Legend?
         }
 
         public enum UserEffect : byte

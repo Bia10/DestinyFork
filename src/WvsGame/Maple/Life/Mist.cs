@@ -33,7 +33,7 @@ namespace Destiny.Maple.Life
 
         public MistType getMistType()
         {
-            switch (this.mistSkill.MapleID)
+            switch (mistSkill.MapleID)
             {
                 case (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist:
                     return MistType.playerPoisonMist;
@@ -47,20 +47,20 @@ namespace Destiny.Maple.Life
 
         public Mist(Rectangle boundingBox, Character character, Skill skill)
         {
-            this.ObjectID = ObjectID;
-            this.mistSkill = skill;
-            this.mistType = getMistType();
-            this.mistOwner = character;          
-            this.mistPosition = boundingBox;
+            ObjectID = ObjectID;
+            mistSkill = skill;
+            mistType = getMistType();
+            mistOwner = character;          
+            mistPosition = boundingBox;
         }
 
         public Mist MistObject(Rectangle boundingBox, Character character, Skill skill)
         {
-            this.ObjectID = ObjectID;
-            this.mistSkill = skill;
-            this.mistType = getMistType();
-            this.mistOwner = character;
-            this.mistPosition = boundingBox;
+            ObjectID = ObjectID;
+            mistSkill = skill;
+            mistType = getMistType();
+            mistOwner = character;
+            mistPosition = boundingBox;
 
             return this;
         }
@@ -74,12 +74,12 @@ namespace Destiny.Maple.Life
 
         public Packet GetCreatePacket()
         {
-            return this.GetSpawnPacket();
+            return GetSpawnPacket();
         }
 
         public Packet GetSpawnPacket()
         {
-            return this.GetInternalPacket();
+            return GetInternalPacket();
         }
 
         private Packet GetInternalPacket()
@@ -87,16 +87,16 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.AffectedAreaCreated);
 
                     oPacket
-                        .WriteInt(this.ObjectID)
-                        .WriteInt((int)this.mistType) 
-                        .WriteInt(this.mistOwner.ID)
-                        .WriteInt(this.mistSkill.MapleID)
-                        .WriteByte(this.mistSkill.CurrentLevel)
-                        .WriteShort((short)this.mistSkill.Cooldown)
-                        .WriteInt(this.mistPosition.RB.X)
-                        .WriteInt(this.mistPosition.RB.Y)
-                        .WriteInt(this.mistPosition.RB.X + this.mistPosition.LT.Y)
-                        .WriteInt(this.mistPosition.RB.Y + this.mistPosition.LT.Y)
+                        .WriteInt(ObjectID)
+                        .WriteInt((int)mistType) 
+                        .WriteInt(mistOwner.ID)
+                        .WriteInt(mistSkill.MapleID)
+                        .WriteByte(mistSkill.CurrentLevel)
+                        .WriteShort((short)mistSkill.Cooldown)
+                        .WriteInt(mistPosition.RightBottom.X)
+                        .WriteInt(mistPosition.RightBottom.Y)
+                        .WriteInt(mistPosition.RightBottom.X + mistPosition.LeftTop.Y)
+                        .WriteInt(mistPosition.RightBottom.Y + mistPosition.LeftTop.Y)
                         .WriteInt(0); // ???
                     
             return oPacket;
@@ -106,7 +106,7 @@ namespace Destiny.Maple.Life
         {
             Packet oPacket = new Packet(ServerOperationCode.AffectedAreaRemoved);
 
-            oPacket.WriteInt(this.ObjectID);
+            oPacket.WriteInt(ObjectID);
 
             return oPacket;
         }

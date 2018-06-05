@@ -19,6 +19,7 @@
         CheckDuplicatedIDResult = 13,
         CreateNewCharacterResult = 14,
         DeleteCharacterResult = 15,
+
         /*CClientSocket::ProcessPacket*/
         MigrateCommand = 16,
         Ping = 17,
@@ -172,9 +173,11 @@
         PyramidGauge = 157,
         PyramidScore = 158,
         //159
+
         /*CUserPool::OnPacket*/
         UserEnterField = 160,
         UserLeaveField = 161,
+
         /*CUserPool::OnUserCommonPacket*/
         UserChat = 162,
         //163
@@ -191,6 +194,7 @@
         PetNameChanged = 172,
         PetLoadExceptionList = 173,
         PetActionCommand = 174,
+
         /*CSummonedPool::OnPacket*/
         SummonedCreated = 175,
         SummonedRemoved = 176,
@@ -198,6 +202,7 @@
         SummonedAttack = 178,
         SummonedHit = 179,
         SummonedSkill = 180,
+
         /*CUser::OnDragonPacket*/
         DragonEnterField = 181,
         DragonMove = 182,
@@ -263,6 +268,7 @@
         MobEnterField = 236,
         MobLeaveField = 237,
         MobChangeController = 238,
+
         /*CMobPool::OnMobPacket*/
         MobMove = 239,
         MobCtrlAck = 240,
@@ -287,13 +293,14 @@
         NpcEnterField = 257,
         NpcLeaveField = 258,
         NpcChangeController = 259,
+
         /*CNpcPool::OnNpcPacket*/
         NpcMove = 260,
         NpcUpdateLimitedInfo = 261,
         NpcSetSpecialAction = 262,
+
         /*CNpcPool::OnNpcTemplatePacket*/
         NpcSetNpcScript = 263,
-
         //264
 
         /*CEmployeePool::OnPacket*/

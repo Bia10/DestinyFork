@@ -6,12 +6,11 @@ namespace Destiny.Maple
 {
     public sealed class Experience
     {
-        public int Amount { get; private set; }
+        public int Amount { get; }
 
-        public Experience(int amount)
-            : base()
+        public Experience(int amount) : base()
         {
-            this.Amount = amount;
+            Amount = amount;
         }
 
         public const int GivenExpLimit = int.MaxValue;

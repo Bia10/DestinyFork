@@ -2,14 +2,13 @@
 {
     public sealed class PlayerShopItem : Item
     {
-        public short Bundles { get; set; }
-        public int MerchantPrice { get; private set; }
+        public short Bundles { get; }
+        public int MerchantPrice { get; }
 
-        public PlayerShopItem(int mapleID, short bundles, short quantity, int price)
-            : base(mapleID, quantity)
+        public PlayerShopItem(int mapleID, short bundles, short quantity, int price) : base(mapleID, quantity)
         {
-            this.Bundles = bundles;
-            this.MerchantPrice = price;
+            Bundles = bundles;
+            MerchantPrice = price;
         }
     }
 }

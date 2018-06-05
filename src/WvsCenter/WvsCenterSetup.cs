@@ -161,8 +161,10 @@ namespace Destiny
             {
                 //read script from file
                 string script = File.ReadAllText(CenterDBFileName);
+
                 //regexp {0} for databaseSchema
                 string scriptModed = Regex.Replace(script, "{0}", databaseSchema);
+
                 //execute script
                 Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, scriptModed,
                     databaseSchema);

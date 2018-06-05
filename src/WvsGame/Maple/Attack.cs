@@ -24,36 +24,36 @@ namespace Destiny.Maple
 
         public Attack(Packet iPacket, CharacterConstants.AttackType type) //TODO: recheck this seems wrong
         {
-            this.Type = type;
-            this.Portals = iPacket.ReadByte();
+            Type = type;
+            Portals = iPacket.ReadByte();
             byte tByte = iPacket.ReadByte();
-            this.Targets = tByte / 0x10;
-            this.Hits = tByte % 0x10;
-            this.SkillID = iPacket.ReadInt();
+            Targets = tByte / 0x10;
+            Hits = tByte % 0x10;
+            SkillID = iPacket.ReadInt();
 
-            if (this.SkillID > 0)
+            if (SkillID > 0)
             {
             }
 
             iPacket.Skip(4); // NOTE: Unknown, probably CRC.
             iPacket.Skip(4); // NOTE: Unknown, probably CRC.
             iPacket.Skip(1); // NOTE: Unknown.
-            this.Display = iPacket.ReadByte();
-            this.Animation = iPacket.ReadByte();
-            this.WeaponClass = iPacket.ReadByte();
-            this.WeaponSpeed = iPacket.ReadByte();
-            this.Ticks = iPacket.ReadInt();
+            Display = iPacket.ReadByte();
+            Animation = iPacket.ReadByte();
+            WeaponClass = iPacket.ReadByte();
+            WeaponSpeed = iPacket.ReadByte();
+            Ticks = iPacket.ReadInt();
 
-            if (this.Type == CharacterConstants.AttackType.Range)
+            if (Type == CharacterConstants.AttackType.Range)
             {
                 short starSlot = iPacket.ReadShort();
                 short cashStarSlot = iPacket.ReadShort();
                 iPacket.ReadByte(); // NOTE: Unknown.
             }
 
-            this.Damages = new Dictionary<int, List<uint>>();
+            Damages = new Dictionary<int, List<uint>>();
 
-            for (int i = 0; i < this.Targets; i++)
+            for (int i = 0; i < Targets; i++)
             {
                 int objectID = iPacket.ReadInt();
                 iPacket.ReadInt(); // NOTE: Unknown.
@@ -61,27 +61,27 @@ namespace Destiny.Maple
                 iPacket.ReadInt(); // NOTE: Damage position.
                 iPacket.ReadShort(); // NOTE: Distance.
 
-                for (int j = 0; j < this.Hits; j++)
+                for (int j = 0; j < Hits; j++)
                 {
                     uint damage = iPacket.ReadUInt();
 
-                    if (!this.Damages.ContainsKey(objectID))
+                    if (!Damages.ContainsKey(objectID))
                     {
-                        this.Damages.Add(objectID, new List<uint>());
+                        Damages.Add(objectID, new List<uint>());
                     }
 
-                    this.Damages[objectID].Add(damage);
+                    Damages[objectID].Add(damage);
 
-                    this.TotalDamage += damage;
+                    TotalDamage += damage;
                 }
 
-                if (this.Type != CharacterConstants.AttackType.Summon)
+                if (Type != CharacterConstants.AttackType.Summon)
                 {
                     iPacket.ReadInt(); // NOTE: Unknown, probably CRC.
                 }
             }
 
-            if (this.Type == CharacterConstants.AttackType.Range)
+            if (Type == CharacterConstants.AttackType.Range)
             {
                 var rangedAttackPoint = new Point(iPacket.ReadShort(), iPacket.ReadShort());
             }

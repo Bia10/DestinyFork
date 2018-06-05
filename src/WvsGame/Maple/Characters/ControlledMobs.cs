@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using Destiny.IO;
 using Destiny.Maple.Life;
 using Destiny.Network.Common;
 
@@ -8,53 +9,54 @@ namespace Destiny.Maple.Characters
 {
     public class ControlledMobs : KeyedCollection<int, Mob>
     {
-        public Character Parent { get; private set; }
+        public Character Parent { get; }
 
         public ControlledMobs(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
-        public void Move(Packet iPacket)
+        public void MoveHandler(Packet inPacket)
         {
-            int objectID = iPacket.ReadInt();
+            int objectID = inPacket.ReadInt();
+            if (objectID <= 0) return;
 
             Mob mob;
-            if (objectID > 0)
-            {
-                try
-                {
-                    mob = this[objectID];
-                }
-                catch (KeyNotFoundException)
-                {
-                    return;
-                }
 
-                mob.Move(iPacket);
+            try
+            {
+                mob = this[objectID];
             }
 
-            //Log.Error("ControlledMobs-Move() objectID < 0!");
+            catch (KeyNotFoundException)
+            {
+                Log.SkipLine();
+                Log.Warn(string.Format("ControlledMobs-MoveHandler: KeyNotFound! Argument: {0} ", this[objectID]));
+                Log.SkipLine();
+                return;
+            }
+
+            mob.Move(inPacket);
         }
 
-        protected override void InsertItem(int index, Mob item)
+        protected override void InsertItem(int index, Mob newlyControlledMob)
         {
             lock (this)
             {
-                if (this.Parent.Client.IsAlive)
+                if (Parent.Client.IsAlive)
                 {
-                    item.Controller = this.Parent;
+                    newlyControlledMob.Controller = Parent;
 
-                    base.InsertItem(index, item);
+                    base.InsertItem(index, newlyControlledMob);
 
-                    using (Packet oPacket = item.GetControlRequestPacket())
+                    using (Packet oPacket = newlyControlledMob.GetControlRequestPacket())
                     {
-                        this.Parent.Client.Send(oPacket);
+                        Parent.Client.Send(oPacket);
                     }
                 }
                 else
                 {
-                    item.AssignController();
+                    newlyControlledMob.AssignController();
                 }
             }
         }
@@ -63,17 +65,16 @@ namespace Destiny.Maple.Characters
         {
             lock (this)
             {
-                Mob item = base.Items[index];
+                Mob controlledMobAtIndex = Items[index];
 
-                if (this.Parent.Client.IsAlive)
+                if (Parent.Client.IsAlive)
                 {
-                    using (Packet oPacket = item.GetControlCancelPacket())
+                    using (Packet oPacket = controlledMobAtIndex.GetControlCancelPacket())
                     {
-                        this.Parent.Client.Send(oPacket);
+                        Parent.Client.Send(oPacket);
                     }
                 }
-
-                item.Controller = null;
+                controlledMobAtIndex.Controller = null;
 
                 base.RemoveItem(index);
             }
@@ -83,16 +84,19 @@ namespace Destiny.Maple.Characters
         {
             lock (this)
             {
-                List<Mob> toRemove = new List<Mob>();
+                // create empty holder
+                List<Mob> controlledMobsToRemove = new List<Mob>();
 
+                // populate with each mob in controlledMobs class
                 foreach (Mob mob in this)
                 {
-                    toRemove.Add(mob);
+                    controlledMobsToRemove.Add(mob);
                 }
 
-                foreach (Mob mob in toRemove)
+                // remove each mob from holder
+                foreach (Mob mob in controlledMobsToRemove)
                 {
-                    this.Remove(mob);
+                    Remove(mob);
                 }
             }
         }

@@ -1,9 +1,10 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using System.Collections.Generic;
+
+using Destiny.Maple.Characters;
 using Destiny.Data;
 using Destiny.Maple.Shops;
-using System.Collections.Generic;
 using Destiny.Maple.Scripting;
-using System;
 using Destiny.Constants;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -12,17 +13,16 @@ namespace Destiny.Maple.Life
 {
     public class Npc : LifeObject, ISpawnable, IControllable
     {
-        public Npc(Datum datum)
-            : base(datum)
+        public Npc(Datum datum) : base(datum)
         {
-            this.Scripts = new Dictionary<Character, NpcScript>();
+            Scripts = new Dictionary<Character, NpcScript>();
         }
 
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
         public int StorageCost { get; set; }
-        public Dictionary<Character, NpcScript> Scripts { get; private set; }
+        public Dictionary<Character, NpcScript> Scripts { get; }
 
         public void Move(Packet iPacket)
         {
@@ -39,7 +39,7 @@ namespace Destiny.Maple.Life
             using (Packet oPacket = new Packet(ServerOperationCode.NpcMove))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteByte(action1)
                     .WriteByte(action2);
 
@@ -48,17 +48,17 @@ namespace Destiny.Maple.Life
                     oPacket.WriteBytes(movements.ToByteArray());
                 }
 
-                this.Map.Broadcast(oPacket);
+                Map.Broadcast(oPacket);
             }
         }
 
         public void Converse(Character talker)
         {
-            if (this.Shop != null)
+            if (Shop != null)
             {
-                this.Shop.Show(talker);
+                Shop.Show(talker);
             }
-            else if (this.StorageCost > 0)
+            else if (StorageCost > 0)
             {
                 talker.Storage.Show(this);
             }
@@ -66,7 +66,7 @@ namespace Destiny.Maple.Life
             {
                 var script = new NpcScript(this, talker);
 
-                this.Scripts[talker] = script;
+                Scripts[talker] = script;
 
                 try
                 {
@@ -123,16 +123,16 @@ namespace Destiny.Maple.Life
 
                 if (lastMessageType == NPCsConstants.NpcMessageType.RequestStyle)
                 {
-                    //selection = this.StyleSelectionHelpers[talker][selection];
+                    //selection = StyleSelectionHelpers[talker][selection];
                 }
 
                 if (selection != -1)
                 {
-                    this.Scripts[talker].SetResult(selection);
+                    Scripts[talker].SetResult(selection);
                 }
                 else
                 {
-                    this.Scripts[talker].SetResult(action);
+                    Scripts[talker].SetResult(action);
                 }
             }
             else
@@ -143,43 +143,38 @@ namespace Destiny.Maple.Life
 
         public void AssignController()
         {
-            if (this.Controller == null)
+            if (Controller != null) return;
+
+            int leastControlled = int.MaxValue;
+            Character newController = null;
+
+            lock (Map.Characters)
             {
-                int leastControlled = int.MaxValue;
-                Character newController = null;
-
-                lock (this.Map.Characters)
+                foreach (Character character in Map.Characters)
                 {
-                    foreach (Character character in this.Map.Characters)
-                    {
-                        if (character.ControlledNpcs.Count < leastControlled)
-                        {
-                            leastControlled = character.ControlledNpcs.Count;
-                            newController = character;
-                        }
-                    }
-                }
+                    if (character.ControlledNpcs.Count >= leastControlled) continue;
 
-                if (newController != null)
-                {
-                    newController.ControlledNpcs.Add(this);
+                    leastControlled = character.ControlledNpcs.Count;
+                    newController = character;
                 }
             }
+
+            newController?.ControlledNpcs.Add(this);
         }
 
         public Packet GetCreatePacket()
         {
-            return this.GetSpawnPacket();
+            return GetSpawnPacket();
         }
 
         public Packet GetSpawnPacket()
         {
-            return this.GetInternalPacket(false);
+            return GetInternalPacket(false);
         }
 
         public Packet GetControlRequestPacket()
         {
-            return this.GetInternalPacket(true);
+            return GetInternalPacket(true);
         }
 
         private Packet GetInternalPacket(bool requestControl)
@@ -192,14 +187,14 @@ namespace Destiny.Maple.Life
             }
 
             oPacket
-                .WriteInt(this.ObjectID)
-                .WriteInt(this.MapleID)
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y)
-                .WriteBool(!this.FacesLeft)
-                .WriteShort(this.Foothold)
-                .WriteShort(this.MinimumClickX)
-                .WriteShort(this.MaximumClickX)
+                .WriteInt(ObjectID)
+                .WriteInt(MapleID)
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y)
+                .WriteBool(!FacesLeft)
+                .WriteShort(Foothold)
+                .WriteShort(MinimumClickX)
+                .WriteShort(MaximumClickX)
                 .WriteBool(true); // NOTE: Hide.
 
             return oPacket;
@@ -211,7 +206,7 @@ namespace Destiny.Maple.Life
 
             oPacket
                 .WriteBool(false)
-                .WriteInt(this.ObjectID);
+                .WriteInt(ObjectID);
 
             return oPacket;
         }
@@ -222,7 +217,7 @@ namespace Destiny.Maple.Life
 
             oPacket
                 .WriteByte(4) // NOTE: Unknown.
-                .WriteInt(this.MapleID)
+                .WriteInt(MapleID)
                 .WriteByte((byte)messageType)
                 .WriteByte() // NOTE: Speaker.
                 .WriteString(text)
@@ -235,7 +230,7 @@ namespace Destiny.Maple.Life
         {
             Packet oPacket = new Packet(ServerOperationCode.NpcLeaveField);
 
-            oPacket.WriteInt(this.ObjectID);
+            oPacket.WriteInt(ObjectID);
 
             return oPacket;
         }

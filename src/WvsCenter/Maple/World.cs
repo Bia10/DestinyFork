@@ -7,18 +7,18 @@ namespace Destiny.Maple
 {
     public sealed class World : KeyedCollection<byte, CenterClient>
     {
-        public byte ID { get; private set; }
-        public string Name { get; private set; }
-        public ushort Port { get; private set; }
-        public ushort ShopPort { get; private set; }
-        public byte Channels { get; private set; }
-        public string TickerMessage { get; private set; }
-        public bool AllowMultiLeveling { get; private set; }
-        public int ExperienceRate { get; private set; }
-        public int QuestExperienceRate { get; private set; }
-        public int PartyQuestExperienceRate { get; private set; }
-        public int MesoRate { get; private set; }
-        public int DropRate { get; private set; }
+        public byte ID { get;  }
+        public string Name { get;  }
+        public ushort Port { get;  }
+        public ushort ShopPort { get;  }
+        public byte Channels { get;  }
+        public string TickerMessage { get;  }
+        public bool AllowMultiLeveling { get;  }
+        public int ExperienceRate { get;  }
+        public int QuestExperienceRate { get;  }
+        public int PartyQuestExperienceRate { get;  }
+        public int MesoRate { get;  }
+        public int DropRate { get;  }
 
         private CenterClient shop;
 
@@ -34,7 +34,7 @@ namespace Destiny.Maple
 
                 if (value != null)
                 {
-                    this.Shop.Port = this.ShopPort;
+                    Shop.Port = ShopPort;
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this[Application.Random.Next(this.Count)];
+                return this[Application.Random.Next(Count)];
             }
         }
 
@@ -51,7 +51,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Count == this.Channels;
+                return Count == Channels;
             }
         }
 
@@ -59,33 +59,32 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Shop != null;
+                return Shop != null;
             }
         }
 
         internal World() : base() { }
 
-        internal World(Packet inPacket)
-            : this()
+        internal World(Packet inPacket) : this()
         {
-            this.ID = inPacket.ReadByte();
-            this.Name = inPacket.ReadString();
-            this.Port = inPacket.ReadUShort();
-            this.ShopPort = inPacket.ReadUShort();
-            this.Channels = inPacket.ReadByte();
-            this.TickerMessage = inPacket.ReadString();
-            this.AllowMultiLeveling = inPacket.ReadBool();
-            this.ExperienceRate = inPacket.ReadInt();
-            this.QuestExperienceRate = inPacket.ReadInt();
-            this.PartyQuestExperienceRate = inPacket.ReadInt();
-            this.MesoRate = inPacket.ReadInt();
-            this.DropRate = inPacket.ReadInt();
+            ID = inPacket.ReadByte();
+            Name = inPacket.ReadString();
+            Port = inPacket.ReadUShort();
+            ShopPort = inPacket.ReadUShort();
+            Channels = inPacket.ReadByte();
+            TickerMessage = inPacket.ReadString();
+            AllowMultiLeveling = inPacket.ReadBool();
+            ExperienceRate = inPacket.ReadInt();
+            QuestExperienceRate = inPacket.ReadInt();
+            PartyQuestExperienceRate = inPacket.ReadInt();
+            MesoRate = inPacket.ReadInt();
+            DropRate = inPacket.ReadInt();
         }
 
         protected override void InsertItem(int index, CenterClient item)
         {
             item.ID = (byte)index;
-            item.Port = (ushort)(this.Port + index);
+            item.Port = (ushort)(Port + index);
 
             base.InsertItem(index, item);
         }
@@ -96,16 +95,15 @@ namespace Destiny.Maple
 
             foreach (CenterClient loopChannel in this)
             {
-                if (loopChannel.ID > index)
+                if (loopChannel.ID <= index) continue;
+
+                loopChannel.ID--;
+
+                using (Packet Packet = new Packet(InteroperabilityOperationCode.UpdateChannelID))
                 {
-                    loopChannel.ID--;
+                    Packet.WriteByte(loopChannel.ID);
 
-                    using (Packet Packet = new Packet(InteroperabilityOperationCode.UpdateChannelID))
-                    {
-                        Packet.WriteByte(loopChannel.ID);
-
-                        loopChannel.Send(Packet);
-                    }
+                    loopChannel.Send(Packet);
                 }
             }
         }

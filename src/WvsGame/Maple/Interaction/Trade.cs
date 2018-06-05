@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Destiny.Maple.Characters;
 using Destiny.Constants;
@@ -21,15 +22,15 @@ namespace Destiny.Maple.Interaction
 
         public Trade(Character owner)
         {
-            this.Owner = owner;
-            this.Visitor = null;
-            this.OwnerMeso = 0;
-            this.VisitorMeso = 0;
-            this.OwnerItems = new List<Item>();
-            this.VisitorItems = new List<Item>();
-            this.Started = false;
-            this.OwnerLocked = false;
-            this.VisitorLocked = false;
+            Owner = owner;
+            Visitor = null;
+            OwnerMeso = 0;
+            VisitorMeso = 0;
+            OwnerItems = new List<Item>();
+            VisitorItems = new List<Item>();
+            Started = false;
+            OwnerLocked = false;
+            VisitorLocked = false;
 
             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
             {
@@ -39,11 +40,11 @@ namespace Destiny.Maple.Interaction
                     .WriteByte(2)
                     .WriteByte(0) // NOTE: Player index.
                     .WriteByte(0)
-                    .WriteBytes(this.Owner.AppearanceToByteArray())
-                    .WriteString(this.Owner.Name)
+                    .WriteBytes(Owner.AppearanceToByteArray())
+                    .WriteString(Owner.Name)
                     .WriteByte(byte.MaxValue);
 
-                this.Owner.Client.Send(oPacket);
+                Owner.Client.Send(oPacket);
             }
         }
 
@@ -55,14 +56,14 @@ namespace Destiny.Maple.Interaction
                     {
                         int characterID = iPacket.ReadInt();
 
-                        if (!this.Owner.Map.Characters.Contains(characterID))
+                        if (!Owner.Map.Characters.Contains(characterID))
                         {
                             // TODO: What does happen in case the invitee left?
 
                             return;
                         }
 
-                        Character invitee = this.Owner.Map.Characters[characterID];
+                        Character invitee = Owner.Map.Characters[characterID];
 
                         if (invitee.Trade != null)
                         {
@@ -73,23 +74,23 @@ namespace Destiny.Maple.Interaction
                                     .WriteByte(2)
                                     .WriteString(invitee.Name);
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                         }
                         else
                         {
                             invitee.Trade = this;
-                            this.Visitor = invitee;
+                            Visitor = invitee;
 
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
                                     .WriteByte((byte)InteractionConstants.InteractionCode.Invite)
                                     .WriteByte(3)
-                                    .WriteString(this.Owner.Name)
+                                    .WriteString(Owner.Name)
                                     .WriteBytes(new byte[4] { 0xB7, 0x50, 0x00, 0x00 });
 
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                         }
                     }
@@ -104,38 +105,38 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(3)
                                 .WriteString(character.Name);
 
-                            this.Owner.Client.Send(oPacket);
+                            Owner.Client.Send(oPacket);
                         }
 
-                        this.Owner.Trade = null;
-                        this.Visitor.Trade = null;
-                        this.Owner = null;
-                        this.Visitor = null;
+                        Owner.Trade = null;
+                        Visitor.Trade = null;
+                        Owner = null;
+                        Visitor = null;
                     }
                     break;
 
                 case InteractionConstants.InteractionCode.Visit:
                     {
-                        if (this.Owner == null)
+                        if (Owner == null)
                         {
-                            this.Visitor = null;
+                            Visitor = null;
                             character.Trade = null;
 
                            Character.Notify(character, "Trade has been closed.", ServerConstants.NoticeType.Popup);
                         }
                         else
                         {
-                            this.Started = true;
+                            Started = true;
 
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
                                 oPacket
                                     .WriteByte((byte)InteractionConstants.InteractionCode.Visit)
                                     .WriteByte(1)
-                                    .WriteBytes(this.Visitor.AppearanceToByteArray())
-                                    .WriteString(this.Visitor.Name);
+                                    .WriteBytes(Visitor.AppearanceToByteArray())
+                                    .WriteString(Visitor.Name);
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
 
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
@@ -146,14 +147,14 @@ namespace Destiny.Maple.Interaction
                                     .WriteByte(2)
                                     .WriteByte(1)
                                     .WriteByte(0)
-                                    .WriteBytes(this.Owner.AppearanceToByteArray())
-                                    .WriteString(this.Owner.Name)
+                                    .WriteBytes(Owner.AppearanceToByteArray())
+                                    .WriteString(Owner.Name)
                                     .WriteByte(1)
-                                    .WriteBytes(this.Visitor.AppearanceToByteArray())
-                                    .WriteString(this.Visitor.Name)
+                                    .WriteBytes(Visitor.AppearanceToByteArray())
+                                    .WriteString(Visitor.Name)
                                     .WriteByte(byte.MaxValue);
 
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                         }
                     }
@@ -200,17 +201,17 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(targetSlot)
                                 .WriteBytes(item.ToByteArray(true));
 
-                            if (character == this.Owner)
+                            if (character == Owner)
                             {
-                                this.OwnerItems.Add(item);
+                                OwnerItems.Add(item);
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                             else
                             {
-                                this.VisitorItems.Add(item);
+                                VisitorItems.Add(item);
 
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                         }
 
@@ -222,13 +223,13 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(targetSlot)
                                 .WriteBytes(item.ToByteArray(true));
 
-                            if (character == this.Owner)
+                            if (character == Owner)
                             {
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                             else
                             {
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                         }
                     }
@@ -253,29 +254,29 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(0)
                                 .WriteInt(meso);
 
-                            if (character == this.Owner)
+                            if (character == Owner)
                             {
-                                if (this.OwnerLocked)
+                                if (OwnerLocked)
                                 {
                                     return;
                                 }
 
-                                this.OwnerMeso += meso;
-                                this.Owner.Stats.Meso -= meso;
+                                OwnerMeso += meso;
+                                Owner.Stats.Meso -= meso;
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                             else
                             {
-                                if (this.VisitorLocked)
+                                if (VisitorLocked)
                                 {
                                     return;
                                 }
 
-                                this.VisitorMeso += meso;
-                                this.Visitor.Stats.Meso -= meso;
+                                VisitorMeso += meso;
+                                Visitor.Stats.Meso -= meso;
 
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                         }
 
@@ -286,15 +287,15 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(1)
                                 .WriteInt(meso);
 
-                            if (this.Owner == character)
+                            if (Owner == character)
                             {
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                             else
                             {
-                                oPacket.WriteInt(this.OwnerMeso);
+                                oPacket.WriteInt(OwnerMeso);
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                         }
                     }
@@ -302,9 +303,9 @@ namespace Destiny.Maple.Interaction
 
                 case InteractionConstants.InteractionCode.Exit:
                     {
-                        if (this.Started)
+                        if (Started)
                         {
-                            this.Cancel();
+                            Cancel();
 
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
@@ -313,14 +314,14 @@ namespace Destiny.Maple.Interaction
                                    .WriteByte(0)
                                    .WriteByte(2);
 
-                                this.Owner.Client.Send(oPacket);
-                                this.Visitor.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
 
-                            this.Owner.Trade = null;
-                            this.Visitor.Trade = null;
-                            this.Owner = null;
-                            this.Visitor = null;
+                            Owner.Trade = null;
+                            Visitor.Trade = null;
+                            Owner = null;
+                            Visitor = null;
                         }
                         else
                         {
@@ -331,11 +332,11 @@ namespace Destiny.Maple.Interaction
                                     .WriteByte(0)
                                     .WriteByte(2);
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
 
-                            this.Owner.Trade = null;
-                            this.Owner = null;
+                            Owner.Trade = null;
+                            Owner = null;
                         }
                     }
                     break;
@@ -346,23 +347,23 @@ namespace Destiny.Maple.Interaction
                         {
                             oPacket.WriteByte((byte)InteractionConstants.InteractionCode.Confirm);
 
-                            if (character == this.Owner)
+                            if (character == Owner)
                             {
-                                this.OwnerLocked = true;
+                                OwnerLocked = true;
 
-                                this.Visitor.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
                             else
                             {
-                                this.VisitorLocked = true;
+                                VisitorLocked = true;
 
-                                this.Owner.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
                             }
                         }
 
-                        if (this.OwnerLocked && this.VisitorLocked)
+                        if (OwnerLocked && VisitorLocked)
                         {
-                            this.Complete();
+                            Complete();
 
                             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                             {
@@ -371,14 +372,14 @@ namespace Destiny.Maple.Interaction
                                     .WriteByte(0)
                                     .WriteByte(6);
 
-                                this.Owner.Client.Send(oPacket);
-                                this.Visitor.Client.Send(oPacket);
+                                Owner.Client.Send(oPacket);
+                                Visitor.Client.Send(oPacket);
                             }
 
-                            this.Owner.Trade = null;
-                            this.Visitor.Trade = null;
-                            this.Owner = null;
-                            this.Visitor = null;
+                            Owner.Trade = null;
+                            Visitor.Trade = null;
+                            Owner = null;
+                            Visitor = null;
                         }
                     }
                     break;
@@ -392,27 +393,49 @@ namespace Destiny.Maple.Interaction
                             oPacket
                                 .WriteByte((byte)InteractionConstants.InteractionCode.Chat)
                                 .WriteByte(8)
-                                .WriteBool(this.Owner != character)
+                                .WriteBool(Owner != character)
                                 .WriteString("{0} : {1}", character.Name, text);
 
-                            this.Owner.Client.Send(oPacket);
-                            this.Visitor.Client.Send(oPacket);
+                            Owner.Client.Send(oPacket);
+                            Visitor.Client.Send(oPacket);
                         }
                     }
                     break;
+
+                case InteractionConstants.InteractionCode.Create:
+                    break;
+                case InteractionConstants.InteractionCode.Room:
+                    break;
+                case InteractionConstants.InteractionCode.Open:
+                    break;
+                case InteractionConstants.InteractionCode.TradeBirthday:
+                    break;
+                case InteractionConstants.InteractionCode.AddItem:
+                    break;
+                case InteractionConstants.InteractionCode.Buy:
+                    break;
+                case InteractionConstants.InteractionCode.UpdateItems:
+                    break;
+                case InteractionConstants.InteractionCode.RemoveItem:
+                    break;
+                case InteractionConstants.InteractionCode.OpenStore:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(code), code, null);
             }
         }
 
         public void Complete()
         {
-            if (this.Owner.Items.CouldReceiveItems(this.VisitorItems) 
-                && this.Visitor.Items.CouldReceiveItems(this.OwnerItems))
+            if (Owner.Items.CouldReceiveItems(VisitorItems) 
+                && Visitor.Items.CouldReceiveItems(OwnerItems))
             {
-                this.Owner.Stats.Meso += this.VisitorMeso;
-                this.Visitor.Stats.Meso += this.OwnerMeso;
+                Owner.Stats.Meso += VisitorMeso;
+                Visitor.Stats.Meso += OwnerMeso;
 
-                this.Owner.Items.AddRangeOfItems(this.VisitorItems);
-                this.Visitor.Items.AddRangeOfItems(this.OwnerItems);
+                Owner.Items.AddRangeOfItems(VisitorItems);
+                Visitor.Items.AddRangeOfItems(OwnerItems);
             }
             else
             {
@@ -422,11 +445,11 @@ namespace Destiny.Maple.Interaction
 
         public void Cancel()
         {
-            this.Owner.Stats.Meso += this.OwnerMeso;
-            this.Visitor.Stats.Meso += this.VisitorMeso;
+            Owner.Stats.Meso += OwnerMeso;
+            Visitor.Stats.Meso += VisitorMeso;
 
-            this.Owner.Items.AddRangeOfItems(this.OwnerItems);
-            this.Visitor.Items.AddRangeOfItems(this.VisitorItems);
+            Owner.Items.AddRangeOfItems(OwnerItems);
+            Visitor.Items.AddRangeOfItems(VisitorItems);
         }
     }
 }

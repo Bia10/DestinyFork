@@ -15,7 +15,7 @@ namespace Destiny
     public static class WvsCenter
     {
         private static bool isAlive;
-        private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent AcceptDone = new ManualResetEvent(false);
 
         public static CenterClient Login { get; set; }
         public static Worlds Worlds { get; private set; }
@@ -36,7 +36,7 @@ namespace Destiny
 
                 if (!value)
                 {
-                    WvsCenter.AcceptDone.Set();
+                    AcceptDone.Set();
                 }
             }
         }
@@ -48,9 +48,9 @@ namespace Destiny
                 WvsCenterSetup.Run();
             }
 
-            WvsCenter.Worlds = new Worlds();
-            WvsCenter.Migrations = new Migrations();
-            WvsCenter.Clients = new List<CenterClient>();
+            Worlds = new Worlds();
+            Migrations = new Migrations();
+            Clients = new List<CenterClient>();
 
             Log.Entitle("WvsCenter v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
@@ -64,11 +64,11 @@ namespace Destiny
                 CenterClient.SecurityCode = Settings.GetString("Server/SecurityCode");
                 Log.Inform("Cross-servers code '{0}' assigned.", Log.MaskString(CenterClient.SecurityCode));
 
-                WvsCenter.Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
-                WvsCenter.Listener.Start();
-                Log.Inform("Initialized clients listener on {0}.", WvsCenter.Listener.LocalEndpoint);
+                Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
+                Listener.Start();
+                Log.Inform("Initialized clients listener on {0}.", Listener.LocalEndpoint);
 
-                WvsCenter.IsAlive = true;
+                IsAlive = true;
             }
             catch (Exception e)
             {
@@ -77,7 +77,7 @@ namespace Destiny
                 Log.SkipLine();
             }
 
-            if (WvsCenter.IsAlive)
+            if (IsAlive)
             {
                 Log.SkipLine();
                 Log.Success("WvsCenter started on thread {0}.", Thread.CurrentThread.ManagedThreadId);
@@ -88,21 +88,21 @@ namespace Destiny
                 Log.Inform("Could not start server because of errors.");
             }
 
-            while (WvsCenter.IsAlive)
+            while (IsAlive)
             {
-                WvsCenter.AcceptDone.Reset();
-                WvsCenter.Listener.BeginAcceptSocket(new AsyncCallback(WvsCenter.OnAcceptSocket), null);
-                WvsCenter.AcceptDone.WaitOne();
+                AcceptDone.Reset();
+                Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
+                AcceptDone.WaitOne();
             }
 
-            CenterClient[] remainingServers = WvsCenter.Clients.ToArray();
+            CenterClient[] remainingServers = Clients.ToArray();
 
             foreach (CenterClient server in remainingServers)
             {
                 server.Stop();
             }
 
-            WvsCenter.Dispose();
+            Dispose();
 
             Log.SkipLine();
             Log.Warn("Server stopped.");
@@ -112,22 +112,19 @@ namespace Destiny
 
         private static void OnAcceptSocket(IAsyncResult ar)
         {
-            WvsCenter.AcceptDone.Set();
+            AcceptDone.Set();
 
-            var centerClient = new CenterClient(WvsCenter.Listener.EndAcceptSocket(ar));
+            var centerClient = new CenterClient(Listener.EndAcceptSocket(ar));
         }
 
         public static void Stop()
         {
-            WvsCenter.IsAlive = false;
+            IsAlive = false;
         }
 
         private static void Dispose()
         {
-            if (WvsCenter.Listener != null)
-            {
-                WvsCenter.Listener.Stop();
-            }
+            Listener?.Stop();
 
             Log.SkipLine();
             Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);

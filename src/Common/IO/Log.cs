@@ -14,7 +14,7 @@ namespace Destiny.IO
         {
             get
             {
-                return new string(' ', Log.LabelWidth);
+                return new string(' ', LabelWidth);
             }
         }
 
@@ -29,7 +29,7 @@ namespace Destiny.IO
             {
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(' ', Log.LabelWidth - label.Length - 3);
+                sb.Append(' ', LabelWidth - label.Length - 3);
                 sb.Append("[");
                 sb.Append(label);
                 sb.Append("]");
@@ -46,17 +46,17 @@ namespace Destiny.IO
 
                 foreach (string s in value.Split('\n'))
                 {
-                    string[] lines = new string[(int)Math.Ceiling((float)s.Length / (float)(Console.BufferWidth - Log.LabelWidth))];
+                    string[] lines = new string[(int) Math.Ceiling((float)s.Length / (float)(Console.BufferWidth - LabelWidth))];
 
                     for (int i = 0; i < lines.Length; i++)
                     {
                         if (i == lines.Length - 1)
                         {
-                            lines[i] = s.Substring((Console.BufferWidth - Log.LabelWidth) * i);
+                            lines[i] = s.Substring((Console.BufferWidth - LabelWidth) * i);
                         }
                         else
                         {
-                            lines[i] = s.Substring((Console.BufferWidth - Log.LabelWidth) * i, (Console.BufferWidth - Log.LabelWidth));
+                            lines[i] = s.Substring((Console.BufferWidth - LabelWidth) * i, Console.BufferWidth - LabelWidth);
                         }
                     }
 
@@ -64,14 +64,14 @@ namespace Destiny.IO
                     {
                         if (!first)
                         {
-                            Console.Write(Log.Margin);
+                            Console.Write(Margin);
                         }
 
-                        if ((line.Length + Log.LabelWidth) < Console.BufferWidth)
+                        if (line.Length + LabelWidth < Console.BufferWidth)
                         {
                             Console.WriteLine(line);
                         }
-                        else if ((line.Length + Log.LabelWidth) == Console.BufferWidth)
+                        else if (line.Length + LabelWidth == Console.BufferWidth)
                         {
                             Console.Write(line);
                         }
@@ -92,21 +92,21 @@ namespace Destiny.IO
             lock (typeof(Log))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine((Log.Entitled ? "\n\n" : "") + string.Format(value, args) + '\n');
+                Console.WriteLine((Entitled ? "\n\n" : "") + string.Format(value, args) + '\n');
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Title = string.Format(value, args);
 
-                Log.Entitled = true;
+                Entitled = true;
             }
 
-            Log.WriteToFile(value, args);
+            WriteToFile(value, args);
         }
 
         public static string Input(string label)
         {
             lock (typeof(Log))
             {
-                Log.WriteItem("Input", ConsoleColor.Cyan, string.Empty);
+                WriteItem("Input", ConsoleColor.Cyan, string.Empty);
                 Console.Write(label);
                 return Console.ReadLine();
             }
@@ -116,7 +116,7 @@ namespace Destiny.IO
         {
             lock (typeof(Log))
             {
-                Log.WriteItem("Input", ConsoleColor.Cyan, string.Empty);
+                WriteItem("Input", ConsoleColor.Cyan, string.Empty);
                 Console.Write(label);
                 string result = Console.ReadLine();
 
@@ -124,7 +124,7 @@ namespace Destiny.IO
                 {
                     result = defaultValue;
                     Console.CursorTop--;
-                    Console.CursorLeft = Log.Margin.Length + label.Length;
+                    Console.CursorLeft = Margin.Length + label.Length;
 
                     Console.WriteLine(defaultValue == string.Empty ? "(None)" : result);
                 }
@@ -136,10 +136,11 @@ namespace Destiny.IO
         public static IPAddress Input(string label, IPAddress defaultValue)
         {
             IPAddress result;
+
         input:
             try
             {
-                result = IPAddress.Parse(Log.Input(label, defaultValue.ToString()));
+                result = IPAddress.Parse(Input(label, defaultValue.ToString()));
             }
             catch
             {
@@ -152,10 +153,11 @@ namespace Destiny.IO
         public static int Input(string label, int defaultValue)
         {
             int result;
+
         input:
             try
             {
-                result = int.Parse(Log.Input(label, defaultValue.ToString()));
+                result = int.Parse(Input(label, defaultValue.ToString()));
             }
             catch
             {
@@ -173,7 +175,7 @@ namespace Destiny.IO
 
                 do
                 {
-                    Log.WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
+                    WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
                     Console.Write(label);
                     result = Console.ReadLine().ToLower();
                 }
@@ -191,7 +193,7 @@ namespace Destiny.IO
 
                 do
                 {
-                    Log.WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
+                    WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
                     Console.Write(label);
                     result = Console.ReadLine().ToLower();
 
@@ -199,7 +201,7 @@ namespace Destiny.IO
                     {
                         result = defaultValue ? "yes" : "no";
                         Console.CursorTop--;
-                        Console.CursorLeft = Log.Margin.Length + label.Length;
+                        Console.CursorLeft = Margin.Length + label.Length;
                         Console.WriteLine(defaultValue ? "Yes" : "No");
                     }
                 }
@@ -211,12 +213,12 @@ namespace Destiny.IO
 
         public static void Inform(string value, params object[] args)
         {
-            Log.WriteItem("Info", ConsoleColor.White, value, args);
+            WriteItem("Info", ConsoleColor.White, value, args);
         }
 
         public static void Inform(object value)
         {
-            Log.Inform(value.ToString());
+            Inform(value.ToString());
         }
 
         // TODO: Cross-process lock/wait for file writability access. (IMPORTANT! else server may crash!)
@@ -234,61 +236,60 @@ namespace Destiny.IO
 
         public static void Warn(string value, params object[] args)
         {
-            Log.WriteItem("Warning", ConsoleColor.Yellow, value, args);
-            Log.WriteToFile("Warning: " + value, args);
+            WriteItem("Warning", ConsoleColor.Yellow, value, args);
+            WriteToFile("Warning: " + value, args);
         }
 
         public static void Warn(object value)
         {
-            Log.Warn(value.ToString());
+            Warn(value.ToString());
         }
 
         public static void Error(string value, params object[] args)
         {
-            Log.WriteItem("Error", ConsoleColor.Red, value, args);
-            Log.WriteToFile(value, args);
+            WriteItem("Error", ConsoleColor.Red, value, args);
+            WriteToFile(value, args);
         }
 
         public static bool ShowStackTrace { get; set; }
 
         public static void Error(Exception exception)
         {
-            Log.WriteItem("Error", ConsoleColor.Red, Log.ShowStackTrace ? exception.ToString() : exception.Message);
-            Log.WriteToFile(exception.ToString());
+            WriteItem("Error", ConsoleColor.Red, ShowStackTrace ? exception.ToString() : exception.Message);
+            WriteToFile(exception.ToString());
         }
 
         public static void Error(string label, Exception exception, params object[] args)
         {
             try
             {
-                Log.WriteItem("Error", ConsoleColor.Red, "{0}\n{1}", string.Format(label, args), Log.ShowStackTrace ? exception.ToString() : exception.Message);
+                WriteItem("Error", ConsoleColor.Red, "{0}\n{1}", string.Format(label, args), ShowStackTrace ? exception.ToString() : exception.Message);
 
             }
 
             catch (FormatException ex)
             {
-                Log.SkipLine();
+                SkipLine();
                 Tracer.TraceErrorMessage(ex, "Incorrect string format! or out of bounds!");
-                Log.SkipLine();
-                throw;
+                SkipLine();
             }
 
-            Log.WriteToFile(exception.ToString());
+            WriteToFile(exception.ToString());
         }
 
         public static void Success(string value, params object[] args)
         {
-            Log.WriteItem("Success", ConsoleColor.Green, value, args);
+            WriteItem("Success", ConsoleColor.Green, value, args);
         }
 
         public static void Success(object value)
         {
-            Log.Success(value.ToString());
+            Success(value.ToString());
         }
 
         public static void Sql(string value, params object[] args)
         {
-            Log.WriteItem("Sql", ConsoleColor.Magenta, value, args);
+            WriteItem("Sql", ConsoleColor.Magenta, value, args);
         }
 
         public static void Hex(string label, byte[] value, params object[] args)
@@ -319,7 +320,7 @@ namespace Destiny.IO
                 }
             }
 
-            Log.WriteItem("Hex", ConsoleColor.Magenta, sb.ToString());
+            WriteItem("Hex", ConsoleColor.Magenta, sb.ToString());
         }
 
         public static void Hex(string label, byte b, params object[] args)
@@ -337,7 +338,7 @@ namespace Destiny.IO
     {
         public static bool ShowTime { get; set; }
 
-        private Stopwatch mWatch;
+        private readonly Stopwatch mWatch;
 
         internal LoadingIndicator(string header)
         {
@@ -357,10 +358,11 @@ namespace Destiny.IO
             {
                 mWatch.Stop();
 
-                if (LoadingIndicator.ShowTime)
+                if (ShowTime)
                 {
                     Console.WriteLine("({0}ms)", mWatch.ElapsedMilliseconds);
                 }
+
                 else
                 {
                     Console.WriteLine();

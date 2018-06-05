@@ -1,7 +1,8 @@
-﻿using Destiny.Data;
+﻿using System.Diagnostics;
+
+using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple.Commands;
-using System.Diagnostics;
 
 namespace Destiny.Maple.Data
 {
@@ -22,41 +23,23 @@ namespace Destiny.Maple.Data
         {
             using (Database.TemporarySchema(Database.SchemaMCDB))
             {
-                DataProvider.IsInitialized = false;
+                IsInitialized = false;
 
-                if (DataProvider.Styles != null)
-                {
-                    DataProvider.Styles.Skins.Clear();
-                    DataProvider.Styles.MaleHairs.Clear();
-                    DataProvider.Styles.MaleFaces.Clear();
-                    DataProvider.Styles.FemaleHairs.Clear();
-                    DataProvider.Styles.FemaleFaces.Clear();
-                }
+                Styles?.Skins.Clear();
+                Styles?.MaleHairs.Clear();
+                Styles?.MaleFaces.Clear();
+                Styles?.FemaleHairs.Clear();
+                Styles?.FemaleFaces.Clear();
 
-                if (DataProvider.Items != null)
-                {
-                    DataProvider.Items.Clear();
-                }
+                Items?.Clear();
 
-                if (DataProvider.Skills != null)
-                {
-                    DataProvider.Skills.Clear();
-                }
+                Skills?.Clear();
 
-                if (DataProvider.Mobs != null)
-                {
-                    DataProvider.Mobs.Clear();
-                }
+                Mobs?.Clear();
 
-                if (DataProvider.Maps != null)
-                {
-                    DataProvider.Maps.Clear();
-                }
+                Maps?.Clear();
 
-                if (DataProvider.Quests != null)
-                {
-                    DataProvider.Quests.Clear();
-                }
+                Quests?.Clear();
 
                 Database.Test();
 
@@ -66,14 +49,14 @@ namespace Destiny.Maple.Data
 
                 Log.Inform("Loading data...");
 
-                DataProvider.Styles = new AvailableStyles();
-                DataProvider.Items = new CachedItems();
-                DataProvider.Skills = new CachedSkills();
-                DataProvider.Mobs = new CachedMobs();
-                DataProvider.Reactors = new CachedReactors();
-                DataProvider.Quests = new CachedQuests();
-                DataProvider.CreationData = new CreationData();
-                DataProvider.Maps = new CachedMaps();
+                Styles = new AvailableStyles();
+                Items = new CachedItems();
+                Skills = new CachedSkills();
+                Mobs = new CachedMobs();
+                Reactors = new CachedReactors();
+                Quests = new CachedQuests();
+                CreationData = new CreationData();
+                Maps = new CachedMaps();
 
                 CommandFactory.Initialize();
 
@@ -83,7 +66,7 @@ namespace Destiny.Maple.Data
                 Log.Success("Maple data loaded in {0}ms.", sw.ElapsedMilliseconds);
                 Log.SkipLine();
 
-                DataProvider.IsInitialized = true;
+                IsInitialized = true;
             }
         }
     }

@@ -9,20 +9,20 @@ namespace Destiny.Data
 {
     public sealed class Datums : IEnumerable<Datum>
     {
-        private string Table { get; set; }
+        private string Table { get; }
         private List<Datum> Values { get; set; }
-        private string ConnectionString { get; set; }
+        private string ConnectionString { get; }
 
         public Datums(string table)
         {
-            this.Table = table;
-            this.ConnectionString = Database.ConnectionString;
+            Table = table;
+            ConnectionString = Database.ConnectionString;
         }
 
         public Datums(string table, string schema)
         {
-            this.Table = table;
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+            Table = table;
+            ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
                                                   "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
@@ -32,15 +32,15 @@ namespace Destiny.Data
 
         private void PopulateInternal(string fields, string constraints, params object[] args)
         {
-            this.Values = new List<Datum>();
+            Values = new List<Datum>();
 
-            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
                     string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
-                    command.CommandText = string.Format("SELECT {0} FROM `{1}`{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, whereClause);
+                    command.CommandText = string.Format("SELECT {0} FROM `{1}`{2}", fields == null ? "*" : Database.CorrectFields(fields), Table, whereClause);
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -53,7 +53,7 @@ namespace Destiny.Data
                                 dictionary.Add(reader.GetName(i), reader.GetValue(i));
                             }
 
-                            this.Values.Add(new Datum(this.Table, dictionary));
+                            Values.Add(new Datum(Table, dictionary));
                         }
                     }
                 }
@@ -62,35 +62,35 @@ namespace Destiny.Data
 
         public Datums Populate()
         {
-            this.PopulateInternal(null, null, null);
+            PopulateInternal(null, null, null);
 
             return this;
         }
 
         public Datums Populate(string constraints, params object[] args)
         {
-            this.PopulateInternal(null, constraints, args);
+            PopulateInternal(null, constraints, args);
 
             return this;
         }
 
         public Datums PopulateWith(string fields)
         {
-            this.PopulateInternal(fields, null, null);
+            PopulateInternal(fields, null, null);
 
             return this;
         }
 
         public Datums PopulateWith(string fields, string constraints, params object[] args)
         {
-            this.PopulateInternal(fields, constraints, args);
+            PopulateInternal(fields, constraints, args);
 
             return this;
         }
 
         public IEnumerator<Datum> GetEnumerator()
         {
-            foreach (Datum loopDatum in this.Values)
+            foreach (Datum loopDatum in Values)
             {
                 yield return loopDatum;
             }
@@ -98,61 +98,63 @@ namespace Destiny.Data
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return (IEnumerator)this.GetEnumerator();
+            return GetEnumerator();
         }
     }
 
     public sealed class Datum
     {
-        public string Table { get; private set; }
-        public Dictionary<string, Object> Dictionary { get; set; }
-        private string ConnectionString { get; set; }
+        public string Table { get; }
+        public Dictionary<string, Object> Dictionary { get; }
+        private string ConnectionString { get; }
 
         public object this[string name]
         {
             get
             {
-                if (this.Dictionary[name] is DBNull)
+                if (Dictionary[name] is DBNull)
                 {
                     return null;
                 }
-                else if (this.Dictionary[name] is byte && Meta.IsBool(this.Table, name))
+
+                if (Dictionary[name] is byte && Meta.IsBool(Table, name))
                 {
-                    return (byte)this.Dictionary[name] > 0;
+                    return (byte) Dictionary[name] > 0;
                 }
 
-                return this.Dictionary[name];
+                return Dictionary[name];
             }
             set
             {
                 if (value is DateTime)
                 {
-                    if (Meta.IsDate(this.Table, name))
+                    if (Meta.IsDate(Table, name))
                     {
                         value = ((DateTime)value).ToString("yyyy-MM-dd");
                     }
-                    else if (Meta.IsDateTime(this.Table, name))
+
+                    else if (Meta.IsDateTime(Table, name))
                     {
                         value = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
                     }
                 }
 
-                this.Dictionary[name] = value;
+                Dictionary[name] = value;
             }
         }
 
         public Datum(string table)
         {
-            this.Table = table;
-            this.Dictionary = new Dictionary<string, object>();
-            this.ConnectionString = Database.ConnectionString;
+            Table = table;
+            Dictionary = new Dictionary<string, object>();
+            ConnectionString = Database.ConnectionString;
         }
 
         public Datum(string table, string schema)
         {
-            this.Table = table;
-            this.Dictionary = new Dictionary<string, object>();
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+            Table = table;
+            Dictionary = new Dictionary<string, object>();
+            ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
                                                   "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
@@ -162,16 +164,16 @@ namespace Destiny.Data
 
         public Datum(string table, Dictionary<string, object> dictionary)
         {
-            this.Table = table;
-            this.Dictionary = dictionary;
-            this.ConnectionString = Database.ConnectionString;
+            Table = table;
+            Dictionary = dictionary;
+            ConnectionString = Database.ConnectionString;
         }
 
         public Datum(string table, string schema, Dictionary<string, object> dictionary)
         {
-            this.Table = table;
-            this.Dictionary = dictionary;
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
+            Table = table;
+            Dictionary = dictionary;
+            ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3};" +
                                                   "convertzerodatetime=yes; SslMode=none;",
                 Database.Host,
                 schema,
@@ -181,19 +183,19 @@ namespace Destiny.Data
 
         public Datum Populate(string constraints, params object[] args)
         {
-            this.PopulateWith("*", constraints, args);
+            PopulateWith("*", constraints, args);
 
             return this;
         }
 
         public Datum PopulateWith(string fields, string constraints, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = string.Format("SELECT {0} FROM `{1}` WHERE ", Database.CorrectFields(fields), this.Table) + command.CommandText;
+                    command.CommandText = string.Format("SELECT {0} FROM `{1}` WHERE ", Database.CorrectFields(fields), Table) + command.CommandText;
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -214,7 +216,7 @@ namespace Destiny.Data
                             string name = reader.GetName(i);
                             object value = reader.GetValue(i);
 
-                            this.Dictionary[name] = value;
+                            Dictionary[name] = value;
                         }
                     }
                 }
@@ -229,12 +231,12 @@ namespace Destiny.Data
 
             int processed = 0;
 
-            foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
+            foreach (KeyValuePair<string, object> loopPair in Dictionary)
             {
                 fields += "`" + loopPair.Key + "`";
                 processed++;
 
-                if (processed < this.Dictionary.Count)
+                if (processed < Dictionary.Count)
                 {
                     fields += ", ";
                 }
@@ -242,8 +244,8 @@ namespace Destiny.Data
 
             fields += " ) VALUES ( ";
 
-            object[] valueArr = new object[this.Dictionary.Count];
-            this.Dictionary.Values.CopyTo(valueArr, 0);
+            object[] valueArr = new object[Dictionary.Count];
+            Dictionary.Values.CopyTo(valueArr, 0);
             for (int i = 0; i < valueArr.Length; i++)
             {
                 fields += "{" + i + "}";
@@ -256,14 +258,14 @@ namespace Destiny.Data
 
             fields += " )";
 
-            Database.Execute(string.Format("INSERT INTO `{0}` {1}", this.Table, fields), valueArr);
+            Database.Execute(string.Format("INSERT INTO `{0}` {1}", Table, fields), valueArr);
         }
 
         public int InsertAndReturnID()
         {
-            this.Insert();
+            Insert();
 
-            return (int)(ulong)Database.Scalar("SELECT LAST_INSERT_ID()");
+            return (int)(ulong) Database.Scalar("SELECT LAST_INSERT_ID()");
         }
 
         public void Update(string constraints, params object[] args)
@@ -272,25 +274,25 @@ namespace Destiny.Data
 
             string fields = string.Empty;
 
-            object[] valueArr = new object[this.Dictionary.Count];
-            this.Dictionary.Values.CopyTo(valueArr, 0);
-            foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
+            object[] valueArr = new object[Dictionary.Count];
+            Dictionary.Values.CopyTo(valueArr, 0);
+            foreach (KeyValuePair<string, object> loopPair in Dictionary)
             {
                 fields += string.Format("`{0}`={1}", loopPair.Key, "{" + processed + "}");
                 processed++;
 
-                if (processed < this.Dictionary.Count)
+                if (processed < Dictionary.Count)
                 {
                     fields += ", ";
                 }
             }
 
-            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = Database.ParameterizeCommandText("set", string.Format("UPDATE `{0}` SET {1} WHERE ", this.Table, fields), valueArr) + command.CommandText;
+                    command.CommandText = Database.ParameterizeCommandText("set", string.Format("UPDATE `{0}` SET {1} WHERE ", Table, fields), valueArr) + command.CommandText;
                     command.Parameters.AddRange(Database.ConstraintsToParameters("set", fields, valueArr));
 
                     command.ExecuteNonQuery();
@@ -300,16 +302,16 @@ namespace Destiny.Data
 
         public override string ToString()
         {
-            string result = this.Table + " [ ";
+            string result = Table + " [ ";
 
             int processed = 0;
 
-            foreach (KeyValuePair<string, object> value in this.Dictionary)
+            foreach (KeyValuePair<string, object> value in Dictionary)
             {
                 result += value.Key;
                 processed++;
 
-                if (processed < this.Dictionary.Count)
+                if (processed < Dictionary.Count)
                 {
                     result += ", ";
                 }

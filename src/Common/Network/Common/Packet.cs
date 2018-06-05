@@ -7,20 +7,19 @@ namespace Destiny.Network.Common
     {
         public static LogLevel LogLevel { get; set; }
 
-        public short OperationCode { get; private set; }
+        public short OperationCode { get; }
 
-        public Packet(byte[] data)
-            : base(data)
+        public Packet(byte[] data) : base(data)
         {
-            this.OperationCode = this.ReadShort();
+           OperationCode = ReadShort();
         }
 
         public Packet(short operationCode) 
             : base()
         {
-            this.OperationCode = operationCode;
+            OperationCode = operationCode;
 
-            this.WriteShort(this.OperationCode);
+            WriteShort(OperationCode);
         }
 
         public Packet(ServerOperationCode operationCode) : this((short)operationCode) { }

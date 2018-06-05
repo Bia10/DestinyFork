@@ -6,7 +6,7 @@ namespace Destiny.Collections
 {
     public class PendingKeyedQueue<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
     {
-        private ManualResetEvent QueueDone = new ManualResetEvent(false);
+        private readonly ManualResetEvent QueueDone = new ManualResetEvent(false);
 
         public PendingKeyedQueue() : base() { }
 
@@ -14,28 +14,28 @@ namespace Destiny.Collections
         {
             base.Add(key, value);
 
-            this.QueueDone.Set();
+            QueueDone.Set();
         }
 
         public TValue Dequeue(TKey key)
         {
-            while (!this.ContainsKey(key))
+            while (!ContainsKey(key))
             {
-                this.QueueDone.WaitOne();
+                QueueDone.WaitOne();
             }
 
             TValue value = this[key];
 
-            this.Remove(key);
+            Remove(key);
 
-            this.QueueDone.Reset();
+            QueueDone.Reset();
 
             return value;
         }
 
         public void Dispose()
         {
-            this.QueueDone.Dispose();
+            QueueDone.Dispose();
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using Destiny.Data;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.Data;
 
 namespace Destiny.Maple.Characters
 {
@@ -26,11 +27,12 @@ namespace Destiny.Maple.Characters
 
             foreach (Variable variable in this)
             {
-                Datum datum = new Datum("variables");
-
-                datum["CharacterID"] = this.Parent.ID;
-                datum["Key"] = variable.Key;
-                datum["Value"] = variable.Value;
+                Datum datum = new Datum("variables")
+                {
+                    ["CharacterID"] = this.Parent.ID,
+                    ["Key"] = variable.Key,
+                    ["Value"] = variable.Value
+                };
 
                 datum.Insert();
             }

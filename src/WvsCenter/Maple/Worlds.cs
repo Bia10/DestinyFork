@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+
 using Destiny.Constants;
 
 namespace Destiny.Maple
@@ -17,7 +18,8 @@ namespace Destiny.Maple
                     {
                         continue;
                     }
-                    else if (type == ServerConstants.ServerType.Shop && loopWorld.HasShop)
+
+                    if (type == ServerConstants.ServerType.Shop && loopWorld.HasShop)
                     {
                         continue;
                     }

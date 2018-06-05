@@ -10,17 +10,17 @@ namespace Destiny.Data
 {
     public class TemporaryConnection : IDisposable
     {
-        private string oldHost;
-        private string oldSchema;
-        private string oldUsername;
-        private string oldPassword;
+        private readonly string oldHost;
+        private readonly string oldSchema;
+        private readonly string oldUsername;
+        private readonly string oldPassword;
 
         internal TemporaryConnection(string host, string schema, string username, string password, bool mcdb = false)
         {
-            this.oldHost = Database.Host;
-            this.oldSchema = mcdb ? Database.Schema : Database.SchemaMCDB;
-            this.oldUsername = Database.Username;
-            this.oldPassword = Database.Password;
+            oldHost = Database.Host;
+            oldSchema = mcdb ? Database.Schema : Database.SchemaMCDB;
+            oldUsername = Database.Username;
+            oldPassword = Database.Password;
 
             Database.Host = host;
             Database.Schema = schema;
@@ -30,26 +30,26 @@ namespace Destiny.Data
 
         public void Dispose()
         {
-            Database.Host = this.oldHost;
-            Database.Schema = this.oldSchema;
-            Database.Username = this.oldUsername;
-            Database.Password = this.oldPassword;
+            Database.Host = oldHost;
+            Database.Schema = oldSchema;
+            Database.Username = oldUsername;
+            Database.Password = oldPassword;
         }
     }
 
     public class TemporarySchema : IDisposable
     {
-        private string oldSchema;
+        private readonly string oldSchema;
 
         internal TemporarySchema(string schema)
         {
-            this.oldSchema = Database.Schema;
+            oldSchema = Database.Schema;
             Database.Schema = schema;
         }
 
         public void Dispose()
         {
-            Database.Schema = this.oldSchema;
+            Database.Schema = oldSchema;
         }
     }
 
@@ -87,16 +87,16 @@ namespace Destiny.Data
             {
                 return string.Format("server={0}; database={1}; uid={2}; password={3}; " +
                                      "convertzerodatetime=yes; SslMode=none;",
-                    Database.Host,
-                    Database.Schema,
-                    Database.Username,
-                    Database.Password);
+                    Host,
+                    Schema,
+                    Username,
+                    Password);
             }
         }
 
         internal static void Execute(string nonQuery, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, nonQuery, args))
@@ -108,7 +108,7 @@ namespace Destiny.Data
 
         internal static MySqlDataReader ExecuteReader(string query, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, query, args))
@@ -120,7 +120,7 @@ namespace Destiny.Data
 
         public static object Scalar(string nonQuery, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, nonQuery, args))
@@ -140,7 +140,7 @@ namespace Destiny.Data
 
         public static void Test()
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 Log.SkipLine();
@@ -151,7 +151,7 @@ namespace Destiny.Data
 
         public static void Analyze(bool mcdb)
         {
-            using (Database.TemporarySchema("information_schema"))
+            using (TemporarySchema("information_schema"))
             {
                 Meta.Initialize(mcdb);
             }
@@ -159,7 +159,7 @@ namespace Destiny.Data
 
         public static void Delete(string table, string constraints, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, constraints, args))
@@ -173,7 +173,7 @@ namespace Destiny.Data
 
         public static bool Exists(string table, string constraints, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, constraints, args))
@@ -196,14 +196,13 @@ namespace Destiny.Data
             {
                 return null;
             }
-            else if (value is byte && Meta.IsBool(table, field))
+
+            if (value is byte && Meta.IsBool(table, field))
             {
                 return (byte)value > 0;
             }
-            else
-            {
-                return value;
-            }
+
+            return value;
         }
 
         public static bool ExecuteScript(string host, string username, string password, string query, params object[] args)
@@ -288,7 +287,7 @@ namespace Destiny.Data
 
         public static MySqlParameter[] ConstraintsToParameters(string namePrefix, string constraints, params object[] args)
         {
-            MySqlParameter[] parameters = new MySqlParameter[args != null ? args.Length : 0];
+            MySqlParameter[] parameters = new MySqlParameter[args?.Length ?? 0];
 
             for (int i = 0; i < args?.Length; i++)
             {

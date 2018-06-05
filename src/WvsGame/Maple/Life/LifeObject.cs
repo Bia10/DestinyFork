@@ -5,22 +5,22 @@ namespace Destiny.Maple.Life
 {
     public abstract class LifeObject : MapObject
     {
-        public int MapleID { get; private set; }
-        public short Foothold { get; private set; }
-        public short MinimumClickX { get; private set; }
-        public short MaximumClickX { get; private set; }
-        public bool FacesLeft { get; private set; }
-        public int RespawnTime { get; private set; }
+        public int MapleID { get; }
+        public short Foothold { get; }
+        protected short MinimumClickX { get; }
+        protected short MaximumClickX { get; }
+        protected bool FacesLeft { get; }
+        public int RespawnTime { get; }
 
-        public LifeObject(Datum datum)
+        protected LifeObject(Datum datum)
         {
-            this.MapleID = (int)datum["lifeid"];
-            this.Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
-            this.Foothold = (short)datum["foothold"];
-            this.MinimumClickX = (short)datum["min_click_pos"];
-            this.MaximumClickX = (short)datum["max_click_pos"];
-            this.FacesLeft = ((string)datum["flags"]).Contains("faces_left");
-            this.RespawnTime = (int)datum["respawn_time"];
+            MapleID = (int)datum["lifeid"];
+            Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
+            Foothold = (short)datum["foothold"];
+            MinimumClickX = (short)datum["min_click_pos"];
+            MaximumClickX = (short)datum["max_click_pos"];
+            FacesLeft = ((string)datum["flags"]).Contains("faces_left");
+            RespawnTime = (int)datum["respawn_time"];
         }
     }
 }

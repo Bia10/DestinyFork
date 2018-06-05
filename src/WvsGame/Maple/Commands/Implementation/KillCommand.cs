@@ -43,7 +43,7 @@ namespace Destiny.Maple.Commands.Implementation
                         {
                             foreach (Character character in caller.Map.Characters)
                             {
-                                if (character != caller && !character.IsMaster)
+                                if (character != caller && !caller.IsMaster)
                                 {
                                     character.Stats.Health = 0;
                                 }

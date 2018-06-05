@@ -9,17 +9,11 @@ namespace Destiny.Maple
         {
             foreach (Migration migration in this)
             {
-                if (migration.Host == host && migration.CharacterID == characterID)
-                {
-                    this.Remove(migration);
+                if (migration.Host != host || migration.CharacterID != characterID) continue;
 
-                    if ((DateTime.Now - migration.Expiry).TotalSeconds > 30)
-                    {
-                        return 0;
-                    }
+                Remove(migration);
 
-                    return migration.AccountID;
-                }
+                return (DateTime.Now - migration.Expiry).TotalSeconds > 30 ? 0 : migration.AccountID;
             }
 
             return 0;

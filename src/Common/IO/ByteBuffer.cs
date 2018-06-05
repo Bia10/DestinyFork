@@ -25,8 +25,8 @@ namespace Destiny.IO
             }
             set
             {
-                this.position = value;
-                this.Stream.Position = this.Position + this.Offset;
+                position = value;
+                Stream.Position = Position + Offset;
             }
         }
 
@@ -34,181 +34,181 @@ namespace Destiny.IO
         {
             get
             {
-                return this.Limit - this.Position;
+                return Limit - Position;
             }
         }
 
         public ByteBuffer(int capacity = Application.DefaultBufferSize)
         {
-            this.Capacity = capacity;
-            this.Array = new byte[this.Capacity];
+            Capacity = capacity;
+            Array = new byte[Capacity];
 
-            this.Stream = new MemoryStream(this.Array);
-            this.Writer = new BinaryWriter(this.Stream);
-            this.Reader = new BinaryReader(this.Stream);
+            Stream = new MemoryStream(Array);
+            Writer = new BinaryWriter(Stream);
+            Reader = new BinaryReader(Stream);
 
-            this.Limit = this.Capacity;
-            this.Offset = 0;
-            this.Position = 0;
+            Limit = Capacity;
+            Offset = 0;
+            Position = 0;
         }
 
         public ByteBuffer(byte[] data)
         {
-            this.Capacity = data.Length;
-            this.Array = data;
+            Capacity = data.Length;
+            Array = data;
 
-            this.Stream = new MemoryStream(this.Array);
-            this.Writer = new BinaryWriter(this.Stream);
-            this.Reader = new BinaryReader(this.Stream);
+            Stream = new MemoryStream(Array);
+            Writer = new BinaryWriter(Stream);
+            Reader = new BinaryReader(Stream);
 
-            this.Limit = this.Capacity;
-            this.Offset = 0;
-            this.Position = 0;
+            Limit = Capacity;
+            Offset = 0;
+            Position = 0;
         }
 
         private ByteBuffer(byte[] array, int offset, int capacity)
         {
-            this.Array = array;
+            Array = array;
 
-            this.Stream = new MemoryStream(this.Array);
-            this.Writer = new BinaryWriter(this.Stream);
-            this.Reader = new BinaryReader(this.Stream);
+            Stream = new MemoryStream(Array);
+            Writer = new BinaryWriter(Stream);
+            Reader = new BinaryReader(Stream);
 
-            this.Offset = offset;
-            this.Capacity = capacity;
-            this.Limit = this.Capacity;
-            this.Position = 0;
+            Offset = offset;
+            Capacity = capacity;
+            Limit = Capacity;
+            Position = 0;
         }
 
         public byte this[int index]
         {
             get
             {
-                return this.Array[index];
+                return Array[index];
             }
             set
             {
-                this.Array[index] = value;
+                Array[index] = value;
             }
         }
 
         public byte[] GetContent()
         {
-            byte[] ba = new byte[this.Remaining];
-            Buffer.BlockCopy(this.Array, this.Position + this.Offset, ba, 0, this.Remaining);
+            byte[] ba = new byte[Remaining];
+            Buffer.BlockCopy(Array, Position + Offset, ba, 0, Remaining);
             return ba;
         }
 
         public ByteBuffer Skip(int count)
         {
-            this.Position += count;
+            Position += count;
             
             return this;
         }
 
         public void Flip()
         {
-            this.Limit = this.Position;
-            this.Position = 0;
-            this.HasFlipped = true;
+            Limit = Position;
+            Position = 0;
+            HasFlipped = true;
         }
 
         public void SafeFlip()
         {
-            if (!this.HasFlipped)
+            if (!HasFlipped)
             {
-                this.Flip();
+                Flip();
             }
         }
 
         public ByteBuffer Slice()
         {
-            return new ByteBuffer(this.Array, this.Position, this.Remaining);
+            return new ByteBuffer(Array, Position, Remaining);
         }
 
         public void Dispose()
         {
-            this.Reader.Dispose();
-            this.Writer.Dispose();
-            this.Stream.Dispose();
+            Reader.Dispose();
+            Writer.Dispose();
+            Stream.Dispose();
         }
 
         public ByteBuffer WriteBytes(params byte[] collection)
         {
-            this.Writer.Write(collection);
-            this.Position += collection.Length;
+            Writer.Write(collection);
+            Position += collection.Length;
 
             return this;
         }
 
         public ByteBuffer WriteByte(byte item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(byte);
+            Writer.Write(item);
+            Position += sizeof(byte);
 
             return this;
         }
 
         public ByteBuffer WriteSByte(sbyte item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(sbyte);
+            Writer.Write(item);
+            Position += sizeof(sbyte);
 
             return this;
         }
 
         public ByteBuffer WriteShort(short item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(short);
+            Writer.Write(item);
+            Position += sizeof(short);
 
             return this;
         }
 
         public ByteBuffer WriteUShort(ushort item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(ushort);
+            Writer.Write(item);
+            Position += sizeof(ushort);
 
             return this;
         }
 
         public ByteBuffer WriteInt(int item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(int);
+            Writer.Write(item);
+            Position += sizeof(int);
 
             return this;
         }
 
         public ByteBuffer WriteUInt(uint item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(uint);
+            Writer.Write(item);
+            Position += sizeof(uint);
 
             return this;
         }
 
         public ByteBuffer WriteLong(long item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(long);
+            Writer.Write(item);
+            Position += sizeof(long);
 
             return this;
         }
 
         public ByteBuffer WriteFloat(float item = 0)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(float);
+            Writer.Write(item);
+            Position += sizeof(float);
 
             return this;
         }
 
         public ByteBuffer WriteBool(bool item)
         {
-            this.Writer.Write(item);
-            this.Position += sizeof(bool);
+            Writer.Write(item);
+            Position += sizeof(bool);
 
             return this;
         }
@@ -222,14 +222,14 @@ namespace Destiny.IO
                 item = string.Format(item, args);
             }
 
-            this.Writer.Write((short)item.Length);
+            Writer.Write((short)item.Length);
 
             foreach (char c in item)
             {
-                this.Writer.Write(c);
+                Writer.Write(c);
             }
 
-            this.Position += item.Length + sizeof(short);
+            Position += item.Length + sizeof(short);
 
             return this;
         }
@@ -238,147 +238,147 @@ namespace Destiny.IO
         {
             foreach (char c in item)
             {
-                this.Writer.Write(c);
+                Writer.Write(c);
             }
 
             for (int i = item.Length; i < length; i++)
             {
-                this.Writer.Write((byte)0);
+                Writer.Write((byte)0);
             }
 
-            this.Position += length;
+            Position += length;
 
             return this;
         }
 
         public ByteBuffer WriteDateTime(DateTime item)
         {
-            this.Writer.Write((long)(item.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
-            this.Position += sizeof(long);
+            Writer.Write((long)(item.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+            Position += sizeof(long);
 
             return this;
         }
 
         public ByteBuffer WriteKoreanDateTime(DateTime item)
         {
-            this.Writer.Write((long)(item.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds * 10000 + 116444592000000000L);
-            this.Position += sizeof(long);
+            Writer.Write((long)(item.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds * 10000 + 116444592000000000L);
+            Position += sizeof(long);
 
             return this;
         }
         
         public ByteBuffer WriteIPAddress(IPAddress value)
         {
-            this.Writer.Write(value.GetAddressBytes());
-            this.Position += 4;
+            Writer.Write(value.GetAddressBytes());
+            Position += 4;
 
             return this;
         }
 
         public byte[] ReadBytes(int count)
         {
-            byte[] result = this.Reader.ReadBytes(count);
-            this.Position += count;
+            byte[] result = Reader.ReadBytes(count);
+            Position += count;
             return result;
         }
 
         public byte[] ReadBytes()
         {
-            return this.ReadBytes(this.Remaining);
+            return ReadBytes(Remaining);
         }
 
         public byte ReadByte()
         {
-            byte result = this.Reader.ReadByte();
-            this.Position += sizeof(byte);
+            byte result = Reader.ReadByte();
+            Position += sizeof(byte);
             return result;
         }
 
         public sbyte ReadSByte()
         {
-            sbyte result = this.Reader.ReadSByte();
-            this.Position += sizeof(sbyte);
+            sbyte result = Reader.ReadSByte();
+            Position += sizeof(sbyte);
             return result;
         }
 
         public short ReadShort()
         {
-            short result = this.Reader.ReadInt16();
-            this.Position += sizeof(short);
+            short result = Reader.ReadInt16();
+            Position += sizeof(short);
             return result;
         }
 
         public ushort ReadUShort()
         {
-            ushort result = this.Reader.ReadUInt16();
-            this.Position += sizeof(ushort);
+            ushort result = Reader.ReadUInt16();
+            Position += sizeof(ushort);
             return result;
         }
 
         public int ReadInt()
         {
            /*#if DEBUG
-            var count = this.Reader.BaseStream.Length / sizeof(int);
+            var count = Reader.BaseStream.Length / sizeof(int);
             for (var i = 0; i < count; i++)
             {
-                int v = this.Reader.ReadInt32();
+                int v = Reader.ReadInt32();
             }
             Log.Inform("ByteBuffer-ReadInt() count of int sized lengths in reader stream: {0}", count);
             #endif*/
 
-            int result = this.Reader.ReadInt32();
-            this.Position += sizeof(int);
+            int result = Reader.ReadInt32();
+            Position += sizeof(int);
             return result;
         }
 
         public uint ReadUInt()
         {
-            uint result = this.Reader.ReadUInt32();
-            this.Position += sizeof(uint);
+            uint result = Reader.ReadUInt32();
+            Position += sizeof(uint);
             return result;
         }
 
         public long ReadLong()
         {
-            long result = this.Reader.ReadInt64();
-            this.Position += sizeof(long);
+            long result = Reader.ReadInt64();
+            Position += sizeof(long);
             return result;
         }
 
         public float ReadFloat()
         {
-            float result = this.Reader.ReadSingle();
-            this.Position += sizeof(float);
+            float result = Reader.ReadSingle();
+            Position += sizeof(float);
             return result;
         }
 
         public bool ReadBool()
         {
-            bool result = this.Reader.ReadBoolean();
-            this.Position += sizeof(bool);
+            bool result = Reader.ReadBoolean();
+            Position += sizeof(bool);
             return result;
         }
 
         public string ReadString()
         {
-            short count = this.Reader.ReadInt16();
+            short count = Reader.ReadInt16();
 
             char[] result = new char[count];
 
             for (int i = 0; i < count; i++)
             {
-                result[i] = (char)this.Reader.ReadByte();
+                result[i] = (char)Reader.ReadByte();
             }
 
-            this.Position += count + sizeof(short);
+            Position += count + sizeof(short);
 
             return new string(result);
         }
 
         public IPAddress ReadIPAddress()
         {
-            IPAddress result = new IPAddress(this.Reader.ReadBytes(4));
-            this.Position += 4;
+            IPAddress result = new IPAddress(Reader.ReadBytes(4));
+            Position += 4;
             return result;
         }
     }

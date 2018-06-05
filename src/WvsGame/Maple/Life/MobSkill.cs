@@ -175,6 +175,16 @@ namespace Destiny.Maple.Life
                         caster.Map.Mobs.Add(summon);
                     }
                     break;
+
+                case MobConstants.MobSkillName.SpeedUpAreaOfEffect:
+                    break;
+                case MobConstants.MobSkillName.ArmorSkill:
+                    break;
+                case MobConstants.MobSkillName.SealMonsterCarnival:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             foreach (Mob affectedMob in this.GetAffectedMobs(caster))

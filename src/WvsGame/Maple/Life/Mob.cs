@@ -1,9 +1,10 @@
-﻿using Destiny.Data;
+﻿using System;
+using System.Collections.Generic;
+
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
-using System;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
@@ -63,7 +64,7 @@ namespace Destiny.Maple.Life
         {
             get
             {
-                return this.Stance % 2 == 0;
+                return Stance % 2 == 0;
             }
         }
 
@@ -82,146 +83,146 @@ namespace Destiny.Maple.Life
         {
             get
             {
-                return DataProvider.Mobs[this.MapleID];
+                return DataProvider.Mobs[MapleID];
             }
         }
 
-        public Mob(Datum datum)
-            : base()
+        public Mob(Datum datum) : base()
         {
-            this.MapleID = (int)datum["mobid"];
+            MapleID = (int)datum["mobid"];
 
-            this.Level = (short)datum["mob_level"];
-            this.Health = this.MaxHealth = (uint)datum["hp"];
-            this.Mana = this.MaxMana = (uint)datum["mp"];
-            this.HealthRecovery = (uint)datum["hp_recovery"];
-            this.ManaRecovery = (uint)datum["mp_recovery"];
-            this.ExplodeHealth = (int)datum["explode_hp"];
-            this.Experience = (uint)datum["experience"];
-            this.Link = (int)datum["link"];
-            this.SummonType = (short)datum["summon_type"];
-            this.KnockBack = (int)datum["knockback"];
-            this.FixedDamage = (int)datum["fixed_damage"];
-            this.DeathBuff = (int)datum["death_buff"];
-            this.DeathAfter = (int)datum["death_after"];
-            this.Traction = (double)datum["traction"];
-            this.DamagedBySkillOnly = (int)datum["damaged_by_skill_only"];
-            this.DamagedByMobOnly = (int)datum["damaged_by_mob_only"];
-            this.DropItemPeriod = (int)datum["drop_item_period"];
-            this.HpBarForeColor = (byte)(sbyte)datum["hp_bar_color"];
-            this.HpBarBackColor = (byte)(sbyte)datum["hp_bar_bg_color"];
-            this.CarnivalPoints = (byte)(sbyte)datum["carnival_points"];
-            this.WeaponAttack = (int)datum["physical_attack"];
-            this.WeaponDefense = (int)datum["physical_defense"];
-            this.MagicAttack = (int)datum["magical_attack"];
-            this.MagicDefense = (int)datum["magical_defense"];
-            this.Accuracy = (short)datum["accuracy"];
-            this.Avoidability = (short)datum["avoidability"];
-            this.Speed = (short)datum["speed"];
-            this.ChaseSpeed = (short)datum["chase_speed"];
+            Level = (short)datum["mob_level"];
+            Health = MaxHealth = (uint)datum["hp"];
+            Mana = MaxMana = (uint)datum["mp"];
+            HealthRecovery = (uint)datum["hp_recovery"];
+            ManaRecovery = (uint)datum["mp_recovery"];
+            ExplodeHealth = (int)datum["explode_hp"];
+            Experience = (uint)datum["experience"];
+            Link = (int)datum["link"];
+            SummonType = (short)datum["summon_type"];
+            KnockBack = (int)datum["knockback"];
+            FixedDamage = (int)datum["fixed_damage"];
+            DeathBuff = (int)datum["death_buff"];
+            DeathAfter = (int)datum["death_after"];
+            Traction = (double)datum["traction"];
+            DamagedBySkillOnly = (int)datum["damaged_by_skill_only"];
+            DamagedByMobOnly = (int)datum["damaged_by_mob_only"];
+            DropItemPeriod = (int)datum["drop_item_period"];
+            HpBarForeColor = (byte)(sbyte)datum["hp_bar_color"];
+            HpBarBackColor = (byte)(sbyte)datum["hp_bar_bg_color"];
+            CarnivalPoints = (byte)(sbyte)datum["carnival_points"];
+            WeaponAttack = (int)datum["physical_attack"];
+            WeaponDefense = (int)datum["physical_defense"];
+            MagicAttack = (int)datum["magical_attack"];
+            MagicDefense = (int)datum["magical_defense"];
+            Accuracy = (short)datum["accuracy"];
+            Avoidability = (short)datum["avoidability"];
+            Speed = (short)datum["speed"];
+            ChaseSpeed = (short)datum["chase_speed"];
 
-            this.Loots = new List<Loot>();
-            this.Skills = new MobSkills(this);
-            this.DeathSummons = new List<int>();
+            Loots = new List<Loot>();
+            Skills = new MobSkills(this);
+            DeathSummons = new List<int>();
         }
 
         public Mob(int mapleID)
         {
-            this.MapleID = mapleID;
+            MapleID = mapleID;
 
-            this.Level = this.CachedReference.Level;
-            this.Health = this.CachedReference.Health;
-            this.Mana = this.CachedReference.Mana;
-            this.MaxHealth = this.CachedReference.MaxHealth;
-            this.MaxMana = this.CachedReference.MaxMana;
-            this.HealthRecovery = this.CachedReference.HealthRecovery;
-            this.ManaRecovery = this.CachedReference.ManaRecovery;
-            this.ExplodeHealth = this.CachedReference.ExplodeHealth;
-            this.Experience = this.CachedReference.Experience;
-            this.Link = this.CachedReference.Link;
-            this.SummonType = this.CachedReference.SummonType;
-            this.KnockBack = this.CachedReference.KnockBack;
-            this.FixedDamage = this.CachedReference.FixedDamage;
-            this.DeathBuff = this.CachedReference.DeathBuff;
-            this.DeathAfter = this.CachedReference.DeathAfter;
-            this.Traction = this.CachedReference.Traction;
-            this.DamagedBySkillOnly = this.CachedReference.DamagedBySkillOnly;
-            this.DamagedByMobOnly = this.CachedReference.DamagedByMobOnly;
-            this.DropItemPeriod = this.CachedReference.DropItemPeriod;
-            this.HpBarForeColor = this.CachedReference.HpBarForeColor;
-            this.HpBarBackColor = this.CachedReference.HpBarBackColor;
-            this.CarnivalPoints = this.CachedReference.CarnivalPoints;
-            this.WeaponAttack = this.CachedReference.WeaponAttack;
-            this.WeaponDefense = this.CachedReference.WeaponDefense;
-            this.MagicAttack = this.CachedReference.MagicAttack;
-            this.MagicDefense = this.CachedReference.MagicDefense;
-            this.Accuracy = this.CachedReference.Accuracy;
-            this.Avoidability = this.CachedReference.Avoidability;
-            this.Speed = this.CachedReference.Speed;
-            this.ChaseSpeed = this.CachedReference.ChaseSpeed;
+            Level = CachedReference.Level;
+            Health = CachedReference.Health;
+            Mana = CachedReference.Mana;
+            MaxHealth = CachedReference.MaxHealth;
+            MaxMana = CachedReference.MaxMana;
+            HealthRecovery = CachedReference.HealthRecovery;
+            ManaRecovery = CachedReference.ManaRecovery;
+            ExplodeHealth = CachedReference.ExplodeHealth;
+            Experience = CachedReference.Experience;
+            Link = CachedReference.Link;
+            SummonType = CachedReference.SummonType;
+            KnockBack = CachedReference.KnockBack;
+            FixedDamage = CachedReference.FixedDamage;
+            DeathBuff = CachedReference.DeathBuff;
+            DeathAfter = CachedReference.DeathAfter;
+            Traction = CachedReference.Traction;
+            DamagedBySkillOnly = CachedReference.DamagedBySkillOnly;
+            DamagedByMobOnly = CachedReference.DamagedByMobOnly;
+            DropItemPeriod = CachedReference.DropItemPeriod;
+            HpBarForeColor = CachedReference.HpBarForeColor;
+            HpBarBackColor = CachedReference.HpBarBackColor;
+            CarnivalPoints = CachedReference.CarnivalPoints;
+            WeaponAttack = CachedReference.WeaponAttack;
+            WeaponDefense = CachedReference.WeaponDefense;
+            MagicAttack = CachedReference.MagicAttack;
+            MagicDefense = CachedReference.MagicDefense;
+            Accuracy = CachedReference.Accuracy;
+            Avoidability = CachedReference.Avoidability;
+            Speed = CachedReference.Speed;
+            ChaseSpeed = CachedReference.ChaseSpeed;
 
-            this.Loots = this.CachedReference.Loots;
-            this.Skills = this.CachedReference.Skills;
-            this.DeathSummons = this.CachedReference.DeathSummons;
+            Loots = CachedReference.Loots;
+            Skills = CachedReference.Skills;
+            DeathSummons = CachedReference.DeathSummons;
 
-            this.Attackers = new Dictionary<Character, uint>();
-            this.Cooldowns = new Dictionary<MobSkill, DateTime>();
-            this.Buffs = new List<MobConstants.MobStatus>();
-            this.Stance = 5;
-            this.CanDrop = true;
+            Attackers = new Dictionary<Character, uint>();
+            Cooldowns = new Dictionary<MobSkill, DateTime>();
+            Buffs = new List<MobConstants.MobStatus>();
+            Stance = 5;
+            CanDrop = true;
         }
 
-        public Mob(SpawnPoint spawnPoint)
-            : this(spawnPoint.MapleID)
+        public Mob(SpawnPoint spawnPoint) : this(spawnPoint.MapleID)
         {
-            this.SpawnPoint = spawnPoint;
-            this.Foothold = this.SpawnPoint.Foothold;
-            this.Position = this.SpawnPoint.Position;
-            this.Position.Y -= 1; // TODO: Is this needed?
+            SpawnPoint = spawnPoint;
+            Foothold = SpawnPoint.Foothold;
+            Position = SpawnPoint.Position;
+            Position.Y -= 1; // TODO: Is this needed?
         }
 
-        public Mob(int mapleID, Point position)
-            : this(mapleID)
+        public Mob(int mapleID, Point position) : this(mapleID)
         {
-            this.Foothold = 0; // TODO.
-            this.Position = position;
-            this.Position.Y -= 5; // TODO: Is this needed?
+            Foothold = 0; // TODO.
+            Position = position;
+            Position.Y -= 5; // TODO: Is this needed?
         }
 
         public void AssignController()
         {
-            if (this.Controller == null)
+            if (Controller == null)
             {
                 int leastControlled = int.MaxValue;
-                Character newController = null;
+                Character newMobController = null;
 
-                lock (this.Map.Characters)
+                lock (Map.Characters)
                 {
-                    foreach (Character character in this.Map.Characters)
+                    // check for all characters in current map
+                    foreach (Character character in Map.Characters)
                     {
                         if (character.ControlledMobs.Count < leastControlled)
                         {
                             leastControlled = character.ControlledMobs.Count;
-                            newController = character;
+                            newMobController = character;
                         }
                     }
                 }
 
-                if (newController != null)
+                if (newMobController != null)
                 {
-                    this.IsProvoked = false;
+                    // destroy agro on mob
+                    IsProvoked = false;
 
                     try
                     {
-                        if (!newController.ControlledMobs.Contains(this.ObjectID))
+                        if (!newMobController.ControlledMobs.Contains(ObjectID))
                         {
-                            newController.ControlledMobs.Add(this);
+                            newMobController.ControlledMobs.Add(this);
                         }
                     }
+
                     catch (Exception e)
                     {
                         Log.SkipLine();
-                        Log.Inform("ERROR: AssignController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
+                        Log.Warn("AssignController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", ObjectID, e);
                         Log.SkipLine();
                     }
                     
@@ -233,20 +234,20 @@ namespace Destiny.Maple.Life
         {
             lock (this)
             {
-                if (this.Controller != newController)
+                if (Controller != newController)
                 {
                     if (this != null)
                     {
-                        if (this.Controller.ControlledMobs.Contains(this))
+                        if (Controller.ControlledMobs.Contains(this))
                         {
                             try
                             {
-                                this.Controller.ControlledMobs.Remove(this);
+                                Controller.ControlledMobs.Remove(this);
                             }
                             catch (Exception e)
                             {
                                 Log.SkipLine();
-                                Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
+                                Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from Controller.ControlledMobs! \n Exception occurred: {1}", ObjectID, e);
                                 Log.SkipLine();
                             }
                         }
@@ -260,7 +261,7 @@ namespace Destiny.Maple.Life
                             catch (Exception e)
                             {
                                 Log.SkipLine();
-                                Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
+                                Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", ObjectID, e);
                                 Log.SkipLine();
                             }
                         }
@@ -269,21 +270,21 @@ namespace Destiny.Maple.Life
             }
         }
 
-        public void Move(Packet iPacket)
+        public void Move(Packet inPacket)
         {
-            short moveAction = iPacket.ReadShort();
-            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
-            byte centerSplit = iPacket.ReadByte();
-            int illegalVelocity = iPacket.ReadInt();
-            iPacket.Skip(8);
-            iPacket.ReadByte();
-            iPacket.ReadInt();
+            short moveAction = inPacket.ReadShort();
+            bool cheatResult = (inPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = inPacket.ReadByte();
+            int illegalVelocity = inPacket.ReadInt();
+            inPacket.Skip(8);
+            inPacket.ReadByte();
+            inPacket.ReadInt();
 
-            Movements movements = Movements.Decode(iPacket);
+            Movements movements = Movements.Decode(inPacket);
 
-            this.Position = movements.Position;
-            this.Foothold = movements.Foothold;
-            this.Stance = movements.Stance;
+            Position = movements.Position;
+            Foothold = movements.Foothold;
+            Stance = movements.Stance;
 
             byte skillID = 0;
             byte skillLevel = 0;
@@ -291,9 +292,9 @@ namespace Destiny.Maple.Life
             
             if (skill != null)
             {
-                if (this.Health * 100 / this.MaxHealth > skill.PercentageLimitHP ||
-                    (this.Cooldowns.ContainsKey(skill) && this.Cooldowns[skill].AddSeconds(skill.Cooldown) >= DateTime.Now) ||
-                    ((MobConstants.MobSkillName)skill.MapleID) == MobConstants.MobSkillName.Summon && this.Map.Mobs.Count >= 100)
+                if (Health * 100 / MaxHealth > skill.PercentageLimitHP ||
+                    (Cooldowns.ContainsKey(skill) && Cooldowns[skill].AddSeconds(skill.Cooldown) >= DateTime.Now) ||
+                    ((MobConstants.MobSkillName)skill.MapleID) == MobConstants.MobSkillName.Summon && Map.Mobs.Count >= 100)
                 {
                     skill = null;
                 }
@@ -307,27 +308,27 @@ namespace Destiny.Maple.Life
             using (Packet oPacket = new Packet(ServerOperationCode.MobCtrlAck))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteShort(moveAction) //moveActionID
                     .WriteBool(cheatResult) //UseSkills??
-                    .WriteShort((short)this.Mana)
+                    .WriteShort((short)Mana)
                     .WriteByte(skillID)
                     .WriteByte(skillLevel);
 
-                this.Controller.Client.Send(oPacket);
+                Controller.Client.Send(oPacket);
             }
 
             using (Packet oPacket = new Packet(ServerOperationCode.MobMove))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteBool(false)
                     .WriteBool(cheatResult) //UseSkills??
                     .WriteByte(centerSplit)
                     .WriteInt(illegalVelocity)
                     .WriteBytes(movements.ToByteArray());
 
-                this.Map.Broadcast(oPacket, this.Controller);
+                Map.Broadcast(oPacket, Controller);
             }
         }
 
@@ -336,7 +337,7 @@ namespace Destiny.Maple.Life
             using (Packet oPacket = new Packet(ServerOperationCode.MobStatSet))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteLong()
                     .WriteInt()
                     .WriteInt((int)buff)
@@ -347,7 +348,7 @@ namespace Destiny.Maple.Life
                     .WriteShort(0) // Delay
                     .WriteInt();
 
-                this.Map.Broadcast(oPacket);
+                Map.Broadcast(oPacket);
             }
 
             Delay.Execute(() =>
@@ -355,16 +356,16 @@ namespace Destiny.Maple.Life
                 using (Packet Packet = new Packet(ServerOperationCode.MobStatReset))
                 {
                     Packet
-                        .WriteInt(this.ObjectID)
+                        .WriteInt(ObjectID)
                         .WriteLong()
                         .WriteInt()
                         .WriteInt((int)buff)
                         .WriteInt();
 
-                    this.Map.Broadcast(Packet);
+                    Map.Broadcast(Packet);
                 }
 
-                this.Buffs.Remove(buff);
+                Buffs.Remove(buff);
             }, skill.Duration * 1000);
         }
 
@@ -373,7 +374,7 @@ namespace Destiny.Maple.Life
             using (Packet oPacket = new Packet(ServerOperationCode.MobStatSet))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteLong()
                     .WriteInt()
                     .WriteInt((int)buff)
@@ -384,7 +385,7 @@ namespace Destiny.Maple.Life
                     .WriteShort(0) // Delay
                     .WriteInt();
 
-                this.Map.Broadcast(oPacket);
+                Map.Broadcast(oPacket);
             }
 
             Delay.Execute(() =>
@@ -392,63 +393,64 @@ namespace Destiny.Maple.Life
                     using (Packet Packet = new Packet(ServerOperationCode.MobStatReset))
                     {
                         Packet
-                            .WriteInt(this.ObjectID)
+                            .WriteInt(ObjectID)
                             .WriteLong()
                             .WriteInt()
                             .WriteInt((int)buff)
                             .WriteInt();
 
-                        this.Map.Broadcast(Packet);
+                        Map.Broadcast(Packet);
                     }
 
-                    this.Buffs.Remove(buff);
+                    Buffs.Remove(buff);
                 }, skill.BuffTime * 1000);
         }
 
-
         public void Heal(uint hp, int range)
         {
-            this.Health = Math.Min(this.MaxHealth, (uint)(this.Health + hp + Application.Random.Next(-range / 2, range / 2)));
+            Health = Math.Min(MaxHealth, (uint)(Health + hp + Application.Random.Next(-range / 2, range / 2)));
 
             using (Packet Packet = new Packet(ServerOperationCode.MobDamaged))
             {
                 Packet
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteByte()
                     .WriteInt((int)-hp)
                     .WriteByte()
                     .WriteByte()
                     .WriteByte();
 
-                this.Map.Broadcast(Packet);
+                Map.Broadcast(Packet);
             }
         }
 
         public void Die()
         {
-            if (!this.Map.Mobs.Remove(this))
+            try
             {
-
+                Map.Mobs.Remove(this);
+            }
+            catch (Exception ex)
+            {
+                Log.SkipLine();
+                Tracer.TraceErrorMessage(ex, "Failed to remove Mob on death from Map.Mobs");
+                Log.SkipLine();
             }
         }
 
         public bool IsAlive()
         {
-            if (this.Health <= 0)
-            {
-                return false;
-            }
-            return true;
+            return Health > 0;
         }
 
         public void ShowHpTo(Character player)
         {
-            int hpRemaining = (int)(Math.Max(1, (this.Health * 100) / this.MaxHealth));
+            int hpRemaining = (int)(Math.Max(1, (Health * 100) / MaxHealth));
 
             using (Packet oPacket = new Packet(ServerOperationCode.MobHPIndicator))
             {
                 oPacket
-                    .WriteInt(this.ObjectID)
+                    .WriteInt(ObjectID)
                     .WriteByte((byte)(hpRemaining));
 
                 player.Client.Send(oPacket);
@@ -459,24 +461,24 @@ namespace Destiny.Maple.Life
         {
             lock (this)
             {
-                amount = Math.Min(amount, this.Health);
+                amount = Math.Min(amount, Health);
 
                 //does the victim knows its attacker?
-                if (this.Attackers.ContainsKey(attacker))
+                if (Attackers.ContainsKey(attacker))
                 {
                     //if so then add to his established dmg bill
-                    this.Attackers[attacker] += amount;
+                    Attackers[attacker] += amount;
                 }
                 else
                 {
                     //if not so then add him as new attacker
-                    this.Attackers.Add(attacker, amount);
+                    Attackers.Add(attacker, amount);
                 }
                 
-                this.Health -= amount; //decrease health by amount dealt
+                Health -= amount; //decrease health by amount dealt
                 ShowHpTo(attacker); //show monster's remaining hp bar to attacker
 
-                if (this.Health <= 0) //???
+                if (Health <= 0) //???
                 {
                     return true;
                 }
@@ -487,17 +489,17 @@ namespace Destiny.Maple.Life
 
         public Packet GetCreatePacket()
         {
-            return this.GetInternalPacket(false, true);
+            return GetInternalPacket(false, true);
         }
 
         public Packet GetSpawnPacket()
         {
-            return this.GetInternalPacket(false, false);
+            return GetInternalPacket(false, false);
         }
 
         public Packet GetControlRequestPacket()
         {
-            return this.GetInternalPacket(true, false);
+            return GetInternalPacket(true, false);
         }
 
         private Packet GetInternalPacket(bool requestControl, bool newSpawn)
@@ -506,30 +508,30 @@ namespace Destiny.Maple.Life
 
             if (requestControl)
             {
-                oPacket.WriteByte((byte)(this.IsProvoked ? 2 : 1));
+                oPacket.WriteByte((byte)(IsProvoked ? 2 : 1));
             }
 
             oPacket
-                .WriteInt(this.ObjectID)
-                .WriteByte((byte)(this.Controller == null ? 5 : 1))
-                .WriteInt(this.MapleID)
+                .WriteInt(ObjectID)
+                .WriteByte((byte)(Controller == null ? 5 : 1))
+                .WriteInt(MapleID)
                 .Skip(15) // NOTE: Unknown.
                 .WriteByte(0x88) // NOTE: Unknown.
                 .Skip(6) // NOTE: Unknown.
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y)
-                .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00))) // implement: getStance()
-                .WriteShort(this.Foothold) //foothold of origin MapObject.GetStartFH()
-                .WriteShort(this.Foothold);
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y)
+                .WriteByte((byte)(0x02 | (IsFacingLeft ? 0x01 : 0x00))) // implement: getStance()
+                .WriteShort(Foothold) //foothold of origin MapObject.GetStartFH()
+                .WriteShort(Foothold);
 
-            if (this.SpawnEffect > 0)
+            if (SpawnEffect > 0)
             {
                 oPacket
-                    .WriteByte((byte)this.SpawnEffect)
+                    .WriteByte((byte)SpawnEffect)
                     .WriteByte()
                     .WriteShort();
 
-                if (this.SpawnEffect == 15)
+                if (SpawnEffect == 15)
                 {
                     oPacket.WriteByte();
                 }
@@ -550,7 +552,7 @@ namespace Destiny.Maple.Life
 
             oPacket
                 .WriteBool(false)
-                .WriteInt(this.ObjectID);
+                .WriteInt(ObjectID);
 
             return oPacket;
         }
@@ -569,9 +571,9 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.MobLeaveField);
 
             oPacket
-                .WriteInt(this.ObjectID)
+                .WriteInt(ObjectID)
                 .WriteByte(1)
-                .WriteByte((byte)this.DeathEffect);
+                .WriteByte((byte)DeathEffect);
 
             return oPacket;
         }
@@ -581,7 +583,7 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.MobLeaveField);
 
             oPacket
-                .WriteInt(this.ObjectID)
+                .WriteInt(ObjectID)
                 .WriteByte(1)
                 .WriteByte(1); // TODO: Death effects.
 
