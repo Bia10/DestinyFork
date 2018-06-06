@@ -20,9 +20,9 @@ namespace Destiny.Maple
 
     public sealed class Movements : List<Movement>
     {
-        public static Movements Decode(Packet iPacket)
+        public static Movements Decode(Packet inPacket)
         {
-            return new Movements(iPacket);
+            return new Movements(inPacket);
         }
 
         public Point Origin { get; private set; }
@@ -30,27 +30,27 @@ namespace Destiny.Maple
         public short Foothold { get; private set; }
         public byte Stance { get; private set; }
 
-        public Movements(Packet iPacket)
-            : base()
+        public Movements(Packet inPacket) : base()
         {
             short foothold = 0;
             byte stance = 0;
-            Point position = new Point(iPacket.ReadShort(), iPacket.ReadShort());
+            Point position = new Point(inPacket.ReadShort(), inPacket.ReadShort());
 
-            this.Origin = position;
+            Origin = position;
 
-            byte count = iPacket.ReadByte();
+            byte count = inPacket.ReadByte();
 
             while (count-- > 0)
             {
-                MapConstants.MovementType type = (MapConstants.MovementType)iPacket.ReadByte();
+                MapConstants.MovementType type = (MapConstants.MovementType)inPacket.ReadByte();
 
-                Movement movement = new Movement();
-
-                movement.Type = type;
-                movement.Foothold = foothold;
-                movement.Position = position;
-                movement.Stance = stance;
+                Movement movement = new Movement
+                {
+                    Type = type,
+                    Foothold = foothold,
+                    Position = position,
+                    Stance = stance
+                };
 
                 switch (type)
                 {
@@ -59,17 +59,17 @@ namespace Destiny.Maple
                     case MapConstants.MovementType.JumpDown:
                     case MapConstants.MovementType.WingsFalling:
                         {
-                            movement.Position = new Point(iPacket.ReadShort(), iPacket.ReadShort());
-                            movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
-                            movement.Foothold = iPacket.ReadShort();
+                            movement.Position = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+                            movement.Velocity = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+                            movement.Foothold = inPacket.ReadShort();
 
                             if (movement.Type == MapConstants.MovementType.JumpDown)
                             {
-                                movement.FallStart = iPacket.ReadShort();
+                                movement.FallStart = inPacket.ReadShort();
                             }
 
-                            movement.Stance = iPacket.ReadByte();
-                            movement.Duration = iPacket.ReadShort();
+                            movement.Stance = inPacket.ReadByte();
+                            movement.Duration = inPacket.ReadShort();
                         }
                         break;
 
@@ -80,9 +80,9 @@ namespace Destiny.Maple
                     case MapConstants.MovementType.RecoilShot:
                     case MapConstants.MovementType.Aran:
                         {
-                            movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
-                            movement.Stance = iPacket.ReadByte();
-                            movement.Duration = iPacket.ReadShort();
+                            movement.Velocity = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+                            movement.Stance = inPacket.ReadByte();
+                            movement.Duration = inPacket.ReadShort();
                         }
                         break;
 
@@ -93,32 +93,32 @@ namespace Destiny.Maple
                     case MapConstants.MovementType.Rush:
                     case MapConstants.MovementType.Chair:
                         {
-                            movement.Position = new Point(iPacket.ReadShort(), iPacket.ReadShort());
-                            movement.Foothold = iPacket.ReadShort();
-                            movement.Stance = iPacket.ReadByte();
-                            movement.Duration = iPacket.ReadShort();
+                            movement.Position = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+                            movement.Foothold = inPacket.ReadShort();
+                            movement.Stance = inPacket.ReadByte();
+                            movement.Duration = inPacket.ReadShort();
                         }
                         break;
 
                     case MapConstants.MovementType.Falling:
                         {
-                            movement.Statistic = iPacket.ReadByte();
+                            movement.Statistic = inPacket.ReadByte();
                         }
                         break;
 
                     case MapConstants.MovementType.Unknown:
                         {
-                            movement.Velocity = new Point(iPacket.ReadShort(), iPacket.ReadShort());
-                            movement.FallStart = iPacket.ReadShort();
-                            movement.Stance = iPacket.ReadByte();
-                            movement.Duration = iPacket.ReadShort();
+                            movement.Velocity = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+                            movement.FallStart = inPacket.ReadShort();
+                            movement.Stance = inPacket.ReadByte();
+                            movement.Duration = inPacket.ReadShort();
                         }
                         break;
 
                     default:
                         {
-                            movement.Stance = iPacket.ReadByte();
-                            movement.Duration = iPacket.ReadShort();
+                            movement.Stance = inPacket.ReadByte();
+                            movement.Duration = inPacket.ReadShort();
                         }
                         break;
                 }
@@ -127,28 +127,28 @@ namespace Destiny.Maple
                 foothold = movement.Foothold;
                 stance = movement.Stance;
 
-                this.Add(movement);
+                Add(movement);
             }
 
-            byte keypadStates = iPacket.ReadByte();
+            byte keypadStates = inPacket.ReadByte();
 
             for (byte i = 0; i < keypadStates; i++)
             {
                 if (i % 2 == 0)
                 {
-                    iPacket.ReadByte(); // NOTE: Unknown.
+                    inPacket.ReadByte(); // NOTE: Unknown.
                 }
             }
 
             // NOTE: Rectangle for bounds checking.
-            iPacket.ReadShort(); // NOTE: Left.
-            iPacket.ReadShort(); // NOTE: Top.
-            iPacket.ReadShort(); // NOTE: Right.
-            iPacket.ReadShort(); // NOTE: Bottom.
+            inPacket.ReadShort(); // NOTE: Left.
+            inPacket.ReadShort(); // NOTE: Top.
+            inPacket.ReadShort(); // NOTE: Right.
+            inPacket.ReadShort(); // NOTE: Bottom.
 
-            this.Position = position;
-            this.Stance = stance;
-            this.Foothold = foothold;
+            Position = position;
+            Stance = stance;
+            Foothold = foothold;
         }
 
         public byte[] ToByteArray()
@@ -156,9 +156,9 @@ namespace Destiny.Maple
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteShort(this.Origin.X)
-                    .WriteShort(this.Origin.Y)
-                    .WriteByte((byte)this.Count);
+                    .WriteShort(Origin.X)
+                    .WriteShort(Origin.Y)
+                    .WriteByte((byte)Count);
 
                 foreach (Movement movement in this)
                 {

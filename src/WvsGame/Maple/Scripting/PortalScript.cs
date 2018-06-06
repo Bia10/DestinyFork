@@ -10,12 +10,11 @@ namespace Destiny.Maple.Scripting
     {
         private Portal mPortal;
 
-        public PortalScript(Portal portal, Character character)
-            : base(ServerConstants.ScriptType.Portal, portal.Script, character, false)
+        public PortalScript(Portal portal, Character character) : base(ServerConstants.ScriptType.Portal, portal.Script, character, false)
         {
             mPortal = portal;
 
-            this.Expose("playPortalSe", new Action(this.PlayPortalSoundEffect));
+            Expose("playPortalSe", new Action(PlayPortalSoundEffect));
         }
 
         private void PlayPortalSoundEffect()

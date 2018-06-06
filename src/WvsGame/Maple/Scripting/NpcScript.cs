@@ -9,7 +9,7 @@ namespace Destiny.Maple.Scripting
 {
     public sealed class NpcScript : ScriptBase
     {
-        private Npc mNpc;
+        private readonly Npc mNpc;
         private string mText;
         private WaitableResult<int> mResult;
 

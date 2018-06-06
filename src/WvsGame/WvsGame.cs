@@ -17,8 +17,8 @@ namespace Destiny
     {
         private static bool isAlive;
         private static byte channelID;
-        private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
-        public static ManualResetEvent CenterConnectionDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent AcceptDone = new ManualResetEvent(false);
+        public static readonly ManualResetEvent CenterConnectionDone = new ManualResetEvent(false);
 
         public static TcpListener Listener { get; private set; }
         public static IPEndPoint RemoteEndPoint { get; set; }
@@ -66,9 +66,9 @@ namespace Destiny
                 Console.Title = string.Format("WvsGame v.{0}.{1} ({2}-{3}) - MOTD: {4}",
                     Application.MapleVersion,
                     Application.PatchVersion,
-                    WvsGame.WorldName,
-                    WvsGame.ChannelID,
-                    WvsGame.TickerMessage);
+                    WorldName,
+                    ChannelID,
+                    TickerMessage);
             }
         }
 
@@ -90,12 +90,12 @@ namespace Destiny
         private static void CloseGameServer()
         {
             // Disconnect clients
-            foreach (GameClient client in WvsGame.Clients)
+            foreach (GameClient client in Clients)
             {
                 client.Stop();
             }
             // Dispose from thread
-            WvsGame.Dispose();
+            Dispose();
             // Inform user
             Log.SkipLine();
             Log.Warn("Server stopped.");
@@ -137,13 +137,13 @@ namespace Destiny
             }
           
             start: 
-            WvsGame.Clients = new GameClients();
+            Clients = new GameClients();
 
             Log.Entitle("WvsGame v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
             try
             {
-                // Read game-server settings from WvsGame.ini
+                // Read game-server settings from ini
                 Settings.Initialize(Application.ExecutablePath + "WvsGame.ini"); 
                 // Test connection to database
                 Database.Test();
@@ -152,12 +152,12 @@ namespace Destiny
                 // Create key shortcuts
                 Shortcuts.Apply();
                 // Set auto-reset
-                WvsGame.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
-                Log.Inform("Automatic restart time set to {0} seconds.", WvsGame.AutoRestartTime);
+                AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
+                Log.Inform("Automatic restart time set to {0} seconds.", AutoRestartTime);
                 // Initiate data handler
                 DataProvider.Initialize();
                 // Success game-server is alive! 
-                WvsGame.IsAlive = true;
+                IsAlive = true;
             }
             catch (Exception ex)
             {
@@ -165,17 +165,17 @@ namespace Destiny
                 Tracer.TraceErrorMessage(ex, "Exception occurred during game-server initialization!");
             }
 
-            if (WvsGame.IsAlive)
+            if (IsAlive)
             {
-                WvsGame.CenterConnectionDone.Reset();
+                CenterConnectionDone.Reset();
                 new Thread(new ThreadStart(GameToCenterServer.Main)).Start();
-                WvsGame.CenterConnectionDone.WaitOne();
+                CenterConnectionDone.WaitOne();
 #if DEBUG
                 string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");
-                if (File.Exists(linkPath) && WvsGame.WorldID == 0 && WvsGame.ChannelID == 0) //Only for the first WvsGame instance, and only if shortcut exists
+
+                if (File.Exists(linkPath) && WorldID == 0 && ChannelID == 0) //Only for the first WvsGame instance, and only if shortcut exists
                 {
-                    System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                    proc.StartInfo.FileName = linkPath;
+                    System.Diagnostics.Process proc = new System.Diagnostics.Process {StartInfo = {FileName = linkPath}};
                     proc.Start();
                 }
 #endif
@@ -185,61 +185,66 @@ namespace Destiny
                 HaltOnFatalError();
             }
 
-            while (WvsGame.IsAlive)
+            while (IsAlive)
             {
-                WvsGame.AcceptDone.Reset();
-                WvsGame.Listener.BeginAcceptSocket(new AsyncCallback(WvsGame.OnAcceptSocket), null);
-                WvsGame.AcceptDone.WaitOne();
+                AcceptDone.Reset();
+
+                try
+                {
+                    Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
+                }
+
+                catch (Exception ex)
+                {
+                    Log.SkipLine();
+                    Tracer.TraceErrorMessage(ex, "Ex occured in game server!");
+                    throw;
+                }
+
+                AcceptDone.WaitOne();
             }
 
             CloseGameServer();
 
-            if (WvsGame.AutoRestartTime > 0) // TODO: fugly rework
+            if (AutoRestartTime > 0) // TODO: fugly rework
             {
-                Log.Inform("Attempting auto-restart in {0} seconds.", WvsGame.AutoRestartTime);
-                Thread.Sleep(WvsGame.AutoRestartTime * 1000);
+                Log.Inform("Attempting auto-restart in {0} seconds.", AutoRestartTime);
+                Thread.Sleep(AutoRestartTime * 1000);
                 goto start;
             }
-            else
-            {
-                Console.Read();
-            }
+
+            Console.Read();
         }
 
         public static void Listen()
         {
-            WvsGame.Listener = new TcpListener(IPAddress.Any, WvsGame.RemoteEndPoint.Port);
-            WvsGame.Listener.Start();
-            Log.Inform("Initialized clients listener on {0}.", WvsGame.Listener.LocalEndpoint);
+            Listener = new TcpListener(IPAddress.Any, RemoteEndPoint.Port);
+            Listener.Start();
+            Log.Inform("Initialized clients listener on {0}.", Listener.LocalEndpoint);
         }
 
         public static void Stop()
         {
-            WvsGame.IsAlive = false;
+            IsAlive = false;
         }
 
         private static void OnAcceptSocket(IAsyncResult asyncResult)
         {
-            WvsGame.AcceptDone.Set();
+            AcceptDone.Set();
 
             try
             {
-                var gameClient = new GameClient(WvsGame.Listener.EndAcceptSocket(asyncResult));
+                var gameClient = new GameClient(Listener.EndAcceptSocket(asyncResult));
             }
+
             catch (ObjectDisposedException) { } // TODO: Figure out why this crashes.
         }
 
         private static void Dispose()
         {
-            if (WvsGame.CenterConnection != null)
-            {
-                WvsGame.CenterConnection.Dispose();
-            }
+            CenterConnection?.Dispose();
 
-            if (WvsGame.Listener != null)
-            {
-                WvsGame.Listener.Stop();
-            }
+            Listener?.Stop();
 
             Log.SkipLine();
             Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);

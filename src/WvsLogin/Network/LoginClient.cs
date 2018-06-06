@@ -22,10 +22,9 @@ namespace Destiny.Network
         public string LastPassword { get; private set; }
         public string[] MacAddresses { get; private set; }
 
-        public LoginClient(Socket socket)
-            : base(socket)
+        public LoginClient(Socket socket) : base(socket)
         {
-            this.ID = Application.Random.Next();
+            ID = Application.Random.Next();
         }
 
         protected override bool IsServerAlive
@@ -41,71 +40,71 @@ namespace Destiny.Network
             switch ((ClientOperationCode)iPacket.OperationCode)
             {
                 case ClientOperationCode.AccountLogin:
-                    this.Login(iPacket);
+                    Login(iPacket);
                     break;
 
                 case ClientOperationCode.EULA:
-                    this.EULA(iPacket);
+                    EULA(iPacket);
                     break;
 
                 case ClientOperationCode.AccountGender:
-                    this.SetGender(iPacket);
+                    SetGender(iPacket);
                     break;
 
                 case ClientOperationCode.PinCheck:
-                    this.CheckPin(iPacket);
+                    CheckPin(iPacket);
                     break;
 
                 case ClientOperationCode.PinUpdate:
-                    this.UpdatePin(iPacket);
+                    UpdatePin(iPacket);
                     break;
 
                 case ClientOperationCode.WorldList:
                 case ClientOperationCode.WorldRelist:
-                    this.ListWorlds();
+                    ListWorlds();
                     break;
 
                 case ClientOperationCode.WorldStatus:
-                    this.InformWorldStatus(iPacket);
+                    InformWorldStatus(iPacket);
                     break;
 
                 case ClientOperationCode.WorldSelect:
-                    this.SelectWorld(iPacket);
+                    SelectWorld(iPacket);
                     break;
 
                 case ClientOperationCode.ViewAllChar:
-                    this.ViewAllChar(iPacket);
+                    ViewAllChar(iPacket);
                     break;
 
                 case ClientOperationCode.VACFlagSet:
-                    this.SetViewAllChar(iPacket);
+                    SetViewAllChar(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterNameCheck:
-                    this.CheckCharacterName(iPacket);
+                    CheckCharacterName(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterCreate:
-                    this.CreateCharacter(iPacket);
+                    CreateCharacter(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterDelete:
-                    this.DeleteCharacter(iPacket);
+                    DeleteCharacter(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterSelect:
                 case ClientOperationCode.SelectCharacterByVAC:
-                    this.SelectCharacter(iPacket);
+                    SelectCharacter(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterSelectRegisterPic:
                 case ClientOperationCode.RegisterPicFromVAC:
-                    this.SelectCharacter(iPacket, registerPic: true);
+                    SelectCharacter(iPacket, registerPic: true);
                     break;
 
                 case ClientOperationCode.CharacterSelectRequestPic:
                 case ClientOperationCode.RequestPicFromVAC:
-                    this.SelectCharacter(iPacket, requestPic: true);
+                    SelectCharacter(iPacket, requestPic: true);
                     break;
             }
         }
@@ -117,60 +116,60 @@ namespace Destiny.Network
 
             if (!username.IsAlphaNumeric())
             {
-                this.SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
+                SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
             }
             else
             {
-                this.Account = new Account(this);
+                Account = new Account(this);
 
                 try
                 {
-                    this.Account.Load(username);
+                    Account.Load(username);
 
-                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
+                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + Account.Salt) != Account.Password)
                     {
-                        this.SendLoginResult(LoginConstants.LoginResult.InvalidPassword);
+                        SendLoginResult(LoginConstants.LoginResult.InvalidPassword);
                     }                  
-                    else if (this.Account.IsBanned)
+                    else if (Account.IsBanned)
                     {
-                        this.SendLoginResult(LoginConstants.LoginResult.Banned);
+                        SendLoginResult(LoginConstants.LoginResult.Banned);
                     }
-                    else if (!this.Account.EULA)
+                    else if (!Account.EULA)
                     {
-                        this.SendLoginResult(LoginConstants.LoginResult.EULA);
+                        SendLoginResult(LoginConstants.LoginResult.EULA);
                     }
                     else // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
                     {
-                        this.SendLoginResult(LoginConstants.LoginResult.Valid);
+                        SendLoginResult(LoginConstants.LoginResult.Valid);
                     }
                 }
                 catch (NoAccountException)
                 {
-                    if (WvsLogin.AutoRegister && username == this.LastUsername && password == this.LastPassword)
+                    if (WvsLogin.AutoRegister && username == LastUsername && password == LastPassword)
                     {
-                        this.Account.Username = username;
-                        this.Account.Salt = HashGenerator.GenerateMD5();
-                        this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
-                        this.Account.EULA = false;
-                        this.Account.Gender = CharacterConstants.Gender.Unset;
-                        this.Account.Pin = string.Empty;
-                        this.Account.Pic = string.Empty;
-                        this.Account.IsBanned = false;
-                        this.Account.IsMaster = false;
-                        this.Account.Birthday = DateTime.UtcNow;
-                        this.Account.Creation = DateTime.UtcNow;
-                        this.Account.MaxCharacters = WvsLogin.MaxCharacters;
+                        Account.Username = username;
+                        Account.Salt = HashGenerator.GenerateMD5();
+                        Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + Account.Salt);
+                        Account.EULA = false;
+                        Account.Gender = CharacterConstants.Gender.Unset;
+                        Account.Pin = string.Empty;
+                        Account.Pic = string.Empty;
+                        Account.IsBanned = false;
+                        Account.IsMaster = false;
+                        Account.Birthday = DateTime.UtcNow;
+                        Account.Creation = DateTime.UtcNow;
+                        Account.MaxCharacters = WvsLogin.MaxCharacters;
 
-                        this.Account.Save();
+                        Account.Save();
 
-                        this.SendLoginResult(LoginConstants.LoginResult.Valid);
+                        SendLoginResult(LoginConstants.LoginResult.Valid);
                     }
                     else
                     {
-                        this.SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
+                        SendLoginResult(LoginConstants.LoginResult.InvalidUsername);
 
-                        this.LastUsername = username;
-                        this.LastPassword = password;
+                        LastUsername = username;
+                        LastPassword = password;
                     }
                 }
             }
@@ -188,22 +187,22 @@ namespace Destiny.Network
                 if (result == LoginConstants.LoginResult.Valid)
                 {
                     oPacket
-                        .WriteInt(this.Account.ID)
-                        .WriteByte((byte)this.Account.Gender)
+                        .WriteInt(Account.ID)
+                        .WriteByte((byte)Account.Gender)
                         .WriteByte() // NOTE: Grade code.
                         .WriteByte() // NOTE: Subgrade code.
                         .WriteByte() // NOTE: Country code.
-                        .WriteString(this.Account.Username)
+                        .WriteString(Account.Username)
                         .WriteByte() // NOTE: Unknown.
                         .WriteByte() // NOTE: Quiet ban reason. 
                         .WriteLong() // NOTE: Quiet ban lift date.
-                        .WriteDateTime(this.Account.Creation)
+                        .WriteDateTime(Account.Creation)
                         .WriteInt() // NOTE: Unknown.
                         .WriteByte((byte)(WvsLogin.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
-                        .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
+                        .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(Account.Pic) ? 0 : 1) : 2));
                 }
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
@@ -213,45 +212,40 @@ namespace Destiny.Network
 
             if (accepted)
             {
-                this.Account.EULA = true;
+                Account.EULA = true;
 
-                Datum datum = new Datum("accounts");
+                Datum datum = new Datum("accounts") {["EULA"] = true};
 
-                datum["EULA"] = true;
+                datum.Update("ID = {0}", Account.ID);
 
-                datum.Update("ID = {0}", this.Account.ID);
-
-                this.SendLoginResult(LoginConstants.LoginResult.Valid);
+                SendLoginResult(LoginConstants.LoginResult.Valid);
             }
             else
             {
-                this.Stop(); // NOTE: I'm pretty sure in the real client it disconnects you if you refuse to accept the EULA.
+                Stop(); // NOTE: I'm pretty sure in the real client it disconnects you if you refuse to accept the EULA.
             }
         }
 
         private void SetGender(Packet iPacket)
         {
-            if (this.Account.Gender != CharacterConstants.Gender.Unset)
+            if (Account.Gender != CharacterConstants.Gender.Unset)
             {
                 return;
             }
 
             bool valid = iPacket.ReadBool();
 
-            if (valid)
-            {
-                CharacterConstants.Gender gender = (CharacterConstants.Gender)iPacket.ReadByte();
+            if (!valid) return;
 
-                this.Account.Gender = gender;
+            CharacterConstants.Gender gender = (CharacterConstants.Gender)iPacket.ReadByte();
 
-                Datum datum = new Datum("accounts");
+            Account.Gender = gender;
 
-                datum["Gender"] = (byte)this.Account.Gender;
+            Datum datum = new Datum("accounts") { ["Gender"] = (byte) Account.Gender};
 
-                datum.Update("ID = {0}", this.Account.ID);
+            datum.Update("ID = {0}", Account.ID);
 
-                this.SendLoginResult(LoginConstants.LoginResult.Valid);
-            }
+            SendLoginResult(LoginConstants.LoginResult.Valid);
         }
 
         private void CheckPin(Packet iPacket)
@@ -265,7 +259,7 @@ namespace Destiny.Network
             {
                 string pin = iPacket.ReadString();
 
-                if (SHACryptograph.Encrypt(SHAMode.SHA256, pin) != this.Account.Pin)
+                if (SHACryptograph.Encrypt(SHAMode.SHA256, pin) != Account.Pin)
                 {
                     result = LoginConstants.PinResult.Invalid;
                 }
@@ -287,7 +281,7 @@ namespace Destiny.Network
             }
             else if (b == 1)
             {
-                if (string.IsNullOrEmpty(this.Account.Pin))
+                if (string.IsNullOrEmpty(Account.Pin))
                 {
                     result = LoginConstants.PinResult.Register;
                 }
@@ -305,7 +299,7 @@ namespace Destiny.Network
             {
                 oPacket.WriteByte((byte)result);
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
@@ -316,19 +310,19 @@ namespace Destiny.Network
 
             if (procceed)
             {
-                this.Account.Pin = SHACryptograph.Encrypt(SHAMode.SHA256, pin);
+                Account.Pin = SHACryptograph.Encrypt(SHAMode.SHA256, pin);
 
                 Datum datum = new Datum("accounts");
 
-                datum["Pin"] = this.Account.Pin;
+                datum["Pin"] = Account.Pin;
 
-                datum.Update("ID = {0}", this.Account.ID);
+                datum.Update("ID = {0}", Account.ID);
 
                 using (Packet oPacket = new Packet(ServerOperationCode.UpdatePinCodeResult))
                 {
                     oPacket.WriteByte(); // NOTE: All the other result types end up in a "trouble logging into the game" message.
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
             }
         }
@@ -369,14 +363,14 @@ namespace Destiny.Network
                                           //        .WriteString(balloon.Text);
                                           //}
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
 
                 using (Packet oPacket = new Packet(ServerOperationCode.WorldInformation))
                 {
                     oPacket.WriteByte(byte.MaxValue);
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
 
                 // TODO: Last connected world. Get this from the database. Set the last connected world once you succesfully load a character.
@@ -384,7 +378,7 @@ namespace Destiny.Network
                 {
                     oPacket.WriteInt(); // NOTE: World ID.
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
 
                 // TODO: Recommended worlds. Get this from configuration.
@@ -395,7 +389,7 @@ namespace Destiny.Network
                         .WriteInt() // NOTE: World ID.
                         .WriteString("Check out Scania! The best world to play - and not because it's the only one available... hehe."); // NOTE: Message.
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
             }
         }
@@ -419,18 +413,18 @@ namespace Destiny.Network
             {
                 oPacket.WriteShort((short)world.Status);
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
         private void SelectWorld(Packet iPacket)
         {
             iPacket.ReadByte(); // NOTE: Connection kind (GameLaunching, WebStart, etc.).
-            this.World = iPacket.ReadByte();
-            this.Channel = iPacket.ReadByte();
+            World = iPacket.ReadByte();
+            Channel = iPacket.ReadByte();
             iPacket.ReadBytes(4); // NOTE: IPv4 Address.
 
-            List<byte[]> characters = WvsLogin.CenterConnection.GetCharacters(this.World, this.Account.ID);
+            List<byte[]> characters = WvsLogin.CenterConnection.GetCharacters(World, Account.ID);
 
             using (Packet oPacket = new Packet(ServerOperationCode.SelectWorldResult))
             {
@@ -444,18 +438,18 @@ namespace Destiny.Network
                 }
 
                 oPacket
-                    .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2))
-                    .WriteInt(this.Account.MaxCharacters);
+                    .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(Account.Pic) ? 0 : 1) : 2))
+                    .WriteInt(Account.MaxCharacters);
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
         private void ViewAllChar(Packet iPacket)
         {
-            /*List<byte[]> characters = WvsLogin.CenterConnection.GetCharacters(this.World, this.Account.ID);
+            /*List<byte[]> characters = WvsLogin.CenterConnection.GetCharacters(World, Account.ID);
 
-            if (this.IsInViewAllChar)
+            if (IsInViewAllChar)
             {
                 using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
                 {
@@ -463,13 +457,13 @@ namespace Destiny.Network
                         .WriteByte((byte) VACResult.UnknownError)
                         .WriteByte();
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
 
-                this.IsInViewAllChar = true;
+                IsInViewAllChar = true;
                 List<Character> characters = new List<Character>();
 
-                foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
+                foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", Account.ID))
                 {
                     Character character = new Character((int) datum["ID"], this);
 
@@ -492,7 +486,7 @@ namespace Destiny.Network
                             .WriteInt(characters.Count)
                             .WriteInt(); //unknown
 
-                        this.Send(oPacket);
+                        Send(oPacket);
                     }
                 }
             }
@@ -514,13 +508,13 @@ namespace Destiny.Network
                         oPacket.WriteBytes(character.ToByteArray());
                     }
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }*/
             }      
 
         private void SetViewAllChar(Packet iPacket)
         {
-            //this.IsInViewAllChar = iPacket.ReadBool();
+            //IsInViewAllChar = iPacket.ReadBool();
         }
 
         private void CheckCharacterName(Packet iPacket)
@@ -534,7 +528,7 @@ namespace Destiny.Network
                     .WriteString(name)
                     .WriteBool(unusable);
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
@@ -545,9 +539,9 @@ namespace Destiny.Network
             using (Packet outPacket = new Packet(ServerOperationCode.CreateNewCharacterResult))
             {
                 outPacket.WriteByte(); // NOTE: 1 for failure. Could be implemented as anti-packet editing.
-                outPacket.WriteBytes(WvsLogin.CenterConnection.CreateCharacter(this.World, this.Account.ID, characterData));
+                outPacket.WriteBytes(WvsLogin.CenterConnection.CreateCharacter(World, Account.ID, characterData));
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
 
@@ -559,7 +553,7 @@ namespace Destiny.Network
 
             LoginConstants.CharacterDeletionResult result;
 
-            if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !WvsLogin.RequestPic)
+            if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == Account.Pic || !WvsLogin.RequestPic)
             {
                 //NOTE: As long as foreign keys are set to cascade, all child entries related to this CharacterID will also be deleted.
                 Database.Delete("characters", "ID = {0}", characterID);
@@ -577,7 +571,7 @@ namespace Destiny.Network
                     .WriteInt(characterID)
                     .WriteByte((byte)result);
 
-                this.Send(oPacket);
+                Send(oPacket);
             }
         }
 
@@ -596,36 +590,36 @@ namespace Destiny.Network
 
             int characterID = iPacket.ReadInt();
 
-            //if (this.IsInViewAllChar)
+            //if (IsInViewAllChar)
             //{
-            //    this.WorldID = (byte)iPacket.ReadInt();
-            //    this.ChannelID = 0; // TODO: Least loaded channel.
+            //    WorldID = (byte)iPacket.ReadInt();
+            //    ChannelID = 0; // TODO: Least loaded channel.
             //}
 
-            this.MacAddresses = iPacket.ReadString().Split(new char[] { ',', ' ' });
+            MacAddresses = iPacket.ReadString().Split(new char[] { ',', ' ' });
 
             if (registerPic)
             {
                 iPacket.ReadString();
                 pic = iPacket.ReadString();
 
-                if (string.IsNullOrEmpty(this.Account.Pic))
+                if (string.IsNullOrEmpty(Account.Pic))
                 {
-                    this.Account.Pic = SHACryptograph.Encrypt(SHAMode.SHA256, pic);
+                    Account.Pic = SHACryptograph.Encrypt(SHAMode.SHA256, pic);
 
                     Datum datum = new Datum("accounts");
 
-                    datum["Pic"] = this.Account.Pic;
+                    datum["Pic"] = Account.Pic;
 
-                    datum.Update("ID = {0}", this.Account.ID);
+                    datum.Update("ID = {0}", Account.ID);
                 }
             }
 
-            if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
+            if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == Account.Pic)
             {
-                if (!WvsLogin.CenterConnection.Migrate(this.RemoteEndPoint.Address.ToString(), this.Account.ID, characterID))
+                if (!WvsLogin.CenterConnection.Migrate(RemoteEndPoint.Address.ToString(), Account.ID, characterID))
                 {
-                    this.Stop();
+                    Stop();
 
                     return;
                 }
@@ -636,12 +630,12 @@ namespace Destiny.Network
                         .WriteByte()
                         .WriteByte()
                         .WriteBytes(127, 0, 0, 1)
-                        .WriteUShort(WvsLogin.Worlds[this.World][this.Channel].Port)
+                        .WriteUShort(WvsLogin.Worlds[World][Channel].Port)
                         .WriteInt(characterID)
                         .WriteInt()
                         .WriteByte();
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
             }
             else
@@ -650,7 +644,7 @@ namespace Destiny.Network
                 {
                     oPacket.WriteByte();
 
-                    this.Send(oPacket);
+                    Send(oPacket);
                 }
             }
         }

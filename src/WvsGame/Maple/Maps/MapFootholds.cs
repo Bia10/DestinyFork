@@ -4,11 +4,11 @@ namespace Destiny.Maple.Maps
 {
     public sealed class MapFootholds : List<Foothold>
     {
-        public Map Map { get; private set; }
+        public Map Map { get; }
 
         public MapFootholds(Map map)
         {
-            this.Map = map;
+            Map = map;
         }
 
         // TODO: Beautify.
@@ -29,12 +29,11 @@ namespace Destiny.Maple.Maps
                 {
                     short fhy = (short)((float)(y2 - y1) / (x2 - x1) * (x - x1) + y1);
 
-                    if ((y - 100) < fhy)
+                    if (y - 100 >= fhy) continue;
+
+                    if (fhy < maxy)
                     {
-                        if (fhy < maxy)
-                        {
-                            maxy = (short)fhy;
-                        }
+                        maxy = fhy;
                     }
                 }
             }

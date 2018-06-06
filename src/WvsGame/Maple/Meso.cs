@@ -8,12 +8,11 @@ namespace Destiny.Maple
 {
     public sealed class Meso : Drop
     {
-        public int Amount { get; private set; }
+        public int Amount { get; }
 
-        public Meso(int amount)
-             : base()
+        public Meso(int amount) : base()
         {
-            this.Amount = amount;
+            Amount = amount;
         }
 
         public const int mesoLimit = int.MaxValue;
@@ -26,6 +25,7 @@ namespace Destiny.Maple
             {
                 character.Stats.Meso = mesoLimit;
             }
+
             else
             {
                 character.Stats.Meso += mesosGiven;
@@ -42,7 +42,7 @@ namespace Destiny.Maple
                 .WriteByte((byte)ServerConstants.MessageType.DropPickup)
                 .WriteBool(true)
                 .WriteByte() // NOTE: Unknown.
-                .WriteInt(this.Amount)
+                .WriteInt(Amount)
                 .WriteShort();
 
             return oPacket;

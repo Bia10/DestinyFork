@@ -1,27 +1,28 @@
-﻿using Destiny.Data;
-using System;
+﻿using System;
+
+using Destiny.Data;
 using Destiny.IO;
 
 namespace Destiny.Maple
 {
     public sealed class Memo
     {
-        public int ID { get; set; }
-        public string Sender { get; private set; }
-        public string Message { get; private set; }
-        public DateTime Received { get; private set; }
+        public int ID { get; }
+        public string Sender { get; }
+        public string Message { get; }
+        public DateTime Received { get; }
 
         public Memo(Datum datum)
         {
-            this.ID = (int)datum["ID"];
-            this.Sender = (string)datum["Sender"];
-            this.Message = (string)datum["Message"];
-            this.Received = (DateTime)datum["Received"];
+            ID = (int)datum["ID"];
+            Sender = (string)datum["Sender"];
+            Message = (string)datum["Message"];
+            Received = (DateTime)datum["Received"];
         }
 
         public void Delete()
         {
-            Database.Delete("memos", "ID = {0}", this.ID);
+            Database.Delete("memos", "ID = {0}", ID);
         }
 
         public byte[] ToByteArray()
@@ -29,10 +30,10 @@ namespace Destiny.Maple
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteInt(this.ID)
-                    .WriteString(this.Sender + " ") // NOTE: Space is intentional.
-                    .WriteString(this.Message)
-                    .WriteDateTime(this.Received)
+                    .WriteInt(ID)
+                    .WriteString(Sender + " ") // NOTE: Space is intentional.
+                    .WriteString(Message)
+                    .WriteDateTime(Received)
                     .WriteByte(3); // TODO: Memo kind (0 - None, 1 - Fame, 2 - Gift).
 
                 oPacket.Flip();

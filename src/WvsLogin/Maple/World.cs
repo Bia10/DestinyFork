@@ -1,5 +1,6 @@
-﻿using Destiny.IO;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.IO;
 using Destiny.Constants;
 
 namespace Destiny.Maple
@@ -52,33 +53,33 @@ namespace Destiny.Maple
         {
             get
             {
-                return this[Application.Random.Next(this.Count)];
+                return this[Application.Random.Next(Count)];
             }
         }
 
         public World(byte id)
         {
-            this.ID = id;
+            ID = id;
 
-            string configSection = "World" + this.ID.ToString();
+            string configSection = "World" + ID.ToString();
 
             // TODO: Get the hardcoded values from config settings
 
-            this.Name = Settings.GetString(configSection + "/Name");
-            this.Port = (ushort)(8585 + 100 * this.ID);
-            this.ShopPort = 9000;
-            this.Channels = Settings.GetByte(configSection + "/Channels");
-            this.Flag = Settings.GetEnum<WorldConstants.WorldFlag>(configSection + "/Flag");
-            this.EventMessage = Settings.GetString(configSection + "/EventMessage");
-            this.TickerMessage = Settings.GetString(configSection + "/TickerMessage");
-            this.AllowMultiLeveling = true;
-            this.DefaultCreationSlots = 3;
-            this.DisableCharacterCreation = false;
-            this.ExperienceRate = Settings.GetInt(configSection + "/ExperienceRate");
-            this.QuestExperienceRate = Settings.GetInt(configSection + "/QuestExperienceRate");
-            this.PartyQuestExperienceRate = Settings.GetInt(configSection + "/PartyQuestExperienceRate");
-            this.MesoRate = Settings.GetInt(configSection + "/MesoDropRate");
-            this.DropRate = Settings.GetInt(configSection + "/ItemDropRate");
+            Name = Settings.GetString(configSection + "/Name");
+            Port = (ushort)(8585 + 100 * ID);
+            ShopPort = 9000;
+            Channels = Settings.GetByte(configSection + "/Channels");
+            Flag = Settings.GetEnum<WorldConstants.WorldFlag>(configSection + "/Flag");
+            EventMessage = Settings.GetString(configSection + "/EventMessage");
+            TickerMessage = Settings.GetString(configSection + "/TickerMessage");
+            AllowMultiLeveling = true;
+            DefaultCreationSlots = 3;
+            DisableCharacterCreation = false;
+            ExperienceRate = Settings.GetInt(configSection + "/ExperienceRate");
+            QuestExperienceRate = Settings.GetInt(configSection + "/QuestExperienceRate");
+            PartyQuestExperienceRate = Settings.GetInt(configSection + "/PartyQuestExperienceRate");
+            MesoRate = Settings.GetInt(configSection + "/MesoDropRate");
+            DropRate = Settings.GetInt(configSection + "/ItemDropRate");
         }
 
         protected override void InsertItem(int index, Channel item)
@@ -86,7 +87,7 @@ namespace Destiny.Maple
             base.InsertItem(index, item);
 
             Log.SkipLine();
-            Log.Success("Registered Channel ({0}-{1}).", this.Name, item.ID + 1);
+            Log.Success("Registered Channel ({0}-{1}).", Name, item.ID + 1);
             Log.SkipLine();
         }
 
@@ -105,7 +106,7 @@ namespace Destiny.Maple
             }
 
             Log.SkipLine();
-            Log.Warn("Unregistered Channel {0}-{1}.", this.Name, item.ID);
+            Log.Warn("Unregistered Channel {0}-{1}.", Name, item.ID);
             Log.SkipLine();
         }
 

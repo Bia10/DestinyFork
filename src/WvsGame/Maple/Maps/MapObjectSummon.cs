@@ -6,19 +6,17 @@ namespace Destiny.Maple.Maps
 {
     public sealed class MapObjectSummon : MapObjects<Summon>
     {
-        public MapObjectSummon(Map map) : base(map)
-        { }
+        public MapObjectSummon(Map map) : base(map) { }
 
         protected override void InsertItem(int index, Summon item)
         {
             base.InsertItem(index, item);
 
-            if (DataProvider.IsInitialized)
+            if (!DataProvider.IsInitialized) return;
+
+            using (Packet oPacket = item.GetCreatePacket())
             {
-                using (Packet oPacket = item.GetCreatePacket())
-                {
-                    this.Map.Broadcast(oPacket);
-                }
+                Map.Broadcast(oPacket);
             }
         }
 

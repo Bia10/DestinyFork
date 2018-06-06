@@ -1,7 +1,8 @@
-﻿using Destiny.Maple.Characters;
-using Destiny.Maple.Life;
+﻿using System;
 using System.Collections.Generic;
-using System;
+
+using Destiny.Maple.Characters;
+using Destiny.Maple.Life;
 using Destiny.IO;
 using Destiny.Network.Common;
 
@@ -17,10 +18,9 @@ namespace Destiny.Maple.Maps
             {
                 foreach (Character character in this)
                 {
-                    if (character.Name.ToLower() == name.ToLower())
-                    {
-                        return character;
-                    }
+                    if (!string.Equals(character.Name, name, StringComparison.CurrentCultureIgnoreCase)) continue;
+
+                    return character;
                 }
 
                 throw new KeyNotFoundException();

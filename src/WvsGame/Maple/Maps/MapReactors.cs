@@ -16,12 +16,11 @@ namespace Destiny.Maple.Maps
             {
                 base.InsertItem(index, item);
 
-                if (DataProvider.IsInitialized)
+                if (!DataProvider.IsInitialized) return;
+
+                using (Packet oPacket = item.GetCreatePacket())
                 {
-                    using (Packet oPacket = item.GetCreatePacket())
-                    {
-                        this.Map.Broadcast(oPacket);
-                    }
+                    this.Map.Broadcast(oPacket);
                 }
             }
         }
@@ -73,9 +72,8 @@ namespace Destiny.Maple.Maps
             }
         }
 
-        public void Touch(Packet iPacket, Character character)
-        {
-            
+        public static void Touch(Packet iPacket, Character character)
+        {         
         }
     }
 }

@@ -15,8 +15,8 @@ namespace Destiny
     public static class WvsLogin
     {
         private static bool isAlive;
-        private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
-        public static ManualResetEvent CenterConnectionDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent AcceptDone = new ManualResetEvent(false);
+        public static readonly ManualResetEvent CenterConnectionDone = new ManualResetEvent(false);
 
         public static TcpListener Listener { get; private set; }
         public static LoginToCenterServer CenterConnection { get; set; }
@@ -41,7 +41,7 @@ namespace Destiny
 
                 if (!value)
                 {
-                    WvsLogin.AcceptDone.Set();
+                    AcceptDone.Set();
                 }
             }
         }
@@ -54,8 +54,8 @@ namespace Destiny
                 WvsLoginSetup.Run();
             }
 
-            WvsLogin.Worlds = new Worlds();
-            WvsLogin.Clients = new LoginClients();
+            Worlds = new Worlds();
+            Clients = new LoginClients();
 
             Log.Entitle("Destiny - Login Server v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
@@ -66,38 +66,38 @@ namespace Destiny
                 Database.Test();
                 Database.Analyze(false);
 
-                WvsLogin.RequireStaffIP = Settings.GetBool("Server/RequireStaffIP");
-                Log.Inform("Staff will{0}be required to connect through a staff IP.", WvsLogin.RequireStaffIP ? " " : " not ");
+                RequireStaffIP = Settings.GetBool("Server/RequireStaffIP");
+                Log.Inform("Staff will{0}be required to connect through a staff IP.", RequireStaffIP ? " " : " not ");
 
-                WvsLogin.AutoRegister = Settings.GetBool("Server/AutoRegister");
-                Log.Inform("Automatic registration {0}.", WvsLogin.AutoRegister ? "enabled" : "disabled");
+                AutoRegister = Settings.GetBool("Server/AutoRegister");
+                Log.Inform("Automatic registration {0}.", AutoRegister ? "enabled" : "disabled");
 
-                WvsLogin.RequestPin = Settings.GetBool("Server/RequestPin");
-                Log.Inform("Pin will{0}be requested upon login.", WvsLogin.RequestPin ? " " : " not ");
+                RequestPin = Settings.GetBool("Server/RequestPin");
+                Log.Inform("Pin will{0}be requested upon login.", RequestPin ? " " : " not ");
 
-                WvsLogin.RequestPic = Settings.GetBool("Server/RequestPic");
-                Log.Inform("Pic will{0}be requested upon character selection.", WvsLogin.RequestPic ? " " : " not ");
+                RequestPic = Settings.GetBool("Server/RequestPic");
+                Log.Inform("Pic will{0}be requested upon character selection.", RequestPic ? " " : " not ");
 
-                WvsLogin.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
-                Log.Inform("Maximum of {0} characters per account.", WvsLogin.MaxCharacters);
+                MaxCharacters = Settings.GetInt("Server/MaxCharacters");
+                Log.Inform("Maximum of {0} characters per account.", MaxCharacters);
 
                 for (byte i = 0; i < Settings.GetByte("Server/Worlds"); i++)
                 {
-                    WvsLogin.Worlds.Add(new World(i));
+                    Worlds.Add(new World(i));
                 }
 
-                WvsLogin.isAlive = true;
+                isAlive = true;
             }
             catch (Exception e)
             {
                 Log.Error(e);
             }
 
-            if (WvsLogin.IsAlive)
+            if (IsAlive)
             {
-                WvsLogin.CenterConnectionDone.Reset();
+                CenterConnectionDone.Reset();
                 new Thread(new ThreadStart(LoginToCenterServer.Main)).Start();
-                WvsLogin.CenterConnectionDone.WaitOne();
+                CenterConnectionDone.WaitOne();
             }
             else
             {
@@ -105,19 +105,19 @@ namespace Destiny
                 Log.Inform("Could not start server because of errors.");
             }
 
-            while (WvsLogin.IsAlive)
+            while (IsAlive)
             {
-                WvsLogin.AcceptDone.Reset();
-                WvsLogin.Listener.BeginAcceptSocket(new AsyncCallback(WvsLogin.OnAcceptSocket), null);
-                WvsLogin.AcceptDone.WaitOne();
+                AcceptDone.Reset();
+                Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
+                AcceptDone.WaitOne();
             }
 
-            foreach (LoginClient client in WvsLogin.Clients)
+            foreach (LoginClient client in Clients)
             {
                 client.Stop();
             }
 
-            WvsLogin.Dispose();
+            Dispose();
 
             Log.SkipLine();
             Log.Warn("Server stopped.");
@@ -127,33 +127,31 @@ namespace Destiny
 
         public static void Listen()
         {
-            WvsLogin.Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
-            WvsLogin.Listener.Start();
-            Log.Inform("Initialized clients listener on {0}.", WvsLogin.Listener.LocalEndpoint);
+            Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
+            Listener.Start();
+            Log.Inform("Initialized clients listener on {0}.", Listener.LocalEndpoint);
         }
 
         private static void OnAcceptSocket(IAsyncResult ar)
         {
-            WvsLogin.AcceptDone.Set();
+            AcceptDone.Set();
 
             try
             {
-                var loginClient = new LoginClient(WvsLogin.Listener.EndAcceptSocket(ar));
+                var loginClient = new LoginClient(Listener.EndAcceptSocket(ar));
             }
+
             catch (ObjectDisposedException) { } // TODO: Figure out why this crashes.
         }
 
         public static void Stop()
         {
-            WvsLogin.IsAlive = false;
+            IsAlive = false;
         }
 
         private static void Dispose()
         {
-            if (WvsLogin.Listener != null)
-            {
-                WvsLogin.Listener.Stop();
-            }
+            Listener?.Stop();
 
             Log.SkipLine();
             Log.Inform("Server disposed.", Thread.CurrentThread.ManagedThreadId);

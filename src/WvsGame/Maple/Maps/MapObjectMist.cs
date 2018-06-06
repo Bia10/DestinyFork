@@ -12,14 +12,12 @@ namespace Destiny.Maple.Maps
         {
             base.InsertItem(index, item);
 
-            if (DataProvider.IsInitialized)
+            if (!DataProvider.IsInitialized) return;
+
+            using (Packet oPacket = item.GetCreatePacket())
             {
-                using (Packet oPacket = item.GetCreatePacket())
-                {
-                    this.Map.Broadcast(oPacket);
-                }
+                Map.Broadcast(oPacket);
             }
         }
-
     }
 }

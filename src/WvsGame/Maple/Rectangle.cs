@@ -2,20 +2,17 @@
 {
     public class Rectangle
     {
-        public Point LT { get; set; }
-        public Point RB { get; set; }
+        public Point LeftTop { get; }
+        public Point RightBottom { get; }
 
-        public Rectangle(Point lt, Point rb)
+        public Rectangle(Point leftTop, Point rightBottom)
         {
-            this.LT = lt;
-            this.RB = rb;
+            LeftTop = leftTop;
+            RightBottom = rightBottom;
         }
 
-        /*public override Rectangle(
-            int x,
-            int y,
-            int width,
-            int height
-        )*/
+        public Rectangle(int x, int y, int width, int height)
+        {
+        }
     }
 }

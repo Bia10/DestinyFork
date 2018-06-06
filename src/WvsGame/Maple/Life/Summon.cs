@@ -8,12 +8,11 @@ namespace Destiny.Maple.Life
 {
     public sealed class Summon : MapObject, ISpawnable
     {
-        public SummonConstants.SummonMovementType movementType;
+        public readonly SummonConstants.SummonMovementType movementType;
         public Character summonOwner { get; set; }
         public Skill summonSkill { get; set; }
         public int health { get; set; }
-        public MapleMapObjectType getType()
-        { return MapleMapObjectType.Summon; }
+        public MapleMapObjectType getType() { return MapleMapObjectType.Summon; }
         public bool spawned { get; set; }
         public bool animated { get; set; }
 
@@ -28,7 +27,7 @@ namespace Destiny.Maple.Life
             spawned = false;
         }
 
-        public bool IsPuppet(Skill sumSkill)
+        public static bool IsPuppet(Skill sumSkill)
         {
             return sumSkill.MapleID == (int) CharacterConstants.SkillNames.Ranger.Puppet ||
                    sumSkill.MapleID == (int) CharacterConstants.SkillNames.Sniper.Puppet ||

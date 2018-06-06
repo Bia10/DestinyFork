@@ -15,7 +15,7 @@ namespace Destiny.Maple.Maps
 
                 using (Packet oPacket = item.GetCreatePacket())
                 {
-                    this.Map.Broadcast(oPacket);
+                    Map.Broadcast(oPacket);
                 }
             }
         }
@@ -24,11 +24,11 @@ namespace Destiny.Maple.Maps
         {
             lock (this)
             {
-                PlayerShop item = base.Items[index];
+                PlayerShop item = Items[index];
 
                 using (Packet oPacket = item.GetDestroyPacket())
                 {
-                    this.Map.Broadcast(oPacket);
+                    Map.Broadcast(oPacket);
                 }
 
                 base.RemoveItem(index);

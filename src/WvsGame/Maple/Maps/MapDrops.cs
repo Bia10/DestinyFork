@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Destiny.IO;
 using Destiny.Maple.Characters;
 using Destiny.Network.Common;
@@ -16,22 +17,19 @@ namespace Destiny.Maple.Maps
 
             base.InsertItem(index, item);
 
-            if (item.Expiry != null)
-            {
-                item.Expiry.Dispose();
-            }
+            item.Expiry?.Dispose();
 
             item.Expiry = new Delay(() =>
             {
-                if (item.Map == this.Map)
+                if (item.Map == Map)
                 {
-                    this.Remove(item);
+                    Remove(item);
                 }
             }, Drop.ExpiryTime);
 
-            lock (this.Map.Characters)
+            lock (Map.Characters)
             {
-                foreach (Character character in this.Map.Characters)
+                foreach (Character character in Map.Characters)
                 {
                     using (Packet oPacket = item.GetCreatePacket(item.Owner == null ? character : null))
                     {
@@ -43,32 +41,28 @@ namespace Destiny.Maple.Maps
 
         protected override void RemoveItem(int index)
         {
-            Drop item = base.Items[index];
+            Drop item = Items[index];
 
-            if (item.Expiry != null)
-            {
-                item.Expiry.Dispose();
-            }
+            item.Expiry?.Dispose();
 
             using (Packet oPacket = item.GetDestroyPacket())
             {
-                this.Map.Broadcast(oPacket);
+                Map.Broadcast(oPacket);
             }
 
-            if (base.Items.Count > index)
+            if (Items.Count <= index) return;
+
+            try
             {
-                try
-                {
-                    base.RemoveItem(index);
-                }
-                catch (Exception e)
-                {
-                    Log.SkipLine();
-                    Log.Inform("MapDrops-RemoveItem: exception occurred: {0}", e);
-                    Log.SkipLine();
-                }
+                base.RemoveItem(index);
             }
 
+            catch (Exception e)
+            {
+                Log.SkipLine();
+                Log.Inform("MapDrops-RemoveItem: exception occurred: {0}", e);
+                Log.SkipLine();
+            }
         }
     }
 }

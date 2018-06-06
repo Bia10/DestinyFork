@@ -2,7 +2,7 @@
 
 namespace Destiny.Maple
 {
-    public class NoAccountException : Exception
+    public class NoGameAccountException : Exception
     {
         public override string Message
         {

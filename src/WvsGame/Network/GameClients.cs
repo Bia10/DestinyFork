@@ -8,14 +8,14 @@ namespace Destiny.Network
         {
             base.InsertItem(index, item);
 
-            WvsGame.CenterConnection.UpdatePopulation(this.Count);
+            WvsGame.CenterConnection.UpdatePopulation(Count);
         }
 
         protected override void RemoveItem(int index)
         {
             base.RemoveItem(index);
 
-            WvsGame.CenterConnection.UpdatePopulation(this.Count);
+            WvsGame.CenterConnection.UpdatePopulation(Count);
         }
 
         protected override long GetKeyForItem(GameClient item)

@@ -153,6 +153,18 @@ namespace Destiny.Network.PacketFactory
                     case CharacterConstants.StatisticType.Mesos:
                         setStatsPacket.WriteInt(character.Stats.Meso);
                         break;
+
+                    case CharacterConstants.StatisticType.None:
+                        break;
+
+                    case CharacterConstants.StatisticType.Pet:
+                        break;
+
+                    case CharacterConstants.StatisticType.GachaponExperience:
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 

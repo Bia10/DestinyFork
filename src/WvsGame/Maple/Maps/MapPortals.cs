@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Destiny.Maple.Maps
 {
@@ -12,10 +13,9 @@ namespace Destiny.Maple.Maps
             {
                 foreach (Portal portal in this)
                 {
-                    if (portal.Label.ToLower() == label.ToLower())
-                    {
-                        return portal;
-                    }
+                    if (!string.Equals(portal.Label, label, StringComparison.CurrentCultureIgnoreCase)) continue;
+
+                    return portal;
                 }
 
                 throw new KeyNotFoundException();

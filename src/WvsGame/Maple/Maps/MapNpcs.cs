@@ -12,28 +12,27 @@ namespace Destiny.Maple.Maps
         {
             base.InsertItem(index, item);
 
-            if (DataProvider.IsInitialized)
-            {
-                using (Packet oPacket = item.GetCreatePacket())
-                {
-                    this.Map.Broadcast(oPacket);
-                }
+            if (!DataProvider.IsInitialized) return;
 
-                item.AssignController();
+            using (Packet oPacket = item.GetCreatePacket())
+            {
+                Map.Broadcast(oPacket);
             }
+
+            item.AssignController();
         }
 
         protected override void RemoveItem(int index)
         {
             if (DataProvider.IsInitialized)
             {
-                Npc item = base.Items[index];
+                Npc item = Items[index];
 
                 item.Controller.ControlledNpcs.Remove(index);
 
                 using (Packet oPacket = item.GetDestroyPacket())
                 {
-                    this.Map.Broadcast(oPacket);
+                    Map.Broadcast(oPacket);
                 }
             }
 

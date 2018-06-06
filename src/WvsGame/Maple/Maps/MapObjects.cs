@@ -9,11 +9,11 @@ namespace Destiny.Maple.Maps
 {
     public abstract class MapObjects<T> : KeyedCollection<int, T> where T : MapObject
     {
-        public Map Map { get; private set; }
+        protected Map Map { get; }
 
-        public MapObjects(Map map)
+        protected MapObjects(Map map)
         {
-            this.Map = map;
+            Map = map;
         }
 
         public IEnumerable<T> GetInRange(MapObject reference, int range)

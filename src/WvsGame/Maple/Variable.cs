@@ -4,19 +4,19 @@ namespace Destiny.Maple
 {
     public sealed class Variable
     {
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public string Key { get; }
+        public string Value { get; }
 
         public Variable(string key, object value)
         {
-            this.Key = key;
-            this.Value = value.ToString();
+            Key = key;
+            Value = value.ToString();
         }
 
         public Variable(Datum datum)
         {
-            this.Key = (string)datum["key"];
-            this.Value = (string)datum["Value"];
+            Key = (string)datum["key"];
+            Value = (string)datum["Value"];
         }
     }
 }

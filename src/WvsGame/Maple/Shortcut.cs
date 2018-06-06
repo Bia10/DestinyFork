@@ -5,34 +5,27 @@ namespace Destiny.Maple
 {
     public sealed class Shortcut
     {
-        public KeyMapConstants.KeymapKey Key { get; private set; }
+        public KeyMapConstants.KeymapKey Key { get; }
         public KeyMapConstants.KeymapType Type { get; set; }
         public KeyMapConstants.KeymapAction Action { get; set; }
 
         public Shortcut(Datum datum)
         {
-            this.Key = (KeyMapConstants.KeymapKey)datum["Key"];
-            this.Type = (KeyMapConstants.KeymapType)datum["Type"];
-            this.Action = (KeyMapConstants.KeymapAction)datum["Action"];
+            Key = (KeyMapConstants.KeymapKey)datum["Key"];
+            Type = (KeyMapConstants.KeymapType)datum["Type"];
+            Action = (KeyMapConstants.KeymapAction)datum["Action"];
         }
 
         public Shortcut(KeyMapConstants.KeymapKey key, KeyMapConstants.KeymapAction action, KeyMapConstants.KeymapType type = KeyMapConstants.KeymapType.None)
         {
-            this.Key = key;
+            Key = key;
 
-            if (type == KeyMapConstants.KeymapType.None)
-            {
-                this.Type = this.GetTypeFromAction(action);
-            }
-            else
-            {
-                this.Type = type;
-            }
+            Type = type == KeyMapConstants.KeymapType.None ? GetTypeFromAction(action) : type;
 
-            this.Action = action;
+            Action = action;
         }
 
-        private KeyMapConstants.KeymapType GetTypeFromAction(KeyMapConstants.KeymapAction action)
+        private static KeyMapConstants.KeymapType GetTypeFromAction(KeyMapConstants.KeymapAction action)
         {
             switch (action)
             {
@@ -81,10 +74,10 @@ namespace Destiny.Maple
                 case KeyMapConstants.KeymapAction.FamilyList:
                 case KeyMapConstants.KeymapAction.Medal:
                     return KeyMapConstants.KeymapType.Menu;
-            }
 
-
-            return KeyMapConstants.KeymapType.None;
+                default:
+                    return KeyMapConstants.KeymapType.None;
+            }      
         }
     }
 }

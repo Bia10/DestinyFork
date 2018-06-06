@@ -1,14 +1,15 @@
-﻿using Destiny.Data;
-using Destiny.Network;
-using System;
+﻿using System;
 using System.Data;
+
+using Destiny.Data;
+using Destiny.Network;
 using Destiny.Constants;
 
 namespace Destiny.Maple
 {
-    public sealed class Account
+    public sealed class GameAccount
     {
-        public GameClient Client { get; private set; }
+        public GameClient Client { get; }
 
         public int ID { get; private set; }
         public string Username { get; set; }
@@ -19,9 +20,9 @@ namespace Destiny.Maple
 
         private bool Assigned { get; set; }
 
-        public Account(GameClient client)
+        public GameAccount(GameClient client)
         {
-            this.Client = client;
+            Client = client;
         }
 
         public void Load(int accountID)
@@ -32,19 +33,20 @@ namespace Destiny.Maple
             {
                 datum.Populate("ID = {0}", accountID);
             }
+
             catch (RowNotInTableException)
             {
-                throw new NoAccountException();
+                throw new NoGameAccountException();
             }
 
-            this.ID = (int)datum["ID"];
-            this.Assigned = true;
+            ID = (int)datum["ID"];
+            Assigned = true;
 
-            this.Username = (string)datum["Username"];
-            this.Gender = (CharacterConstants.Gender)datum["Gender"];
-            this.IsMaster = (bool)datum["IsMaster"];
-            this.Birthday = (DateTime)datum["Birthday"];
-            this.Creation = (DateTime)datum["Creation"];
+            Username = (string)datum["Username"];
+            Gender = (CharacterConstants.Gender)datum["Gender"];
+            IsMaster = (bool)datum["IsMaster"];
+            Birthday = (DateTime)datum["Birthday"];
+            Creation = (DateTime)datum["Creation"];
         }
     }
 }

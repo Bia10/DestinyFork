@@ -1,6 +1,7 @@
-﻿using Destiny.Data;
+﻿using System.Collections.Generic;
+
+using Destiny.Data;
 using Destiny.Maple.Data;
-using System.Collections.Generic;
 using Destiny.Constants;
 
 namespace Destiny.Maple
@@ -43,7 +44,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.NextQuestID > 0 ? DataProvider.Quests[this.NextQuestID] : null;
+                return NextQuestID > 0 ? DataProvider.Quests[NextQuestID] : null;
             }
         }
 
@@ -53,8 +54,8 @@ namespace Destiny.Maple
             {
                 byte flags = 0;
 
-                if (this.AutoStart) flags |= (byte)QuestConstants.QuestFlags.AutoStart;
-                if (this.SelectedMob) flags |= (byte)QuestConstants.QuestFlags.SelectedMob;
+                if (AutoStart) flags |= (byte)QuestConstants.QuestFlags.AutoStart;
+                if (SelectedMob) flags |= (byte)QuestConstants.QuestFlags.SelectedMob;
 
                 return flags;
             }
@@ -62,38 +63,38 @@ namespace Destiny.Maple
 
         public Quest(Datum datum)
         {
-            this.MapleID = (ushort)datum["questid"];
-            this.NextQuestID = (ushort)datum["next_quest"];
-            this.Area = (sbyte)datum["quest_area"];
-            this.MinimumLevel = (byte)datum["min_level"];
-            this.MaximumLevel = (byte)datum["max_level"];
-            this.PetCloseness = (short)datum["pet_closeness"];
-            this.TamingMobLevel = (sbyte)datum["taming_mob_level"];
-            this.RepeatWait = (int)datum["repeat_wait"];
-            this.Fame = (short)datum["fame"];
-            this.TimeLimit = (int)datum["time_limit"];
-            this.AutoStart = datum["flags"].ToString().Contains("auto_start");
-            this.SelectedMob = datum["flags"].ToString().Contains("selected_mob");
+            MapleID = (ushort)datum["questid"];
+            NextQuestID = (ushort)datum["next_quest"];
+            Area = (sbyte)datum["quest_area"];
+            MinimumLevel = (byte)datum["min_level"];
+            MaximumLevel = (byte)datum["max_level"];
+            PetCloseness = (short)datum["pet_closeness"];
+            TamingMobLevel = (sbyte)datum["taming_mob_level"];
+            RepeatWait = (int)datum["repeat_wait"];
+            Fame = (short)datum["fame"];
+            TimeLimit = (int)datum["time_limit"];
+            AutoStart = datum["flags"].ToString().Contains("auto_start");
+            SelectedMob = datum["flags"].ToString().Contains("selected_mob");
 
-            this.PreRequiredQuests = new List<ushort>();
-            this.PostRequiredQuests = new List<ushort>();
-            this.PreRequiredItems = new Dictionary<int, short>();
-            this.PostRequiredItems = new Dictionary<int, short>();
-            this.PostRequiredKills = new Dictionary<int, short>();
+            PreRequiredQuests = new List<ushort>();
+            PostRequiredQuests = new List<ushort>();
+            PreRequiredItems = new Dictionary<int, short>();
+            PostRequiredItems = new Dictionary<int, short>();
+            PostRequiredKills = new Dictionary<int, short>();
 
-            this.ExperienceReward = new int[2];
-            this.MesoReward = new int[2];
-            this.PetClosenessReward = new int[2];
-            this.PetSpeedReward = new bool[2];
-            this.FameReward = new int[2];
-            this.PetSkillReward = new int[2];
+            ExperienceReward = new int[2];
+            MesoReward = new int[2];
+            PetClosenessReward = new int[2];
+            PetSpeedReward = new bool[2];
+            FameReward = new int[2];
+            PetSkillReward = new int[2];
 
-            this.PreItemRewards = new Dictionary<int, short>();
-            this.PostItemRewards = new Dictionary<int, short>();
-            this.PreSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
-            this.PostSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
+            PreItemRewards = new Dictionary<int, short>();
+            PostItemRewards = new Dictionary<int, short>();
+            PreSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
+            PostSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
 
-            this.ValidJobs = new List<CharacterConstants.Job>();
+            ValidJobs = new List<CharacterConstants.Job>();
         }
     }
 }

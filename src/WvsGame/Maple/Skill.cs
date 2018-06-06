@@ -64,7 +64,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.BuffTime > 0;
+                return BuffTime > 0;
             }
         }
 
@@ -78,14 +78,13 @@ namespace Destiny.Maple
             {
                 currentLevel = value;
 
-                if (this.Parent != null)
-                {
-                    this.Recalculate();
+                if (Parent == null) return;
 
-                    if (this.Character.IsInitialized)
-                    {
-                        this.Parent.UpdateSkill(this);
-                    }
+                Recalculate();
+
+                if (Character.IsInitialized)
+                {
+                    Parent.UpdateSkill(this);
                 }
             }
         }
@@ -100,9 +99,9 @@ namespace Destiny.Maple
             {
                 maxLevel = value;
 
-                if (this.Parent != null && this.Character.IsInitialized)
+                if (Parent != null && Character.IsInitialized)
                 {
-                    this.Parent.UpdateSkill(this);
+                    Parent.UpdateSkill(this);
                 }
             }
         }
@@ -111,7 +110,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.Skills[this.MapleID][this.CurrentLevel];
+                return DataProvider.Skills[MapleID][CurrentLevel];
             }
         }
 
@@ -119,7 +118,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Parent.Parent;
+                return Parent.Parent;
             }
         }
 
@@ -127,7 +126,7 @@ namespace Destiny.Maple
         {
             get
             {   // TODO: Redo that.
-                return this.MapleID > 1000000 && (this.MapleID / 10000).ToString()[2] == '2'; 
+                return MapleID > 1000000 && (MapleID / 10000).ToString()[2] == '2'; 
             }
         }
 
@@ -171,7 +170,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DateTime.Now < this.CooldownEnd;
+                return DateTime.Now < CooldownEnd;
             }
         }
 
@@ -179,7 +178,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return Math.Min(0, (int)(this.CooldownEnd - DateTime.Now).TotalSeconds);
+                return Math.Min(0, (int)(CooldownEnd - DateTime.Now).TotalSeconds);
             }
         }
 
@@ -193,36 +192,31 @@ namespace Destiny.Maple
             {
                 cooldownEnd = value;
 
-                if (this.IsCoolingDown)
+                if (!IsCoolingDown) return;
+
+                //set cooldown
+                using (Packet oPacket = new Packet(ServerOperationCode.Cooldown))
                 {
-                    //set cooldown
+                    oPacket
+                        .WriteInt(MapleID)
+                        .WriteShort((short)RemainingCooldownSeconds);
+
+                    Character.Client.Send(oPacket);
+                }
+
+                //remove cooldown
+                Delay.Execute(() => 
+                {
                     using (Packet oPacket = new Packet(ServerOperationCode.Cooldown))
                     {
                         oPacket
-                            .WriteInt(this.MapleID)
-                            .WriteShort((short)this.RemainingCooldownSeconds);
+                            .WriteInt(MapleID)
+                            .WriteShort(0);
 
-                        this.Character.Client.Send(oPacket);
+                        Character.Client.Send(oPacket);
                     }
 
-                    //remove cooldown
-                    Delay.Execute(() => 
-                    {
-                        using (Packet oPacket = new Packet(ServerOperationCode.Cooldown))
-                        {
-                            oPacket
-                                .WriteInt(this.MapleID)
-                                .WriteShort(0);
-
-                            this.Character.Client.Send(oPacket);
-                        }
-
-                    }, (this.RemainingCooldownSeconds * 1000));
-
-
-
-
-                }
+                }, RemainingCooldownSeconds * 1000);
             }
         }
 
@@ -230,223 +224,222 @@ namespace Destiny.Maple
 
         public Skill(int mapleID, DateTime? expiration = null)
         {
-            this.MapleID = mapleID;
-            this.CurrentLevel = 0;
-            this.MaxLevel = (byte)DataProvider.Skills[this.MapleID].Count;
+            MapleID = mapleID;
+            CurrentLevel = 0;
+            MaxLevel = (byte)DataProvider.Skills[MapleID].Count;
 
             if (!expiration.HasValue)
             {
                 expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
             }
 
-            this.Expiration = (DateTime)expiration;
+            Expiration = (DateTime)expiration;
         }
 
         public Skill(int mapleID, byte currentLevel, byte maxLevel, DateTime? expiration = null)
         {
-            this.MapleID = mapleID;
-            this.CurrentLevel = currentLevel;
-            this.MaxLevel = maxLevel;
+            MapleID = mapleID;
+            CurrentLevel = currentLevel;
+            MaxLevel = maxLevel;
 
             if (!expiration.HasValue)
             {
                 expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
             }
 
-            this.Expiration = (DateTime)expiration;
+            Expiration = (DateTime)expiration;
         }
 
         public Skill(Datum datum)
         {
             if (DataProvider.IsInitialized)
             {
-                this.ID = (int)datum["ID"];
-                this.Assigned = true;
+                ID = (int)datum["ID"];
+                Assigned = true;
 
-                this.MapleID = (int)datum["MapleID"];
-                this.CurrentLevel = (byte)datum["CurrentLevel"];
-                this.MaxLevel = (byte)datum["MaxLevel"];
-                this.Expiration = (DateTime)datum["Expiration"];
-                this.CooldownEnd = (DateTime)datum["CooldownEnd"];
+                MapleID = (int)datum["MapleID"];
+                CurrentLevel = (byte)datum["CurrentLevel"];
+                MaxLevel = (byte)datum["MaxLevel"];
+                Expiration = (DateTime)datum["Expiration"];
+                CooldownEnd = (DateTime)datum["CooldownEnd"];
             }
             else
             {
-                this.MapleID = (int)datum["skillid"];
-                this.CurrentLevel = (byte)(short)datum["skill_level"];
-                this.MobCount = (sbyte)datum["mob_count"];
-                this.HitCount = (sbyte)datum["hit_count"];
-                this.Range = (short)datum["range"];
-                this.BuffTime = (int)datum["buff_time"];
-                this.CostHP = (short)datum["hp_cost"];
-                this.CostMP = (short)datum["mp_cost"];
-                this.Damage = (short)datum["damage"];
-                this.FixedDamage = (int)datum["fixed_damage"];
-                this.CriticalDamage = (byte)datum["critical_damage"];
-                this.Mastery = (sbyte)datum["mastery"];
-                this.OptionalItemCost = (int)datum["optional_item_cost"];
-                this.CostItem = (int)datum["item_cost"];
-                this.ItemCount = (short)datum["item_count"];
-                this.CostBullet = (short)datum["bullet_cost"];
-                this.CostMeso = (short)datum["money_cost"];
-                this.ParameterA = (short)datum["x_property"];
-                this.ParameterB = (short)datum["y_property"];
-                this.Speed = (short)datum["speed"];
-                this.Jump = (short)datum["jump"];
-                this.Strength = (short)datum["str"];
-                this.WeaponAttack = (short)datum["weapon_atk"];
-                this.MagicAttack = (short)datum["magic_atk"];
-                this.WeaponDefense = (short)datum["weapon_def"];
-                this.MagicDefense = (short)datum["magic_def"];
-                this.Accuracy = (short)datum["accuracy"];
-                this.Avoidability = (short)datum["avoid"];
-                this.HP = (short)datum["hp"];
-                this.MP = (short)datum["mp"];
-                this.Probability = (short)datum["prop"];
-                this.Morph = (short)datum["morph"];
-                this.LT = new Point((short)datum["ltx"], (short)datum["lty"]);
-                this.RB = new Point((short)datum["rbx"], (short)datum["rby"]);
-                this.Cooldown = (int)datum["cooldown_time"];
+                MapleID = (int)datum["skillid"];
+                CurrentLevel = (byte)(short)datum["skill_level"];
+                MobCount = (sbyte)datum["mob_count"];
+                HitCount = (sbyte)datum["hit_count"];
+                Range = (short)datum["range"];
+                BuffTime = (int)datum["buff_time"];
+                CostHP = (short)datum["hp_cost"];
+                CostMP = (short)datum["mp_cost"];
+                Damage = (short)datum["damage"];
+                FixedDamage = (int)datum["fixed_damage"];
+                CriticalDamage = (byte)datum["critical_damage"];
+                Mastery = (sbyte)datum["mastery"];
+                OptionalItemCost = (int)datum["optional_item_cost"];
+                CostItem = (int)datum["item_cost"];
+                ItemCount = (short)datum["item_count"];
+                CostBullet = (short)datum["bullet_cost"];
+                CostMeso = (short)datum["money_cost"];
+                ParameterA = (short)datum["x_property"];
+                ParameterB = (short)datum["y_property"];
+                Speed = (short)datum["speed"];
+                Jump = (short)datum["jump"];
+                Strength = (short)datum["str"];
+                WeaponAttack = (short)datum["weapon_atk"];
+                MagicAttack = (short)datum["magic_atk"];
+                WeaponDefense = (short)datum["weapon_def"];
+                MagicDefense = (short)datum["magic_def"];
+                Accuracy = (short)datum["accuracy"];
+                Avoidability = (short)datum["avoid"];
+                HP = (short)datum["hp"];
+                MP = (short)datum["mp"];
+                Probability = (short)datum["prop"];
+                Morph = (short)datum["morph"];
+                LT = new Point((short)datum["ltx"], (short)datum["lty"]);
+                RB = new Point((short)datum["rbx"], (short)datum["rby"]);
+                Cooldown = (int)datum["cooldown_time"];
             }
         }
 
         public void Save()
         {
-            Datum datum = new Datum("skills");
-
-            datum["CharacterID"] = this.Character.ID;
-            datum["MapleID"] = this.MapleID;
-            datum["CurrentLevel"] = this.CurrentLevel;
-            datum["MaxLevel"] = this.MaxLevel;
-            datum["Expiration"] = this.Expiration;
-            datum["CooldownEnd"] = this.CooldownEnd;
-
-            if (this.Assigned)
+            Datum datum = new Datum("skills")
             {
-                datum.Update("ID = {0}", this.ID);
+                ["CharacterID"] = Character.ID,
+                ["MapleID"] = MapleID,
+                ["CurrentLevel"] = CurrentLevel,
+                ["MaxLevel"] = MaxLevel,
+                ["Expiration"] = Expiration,
+                ["CooldownEnd"] = CooldownEnd
+            };
+
+            if (Assigned)
+            {
+                datum.Update("ID = {0}", ID);
             }
             else
             {
-                this.ID = datum.InsertAndReturnID();
-                this.Assigned = true;
+                ID = datum.InsertAndReturnID();
+                Assigned = true;
             }
         }
 
         public void Delete()
         {
-            Database.Delete("skills", "ID = {0}", this.ID);
+            Database.Delete("skills", "ID = {0}", ID);
 
-            this.Assigned = false;
+            Assigned = false;
         }
 
         public void Recalculate()
         {
-            this.MobCount = this.CachedReference.MobCount;
-            this.HitCount = this.CachedReference.HitCount;
-            this.Range = this.CachedReference.Range;
-            this.BuffTime = this.CachedReference.BuffTime;
-            this.CostMP = this.CachedReference.CostMP;
-            this.CostHP = this.CachedReference.CostHP;
-            this.Damage = this.CachedReference.Damage;
-            this.FixedDamage = this.CachedReference.FixedDamage;
-            this.CriticalDamage = this.CachedReference.CriticalDamage;
-            this.Mastery = this.CachedReference.Mastery;
-            this.OptionalItemCost = this.CachedReference.OptionalItemCost;
-            this.CostItem = this.CachedReference.CostItem;
-            this.ItemCount = this.CachedReference.ItemCount;
-            this.CostBullet = this.CachedReference.CostBullet;
-            this.CostMeso = this.CachedReference.CostMeso;
-            this.ParameterA = this.CachedReference.ParameterA;
-            this.ParameterB = this.CachedReference.ParameterB;
-            this.Speed = this.CachedReference.Speed;
-            this.Jump = this.CachedReference.Jump;
-            this.Strength = this.CachedReference.Strength;
-            this.WeaponAttack = this.CachedReference.WeaponAttack;
-            this.WeaponDefense = this.CachedReference.WeaponDefense;
-            this.MagicAttack = this.CachedReference.MagicAttack;
-            this.MagicDefense = this.CachedReference.MagicDefense;
-            this.Accuracy = this.CachedReference.Accuracy;
-            this.Avoidability = this.CachedReference.Avoidability;
-            this.HP = this.CachedReference.HP;
-            this.MP = this.CachedReference.MP;
-            this.Probability = this.CachedReference.Probability;
-            this.Morph = this.CachedReference.Morph;
-            this.LT = this.CachedReference.LT;
-            this.RB = this.CachedReference.RB;
-            this.Cooldown = this.CachedReference.Cooldown;
+            MobCount = CachedReference.MobCount;
+            HitCount = CachedReference.HitCount;
+            Range = CachedReference.Range;
+            BuffTime = CachedReference.BuffTime;
+            CostMP = CachedReference.CostMP;
+            CostHP = CachedReference.CostHP;
+            Damage = CachedReference.Damage;
+            FixedDamage = CachedReference.FixedDamage;
+            CriticalDamage = CachedReference.CriticalDamage;
+            Mastery = CachedReference.Mastery;
+            OptionalItemCost = CachedReference.OptionalItemCost;
+            CostItem = CachedReference.CostItem;
+            ItemCount = CachedReference.ItemCount;
+            CostBullet = CachedReference.CostBullet;
+            CostMeso = CachedReference.CostMeso;
+            ParameterA = CachedReference.ParameterA;
+            ParameterB = CachedReference.ParameterB;
+            Speed = CachedReference.Speed;
+            Jump = CachedReference.Jump;
+            Strength = CachedReference.Strength;
+            WeaponAttack = CachedReference.WeaponAttack;
+            WeaponDefense = CachedReference.WeaponDefense;
+            MagicAttack = CachedReference.MagicAttack;
+            MagicDefense = CachedReference.MagicDefense;
+            Accuracy = CachedReference.Accuracy;
+            Avoidability = CachedReference.Avoidability;
+            HP = CachedReference.HP;
+            MP = CachedReference.MP;
+            Probability = CachedReference.Probability;
+            Morph = CachedReference.Morph;
+            LT = CachedReference.LT;
+            RB = CachedReference.RB;
+            Cooldown = CachedReference.Cooldown;
         }
 
         public void Cast()
         {
-            if (!this.Character.IsAlive) return;       
-            if (this.IsCoolingDown) return;
+            if (!Character.IsAlive) return;       
+            if (IsCoolingDown) return;
 
-            this.Character.Stats.Health -= this.CostHP;
-            this.Character.Stats.Mana -= this.CostMP;
+            Character.Stats.Health -= CostHP;
+            Character.Stats.Mana -= CostMP;
 
-            if (this.Cooldown > 0)
+            if (Cooldown > 0)
             {
-                this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
+                CooldownEnd = DateTime.Now.AddSeconds(Cooldown);
             }
 
-            if (this.CostItem > 0)
-            {
-            }
-
-            if (this.CostBullet > 0)
+            if (CostItem > 0)
             {
             }
 
-            if (this.CostMeso > 0)
+            if (CostBullet > 0)
             {
             }
 
-            if (this.MapleID == (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
+            if (CostMeso > 0)
+            {
+            }
+
+            if (MapleID == (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
             {
                 Point mistMaxLT = new Point(-200, -150);
                 Point mistMaxRB = new Point(200, 150);
 
-                Rectangle boundingBox = new Rectangle(mistMaxLT + this.Character.Position, mistMaxRB + this.Character.Position);
+                Rectangle boundingBox = new Rectangle(mistMaxLT + Character.Position, mistMaxRB + Character.Position);
 
-                Mist poisonMist = new Mist(boundingBox, this.Character, this);
-                //Mist.SpawnMist(this.Character.Client, poisonMist);            
+                Mist poisonMist = new Mist(boundingBox, Character, this);
+                //Mist.SpawnMist(Character.Client, poisonMist);            
                 //get damage ticks of poisoned mobs within bounds
             }
 
-            if (this.MapleID == (int) CharacterConstants.SkillNames.FirePoisonWizard.PoisonBreath)
+            if (MapleID == (int) CharacterConstants.SkillNames.FirePoisonWizard.PoisonBreath)
             {
-                Mob victim = this.Character.ControlledMobs.FirstOrDefault();
-                if (victim != null)
-                {
-                    victim.Buff(MobConstants.MobStatus.Poisoned, 1, this);
-                }
+                Mob victim = Character.ControlledMobs.FirstOrDefault();
+
+                victim?.Buff(MobConstants.MobStatus.Poisoned, 1, this);
             }
         }
 
         //public void Cast(Packet iPacket)
         //{
-        //    if (!this.Character.IsAlive)
+        //    if (!Character.IsAlive)
         //    {
         //        return;
         //    }
 
-        //    if (this.IsCoolingDown)
+        //    if (IsCoolingDown)
         //    {
         //        return;
         //    }
 
-        //    if (this.MapleID == (int)SkillNames.Priest.MysticDoor)
+        //    if (MapleID == (int)SkillNames.Priest.MysticDoor)
         //    {
         //        Point origin = new Point(iPacket.ReadShort(), iPacket.ReadShort());
 
         //        // TODO: Open mystic door.
         //    }
 
-        //    this.Character.Health -= this.CostHP;
-        //    this.Character.Mana -= this.CostMP;
+        //    Character.Health -= CostHP;
+        //    Character.Mana -= CostMP;
 
-        //    if (this.Cooldown > 0)
+        //    if (Cooldown > 0)
         //    {
-        //        this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
+        //        CooldownEnd = DateTime.Now.AddSeconds(Cooldown);
         //    }
 
         //    // TODO: Money cost.
@@ -455,7 +448,7 @@ namespace Destiny.Maple
         //    byte direction = 0;
         //    short addedInfo = 0;
 
-        //    switch (this.MapleID)
+        //    switch (MapleID)
         //    {
         //        case (int)SkillNames.Priest.MysticDoor:
         //            // NOTe: Prevents the default case from executing, there's no packet data left for it.
@@ -463,11 +456,11 @@ namespace Destiny.Maple
 
         //        case (int)SkillNames.Brawler.MpRecovery:
         //            {
-        //                short healthMod = (short)((this.Character.MaxHealth * this.ParameterA) / 100);
-        //                short manaMod = (short)((healthMod * this.ParameterB) / 100);
+        //                short healthMod = (short)((Character.MaxHealth * ParameterA) / 100);
+        //                short manaMod = (short)((healthMod * ParameterB) / 100);
 
-        //                this.Character.Health -= healthMod;
-        //                this.Character.Mana += manaMod;
+        //                Character.Health -= healthMod;
+        //                Character.Mana += manaMod;
         //            }
         //            break;
 
@@ -500,7 +493,7 @@ namespace Destiny.Maple
 
         //                    try
         //                    {
-        //                        mob = this.Character.Map.Mobs[objectID];
+        //                        mob = Character.Map.Mobs[objectID];
         //                    }
         //                    catch (KeyNotFoundException)
         //                    {
@@ -526,7 +519,7 @@ namespace Destiny.Maple
 
         //                    try
         //                    {
-        //                        mob = this.Character.Map.Mobs[objectID];
+        //                        mob = Character.Map.Mobs[objectID];
         //                    }
         //                    catch (KeyNotFoundException)
         //                    {
@@ -559,7 +552,7 @@ namespace Destiny.Maple
 
         //                    try
         //                    {
-        //                        mob = this.Character.Map.Mobs[objectID];
+        //                        mob = Character.Map.Mobs[objectID];
         //                    }
         //                    catch (KeyNotFoundException)
         //                    {
@@ -590,7 +583,7 @@ namespace Destiny.Maple
 
         //                    try
         //                    {
-        //                        mob = this.Character.Map.Mobs[objectID];
+        //                        mob = Character.Map.Mobs[objectID];
         //                    }
         //                    catch (KeyNotFoundException)
         //                    {
@@ -627,25 +620,25 @@ namespace Destiny.Maple
 
         //        case (int)SkillNames.Cleric.Heal:
         //            {
-        //                short healthRate = this.HP;
+        //                short healthRate = HP;
 
         //                if (healthRate > 100)
         //                {
         //                    healthRate = 100;
         //                }
 
-        //                int partyPlayers = this.Character.Party != null ? this.Character.Party.Count : 1;
-        //                short healthMod = (short)(((healthRate * this.Character.MaxHealth) / 100) / partyPlayers);
+        //                int partyPlayers = Character.Party != null ? Character.Party.Count : 1;
+        //                short healthMod = (short)(((healthRate * Character.MaxHealth) / 100) / partyPlayers);
 
-        //                if (this.Character.Party != null)
+        //                if (Character.Party != null)
         //                {
         //                    int experience = 0;
 
         //                    List<PartyMember> members = new List<PartyMember>();
 
-        //                    foreach (PartyMember member in this.Character.Party)
+        //                    foreach (PartyMember member in Character.Party)
         //                    {
-        //                        if (member.Character != null && member.Character.Map.MapleID == this.Character.Map.MapleID)
+        //                        if (member.Character != null && member.Character.Map.MapleID == Character.Map.MapleID)
         //                        {
         //                            members.Add(member);
         //                        }
@@ -659,7 +652,7 @@ namespace Destiny.Maple
         //                        {
         //                            member.Character.Health += healthMod;
 
-        //                            if (member.Character != this.Character)
+        //                            if (member.Character != Character)
         //                            {
         //                                experience += 20 * (member.Character.Health - memberHealth) / (8 * member.Character.Level + 190);
         //                            }
@@ -668,12 +661,12 @@ namespace Destiny.Maple
 
         //                    if (experience > 0)
         //                    {
-        //                        this.Character.Experience += experience;
+        //                        Character.Experience += experience;
         //                    }
         //                }
         //                else
         //                {
-        //                    this.Character.Health += healthRate;
+        //                    Character.Health += healthRate;
         //                }
         //            }
         //            break;
@@ -711,12 +704,12 @@ namespace Destiny.Maple
         //        case (int)SkillNames.Buccaneer.MapleWarrior:
         //        case (int)SkillNames.Corsair.MapleWarrior:
         //            {
-        //                if (this.MapleID == (int)SkillNames.Buccaneer.TimeLeap)
+        //                if (MapleID == (int)SkillNames.Buccaneer.TimeLeap)
         //                {
         //                    // TODO: Remove all cooldowns.
         //                }
 
-        //                if (this.Character.Party != null)
+        //                if (Character.Party != null)
         //                {
         //                    byte targets = iPacket.ReadByte();
 
@@ -730,7 +723,7 @@ namespace Destiny.Maple
         //                        {
         //                            oPacket
         //                                .WriteByte((byte)UserEffect.SkillAffected)
-        //                                .WriteInt(this.MapleID)
+        //                                .WriteInt(MapleID)
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
@@ -742,7 +735,7 @@ namespace Destiny.Maple
         //                            oPacket
         //                                .WriteInt(member.Character.ID)
         //                                .WriteByte((byte)UserEffect.SkillAffected)
-        //                                .WriteInt(this.MapleID)
+        //                                .WriteInt(MapleID)
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
@@ -768,7 +761,7 @@ namespace Destiny.Maple
         //                Func<Character, bool> condition = null;
         //                Action<Character> action = null;
 
-        //                switch (this.MapleID)
+        //                switch (MapleID)
         //                {
         //                    case (int)SkillNames.SuperGM.HealPlusDispel:
         //                        {
@@ -808,15 +801,15 @@ namespace Destiny.Maple
         //                {
         //                    int targetID = iPacket.ReadInt();
 
-        //                    Character target = this.Character.Map.Characters[targetID];
+        //                    Character target = Character.Map.Characters[targetID];
 
-        //                    if (target != this.Character && condition(target))
+        //                    if (target != Character && condition(target))
         //                    {
         //                        using (Packet oPacket = new Packet(ServerOperationCode.Effect))
         //                        {
         //                            oPacket
         //                                .WriteByte((byte)UserEffect.SkillAffected)
-        //                                .WriteInt(this.MapleID)
+        //                                .WriteInt(MapleID)
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
@@ -828,7 +821,7 @@ namespace Destiny.Maple
         //                            oPacket
         //                                .WriteInt(target.ID)
         //                                .WriteByte((byte)UserEffect.SkillAffected)
-        //                                .WriteInt(this.MapleID)
+        //                                .WriteInt(MapleID)
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
@@ -859,11 +852,11 @@ namespace Destiny.Maple
         //    {
         //        oPacket
         //            .WriteByte((byte)UserEffect.SkillUse)
-        //            .WriteInt(this.MapleID)
+        //            .WriteInt(MapleID)
         //            .WriteByte(1)
         //            .WriteByte(1);
 
-        //        this.Character.Client.Send(oPacket);
+        //        Character.Client.Send(oPacket);
         //    }
 
         //    using (Packet oPacket = new Packet(ServerOperationCode.RemoteEffect))
@@ -871,16 +864,16 @@ namespace Destiny.Maple
         //        oPacket
         //            .WriteInt(Character.ID)
         //            .WriteByte((byte)UserEffect.SkillUse)
-        //            .WriteInt(this.MapleID)
+        //            .WriteInt(MapleID)
         //            .WriteByte(1)
         //            .WriteByte(1);
 
-        //        this.Character.Map.Broadcast(oPacket, this.Character);
+        //        Character.Map.Broadcast(oPacket, Character);
         //    }
 
-        //    if (this.HasBuff)
+        //    if (HasBuff)
         //    {
-        //        this.Character.Buffs.Add(this, 0);
+        //        Character.Buffs.Add(this, 0);
         //    }
         //}
 
@@ -889,13 +882,13 @@ namespace Destiny.Maple
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteInt(this.MapleID)
-                    .WriteInt(this.CurrentLevel)
-                    .WriteDateTime(this.Expiration);
+                    .WriteInt(MapleID)
+                    .WriteInt(CurrentLevel)
+                    .WriteDateTime(Expiration);
 
-                if (this.IsFromFourthJob)
+                if (IsFromFourthJob)
                 {
-                    oPacket.WriteInt(this.MaxLevel);
+                    oPacket.WriteInt(MaxLevel);
                 }
 
                 oPacket.Flip();
