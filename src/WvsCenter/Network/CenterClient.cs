@@ -154,19 +154,6 @@ namespace Destiny.Network
                     ChannelPortRequest(inPacket);
                     break;
 
-                case InteroperabilityOperationCode.RegistrationResponse:
-                    break;
-                case InteroperabilityOperationCode.UpdateChannel:
-                    break;
-                case InteroperabilityOperationCode.UpdateChannelID:
-                    break;
-                case InteroperabilityOperationCode.MigrationRegisterResponse:
-                    break;
-                case InteroperabilityOperationCode.MigrationResponse:
-                    break;
-                case InteroperabilityOperationCode.ChannelPortResponse:
-                    break;
-
                 default:
                     Log.SkipLine();
                     Log.Warn(" Unhandled InteroperabilityOperationCode encountered!" +
@@ -274,6 +261,7 @@ namespace Destiny.Network
 
                         case ServerConstants.ServerType.ITC:
                             break;
+
                         default:
                             Log.SkipLine();
                             Log.Warn(" Unhandled Registration request!" +

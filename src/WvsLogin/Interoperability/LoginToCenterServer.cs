@@ -76,7 +76,7 @@ namespace Destiny.Interoperability
                     Packet.WriteInt(loopWorld.DropRate);
                 }
 
-                this.Send(Packet);
+                Send(Packet);
             }
         }
 
@@ -90,36 +90,43 @@ namespace Destiny.Interoperability
             switch ((InteroperabilityOperationCode)inPacket.OperationCode)
             {
                 case InteroperabilityOperationCode.RegistrationResponse:
-                    this.Register(inPacket);
+                    Register(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.UpdateChannel:
-                    this.UpdateChannel(inPacket);
+                    UpdateChannel(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.UpdateChannelPopulation:
-                    this.UpdateChannelPopulation(inPacket);
+                    UpdateChannelPopulation(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterNameCheckResponse:
-                    this.CheckCharacterName(inPacket);
+                    CheckCharacterName(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterEntriesResponse:
-                    this.GetCharacters(inPacket);
+                    GetCharacters(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterCreationResponse:
-                    this.CreateCharacter(inPacket);
+                    CreateCharacter(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.MigrationRegisterResponse:
-                    this.Migrate(inPacket);
+                    Migrate(inPacket);
+                    break;
+
+                default:
+                    Log.SkipLine();
+                    Log.Warn(" Unhandled InteroperabilityOperationCode at LoginToCenterServer.cs encountered!" +
+                             " \n Argument: {0}", inPacket.OperationCode);
+                    Log.SkipLine();
                     break;
             }
         }
 
-        private void Register(Packet inPacket)
+        private static void Register(Packet inPacket)
         {
             ServerRegsitrationResponse response = (ServerRegsitrationResponse)inPacket.ReadByte();
 
@@ -136,6 +143,13 @@ namespace Destiny.Interoperability
                     }
                     break;
 
+                case ServerRegsitrationResponse.InvalidType:
+                    break;
+                case ServerRegsitrationResponse.InvalidCode:
+                    break;
+                case ServerRegsitrationResponse.Full:
+                    break;
+
                 default:
                     {
                         Log.Error(ServerRegistrationResponseResolver.Explain(response));
@@ -146,7 +160,7 @@ namespace Destiny.Interoperability
             }
         }
 
-        private void UpdateChannel(Packet inPacket)
+        private static void UpdateChannel(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
             bool add = inPacket.ReadBool();
@@ -165,7 +179,7 @@ namespace Destiny.Interoperability
             }
         }
 
-        private void UpdateChannelPopulation(Packet inPacket)
+        private static void UpdateChannelPopulation(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
             byte channelID = inPacket.ReadByte();
@@ -179,10 +193,10 @@ namespace Destiny.Interoperability
             string name = inPacket.ReadString();
             bool unusable = inPacket.ReadBool();
 
-            this.NameCheckPool.Enqueue(name, unusable);
+            NameCheckPool.Enqueue(name, unusable);
         }
 
-        private PendingKeyedQueue<int, List<byte[]>> CharacterEntriesPool = new PendingKeyedQueue<int, List<byte[]>>();
+        private readonly PendingKeyedQueue<int, List<byte[]>> CharacterEntriesPool = new PendingKeyedQueue<int, List<byte[]>>();
 
         private void GetCharacters(Packet inPacket)
         {
@@ -195,7 +209,7 @@ namespace Destiny.Interoperability
                 entires.Add(inPacket.ReadBytes(inPacket.ReadByte()));
             }
 
-            this.CharacterEntriesPool.Enqueue(accountID, entires);
+            CharacterEntriesPool.Enqueue(accountID, entires);
         }
 
         public List<byte[]> GetCharacters(byte worldID, int accountID)
@@ -205,13 +219,13 @@ namespace Destiny.Interoperability
                 outPacket.WriteByte(worldID);
                 outPacket.WriteInt(accountID);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.CharacterEntriesPool.Dequeue(accountID);
+            return CharacterEntriesPool.Dequeue(accountID);
         }
 
-        private PendingKeyedQueue<string, bool> NameCheckPool = new PendingKeyedQueue<string, bool>();
+        private readonly PendingKeyedQueue<string, bool> NameCheckPool = new PendingKeyedQueue<string, bool>();
 
         public bool IsNameTaken(string name)
         {
@@ -219,20 +233,20 @@ namespace Destiny.Interoperability
             {
                 outPacket.WriteString(name);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.NameCheckPool.Dequeue(name);
+            return NameCheckPool.Dequeue(name);
         }
 
-        private PendingKeyedQueue<int, byte[]> CharacterCreationPool = new PendingKeyedQueue<int, byte[]>();
+        private readonly PendingKeyedQueue<int, byte[]> CharacterCreationPool = new PendingKeyedQueue<int, byte[]>();
 
         private void CreateCharacter(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
             byte[] characterData = inPacket.ReadBytes(inPacket.Remaining);
 
-            this.CharacterCreationPool.Enqueue(accountID, characterData);
+            CharacterCreationPool.Enqueue(accountID, characterData);
         }
 
         public byte[] CreateCharacter(byte worldID, int accountID, byte[] characterData)
@@ -243,13 +257,13 @@ namespace Destiny.Interoperability
                 outPacket.WriteInt(accountID);
                 outPacket.WriteBytes(characterData);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.CharacterCreationPool.Dequeue(accountID);
+            return CharacterCreationPool.Dequeue(accountID);
         }
 
-        private PendingKeyedQueue<string, bool> MigrationPool = new PendingKeyedQueue<string, bool>();
+        private readonly PendingKeyedQueue<string, bool> MigrationPool = new PendingKeyedQueue<string, bool>();
 
         public bool Migrate(string host, int accountID, int characterID)
         {
@@ -260,10 +274,10 @@ namespace Destiny.Interoperability
                     .WriteInt(accountID)
                     .WriteInt(characterID);
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
 
-            return this.MigrationPool.Dequeue(host);
+            return MigrationPool.Dequeue(host);
         }
 
         private void Migrate(Packet inPacket)
@@ -271,7 +285,7 @@ namespace Destiny.Interoperability
             string host = inPacket.ReadString();
             bool valid = inPacket.ReadBool();
 
-            this.MigrationPool.Enqueue(host, valid);
+            MigrationPool.Enqueue(host, valid);
         }
     }
 }

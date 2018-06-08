@@ -106,27 +106,6 @@ namespace Destiny.Interoperability
                     ChannelPortResponse(inPacket);
                     break;
 
-                case InteroperabilityOperationCode.RegistrationRequest:
-                    break;
-                case InteroperabilityOperationCode.UpdateChannel:
-                    break;
-                case InteroperabilityOperationCode.UpdateChannelPopulation:
-                    break;
-                case InteroperabilityOperationCode.CharacterEntriesResponse:
-                    break;
-                case InteroperabilityOperationCode.CharacterCreationResponse:
-                    break;
-                case InteroperabilityOperationCode.MigrationRegisterRequest:
-                    break;
-                case InteroperabilityOperationCode.MigrationRegisterResponse:
-                    break;
-                case InteroperabilityOperationCode.CharacterNameCheckResponse:
-                    break;
-                case InteroperabilityOperationCode.MigrationRequest:
-                    break;
-                case InteroperabilityOperationCode.ChannelPortRequest:
-                    break;
-
                 default:
                     throw new ArgumentOutOfRangeException();
             }
