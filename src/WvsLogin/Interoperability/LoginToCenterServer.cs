@@ -14,7 +14,8 @@ namespace Destiny.Interoperability
 {
     public class LoginToCenterServer : ServerHandler<InteroperabilityOperationCode, InteroperabilityOperationCode, BlankCryptograph>
     {
-        public LoginToCenterServer(IPEndPoint remoteEP, string code) : base(remoteEP, "Center server", new object[] { code }) { }
+        public LoginToCenterServer(IPEndPoint remoteEP, string code) 
+            : base(remoteEP, "Center server", new object[] { code }) { }
 
         protected override bool IsServerAlive
         {
@@ -40,12 +41,14 @@ namespace Destiny.Interoperability
 
                 WvsLogin.CenterConnection.Loop();
             }
+
             catch (Exception e)
             {
                 Log.Error("Server connection failed: \n{0}", e.Message);
 
                 WvsLogin.Stop();
             }
+
             finally
             {
                 WvsLogin.CenterConnectionDone.Set();

@@ -3,6 +3,8 @@
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Constants;
+using Destiny.IO;
+using Destiny.Maple.Maps;
 using Destiny.Network.ClientHandler;
 using Destiny.Network.Common;
 using Destiny.Network.ServerHandler;
@@ -11,15 +13,14 @@ namespace Destiny.Network
 {
     public sealed class GameClient : MapleClientHandler.MapleClientHandler
     {
-        public long ID { get; private set; }
+        public long ID { get; }
 
-        public Account Account { get; set; }
+        public GameAccount Account { get; set; }
         public Character Character { get; set; }
 
-        public GameClient(Socket socket)
-            : base(socket)
+        public GameClient(Socket socket) : base(socket)
         {
-            this.ID = Application.Random.Next();
+            ID = Application.Random.Next();
         }
 
         protected override bool IsServerAlive
@@ -35,18 +36,18 @@ namespace Destiny.Network
             int accountID;
             int characterID = inPacket.ReadInt();
 
-            if ((accountID = WvsGame.CenterConnection.ValidateMigration(this.RemoteEndPoint.Address.ToString(), characterID)) == 0)
+            if ((accountID = WvsGame.CenterConnection.ValidateMigration(RemoteEndPoint.Address.ToString(), characterID)) == 0)
             {
-                this.Stop();
+                Stop();
 
                 return;
             }
 
-            this.Character = new Character(characterID, this);
-            this.Character.Load();
-            Character.InitializeCharacter(this.Character);
+            Character = new Character(characterID, this);
+            Character.Load();
+            Character.InitializeCharacter(Character);
 
-            this.Title = this.Character.Name;
+            Title = Character.Name;
         }
 
         protected override void Register()
@@ -56,12 +57,11 @@ namespace Destiny.Network
 
         protected override void Terminate()
         {
-            if (this.Character != null)
-            {
-                this.Character.Save();
-                this.Character.LastNpc = null;
-                this.Character.Map.Characters.Remove(this.Character);
-            }
+            if (Character == null) return;
+
+            Character.Save();
+            Character.LastNpc = null;
+            Character.Map.Characters.Remove(Character);
         }
 
         protected override void Unregister()
@@ -69,204 +69,211 @@ namespace Destiny.Network
             WvsGame.Clients.Remove(this);
         }
 
-        protected override void Dispatch(Packet iPacket)
+        protected override void Dispatch(Packet inPacket)
         {
-            switch ((ClientOperationCode)iPacket.OperationCode)
+            switch ((ClientOperationCode)inPacket.OperationCode)
             {
                 case ClientOperationCode.CharacterLoad:
-                    this.Initialize(iPacket);
+                    Initialize(inPacket);
                     break;
 
                 case ClientOperationCode.MapChange:
-                    this.Character.ChangeMapHandler(iPacket);
+                    Character.ChangeMapHandler(inPacket);
                     break;
 
                 case ClientOperationCode.ChannelChange:
-                    this.ChangeChannel(iPacket);
+                    ChangeChannel(inPacket);
                     break;
 
                 case ClientOperationCode.PlayerMovement:
-                    this.Character.CharMoveHandler(iPacket);
+                    Character.CharMoveHandler(inPacket);
                     break;
 
                 case ClientOperationCode.Sit:
-                    this.Character.CharSitHandler(iPacket);
+                    Character.CharSitHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseChair:
-                    this.Character.CharSitOnChairHandler(iPacket);
+                    Character.CharSitOnChairHandler(inPacket);
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:
-                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Melee);
+                    Character.AttackHandler(inPacket, CharacterConstants.AttackType.Melee);
                     break;
 
                 case ClientOperationCode.RangedAttack:
-                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Range);
+                    Character.AttackHandler(inPacket, CharacterConstants.AttackType.Range);
                     break;
 
                 case ClientOperationCode.MagicAttack:
-                    this.Character.AttackHandler(iPacket, CharacterConstants.AttackType.Magic);
+                    Character.AttackHandler(inPacket, CharacterConstants.AttackType.Magic);
                     break;
 
                 case ClientOperationCode.TakeDamage:
-                    this.Character.DamageHandler(iPacket);
+                    Character.DamageHandler(inPacket);
                     break;
 
                 case ClientOperationCode.PlayerChat:
-                    this.Character.CharTalkHandler(iPacket);
+                    Character.CharTalkHandler(inPacket);
                     break;
 
                 case ClientOperationCode.CloseChalkboard:
-                    this.Character.Chalkboard = string.Empty;
+                    Character.Chalkboard = string.Empty;
                     break;
 
                 case ClientOperationCode.FaceExpression:
-                    this.Character.CharExpressionHandler(iPacket);
+                    Character.CharExpressionHandler(inPacket);
                     break;
 
                 case ClientOperationCode.NpcConverse:
-                    this.Character.Converse(iPacket);
+                    Character.Converse(inPacket);
                     break;
 
                 case ClientOperationCode.NpcResult:
-                    this.Character.LastNpc.Handle(this.Character, iPacket);
+                    Character.LastNpc.Handle(Character, inPacket);
                     break;
 
                 case ClientOperationCode.NpcShop:
-                    this.Character.LastNpc.Shop.Handle(this.Character, iPacket);
+                    Character.LastNpc.Shop.Handle(Character, inPacket);
                     break;
 
                 case ClientOperationCode.Storage:
-                    this.Character.Storage.CharStorageHandler(iPacket);
+                    Character.Storage.CharStorageHandler(inPacket);
                     break;
 
                 case ClientOperationCode.InventorySort:
-                    this.Character.Items.SortItemsHandler(iPacket);
+                    Character.Items.SortItemsHandler(inPacket);
                     break;
 
                 case ClientOperationCode.InventoryGather:
-                    this.Character.Items.GatherItemsHandler(iPacket);
+                    Character.Items.GatherItemsHandler(inPacket);
                     break;
 
                 case ClientOperationCode.InventoryAction:
-                    this.Character.Items.CharItemsHandler(iPacket);
+                    Character.Items.CharItemsHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseItem:
-                    this.Character.Items.UseItemHandler(iPacket);
+                    Character.Items.UseItemHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseSummonBag:
-                    this.Character.Items.UseSummonBagHandler(iPacket);
+                    Character.Items.UseSummonBagHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseCashItem:
-                    this.Character.Items.UseCashItemHandler(iPacket);
+                    Character.Items.UseCashItemHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseTeleportRock: // NOTE: Only occurs with the special Teleport Rock in the usable inventory.
-                    this.Character.Trocks.UseTrockHandler(2320000, iPacket);
+                    Character.Trocks.UseTrockHandler(2320000, inPacket);
                     break;
 
                 case ClientOperationCode.UseReturnScroll:
-                    this.Character.Items.UseReturnScrollHandler(iPacket);
+                    Character.Items.UseReturnScrollHandler(inPacket);
                     break;
 
                 case ClientOperationCode.DistributeAP:
-                    this.Character.Stats.CharDistributeAPHandler(iPacket);
+                    Character.Stats.CharDistributeAPHandler(inPacket);
                     break;
 
                 case ClientOperationCode.AutoDistributeAP:
-                    this.Character.Stats.AutoDistributeAP(iPacket);
+                    Character.Stats.AutoDistributeAP(inPacket);
                     break;
 
                 case ClientOperationCode.HealOverTime:
-                    this.Character.Stats.HealOverTime(iPacket);
+                    Character.Stats.HealOverTime(inPacket);
                     break;
 
                 case ClientOperationCode.DistributeSP:
-                    this.Character.Stats.DistributeSPHandler(iPacket);
+                    Character.Stats.DistributeSPHandler(inPacket);
                     break;
 
                 case ClientOperationCode.UseSkill:
-                    this.Character.Skills.CastSkillHandler(iPacket);
+                    Character.Skills.CastSkillHandler(inPacket);
                     break;
 
                 case ClientOperationCode.CancelBuff:
-                    this.Character.Buffs.CancelBuffHandler(iPacket);
+                    Character.Buffs.CancelBuffHandler(inPacket);
                     break;
 
                 case ClientOperationCode.MesoDrop:
-                    this.Character.Stats.DropMesoHandler(iPacket);
+                    Character.Stats.DropMesoHandler(inPacket);
                     break;
 
                 case ClientOperationCode.PlayerInformation:
-                    this.Character.InformOnCharacter(iPacket);
+                    Character.InformOnCharacter(inPacket);
                     break;
 
                 case ClientOperationCode.ChangeMapSpecial:
-                    this.Character.EnterPortal(iPacket);
+                    Character.EnterPortal(inPacket);
                     break;
 
                 case ClientOperationCode.TrockAction:
-                    this.Character.Trocks.UpdateTrockHandler(iPacket);
+                    Character.Trocks.UpdateTrockHandler(inPacket);
                     break;
 
                 case ClientOperationCode.Report:
-                    this.Character.Report(iPacket);
+                    Character.Report(inPacket);
                     break;
 
                 case ClientOperationCode.QuestAction:
-                    this.Character.Quests.Handle(iPacket);
+                    Character.Quests.Handle(inPacket);
                     break;
 
                 case ClientOperationCode.MultiChat:
-                    this.Character.MultiTalkHandler(iPacket);
+                    Character.MultiTalkHandler(inPacket);
                     break;
 
                 case ClientOperationCode.Command:
-                    this.Character.UseCommand(iPacket);
+                    Character.UseCommand(inPacket);
                     break;
 
                 case ClientOperationCode.PlayerInteraction:
-                    this.Character.Interact(iPacket);
+                    Character.Interact(inPacket);
                     break;
 
                 case ClientOperationCode.AdminCommand:
-                    this.Character.UseAdminCommandHandler(iPacket);
+                    Character.UseAdminCommandHandler(inPacket);
                     break;
 
                 case ClientOperationCode.NoteAction:
-                    this.Character.Memos.Handle(iPacket);
+                    Character.Memos.Handle(inPacket);
                     break;
 
                 case ClientOperationCode.ChangeKeymap:
-                    this.Character.Keymap.Change(iPacket);
+                    Character.Keymap.Change(inPacket);
                     break;
 
                 case ClientOperationCode.MovePet:
-                    //this.Character.Pets.Move(iPacket);
+                    //Character.Pets.Move(inPacket);
                     break;
 
                 case ClientOperationCode.MobMovement:
-                    this.Character.ControlledMobs.Move(iPacket);
+                    Character.ControlledMobs.MoveHandler(inPacket);
                     break;
 
                 case ClientOperationCode.DropPickup:
-                    this.Character.Items.PickupItemHandler(iPacket);
+                    Character.Items.PickupItemHandler(inPacket);
                     break;
 
                 case ClientOperationCode.NpcMovement:
-                    this.Character.ControlledNpcs.Move(iPacket);
+                    Character.ControlledNpcs.Move(inPacket);
                     break;
 
                 case ClientOperationCode.HitReactor:
-                    this.Character.Map.Reactors.Hit(iPacket, this.Character);
+                    Character.Map.Reactors.Hit(inPacket, Character);
                     break;
 
                 case ClientOperationCode.TouchReactor:
-                    this.Character.Map.Reactors.Touch(iPacket, this.Character);
+                    MapReactors.Touch(inPacket, Character);
+                    break;
+
+                default:
+                    Log.SkipLine();
+                    Log.Warn(" Unhandled ClientOperationCode encountered!" +
+                             " \n Argument: {0}", inPacket.OperationCode);
+                    Log.SkipLine();
                     break;
             }
         }
@@ -281,7 +288,7 @@ namespace Destiny.Network
                 outPacket.WriteBytes(127, 0, 0, 1);
                 outPacket.WriteUShort(WvsGame.CenterConnection.GetChannelPort(channelID));
 
-                this.Send(outPacket);
+                Send(outPacket);
             }
         }
     }

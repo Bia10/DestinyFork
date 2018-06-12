@@ -607,9 +607,7 @@ namespace Destiny.Network
                 {
                     Account.Pic = SHACryptograph.Encrypt(SHAMode.SHA256, pic);
 
-                    Datum datum = new Datum("accounts");
-
-                    datum["Pic"] = Account.Pic;
+                    Datum datum = new Datum("accounts") {["Pic"] = Account.Pic};
 
                     datum.Update("ID = {0}", Account.ID);
                 }

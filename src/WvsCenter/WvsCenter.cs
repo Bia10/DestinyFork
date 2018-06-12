@@ -64,7 +64,8 @@ namespace Destiny
                 CenterClient.SecurityCode = Settings.GetString("Server/SecurityCode");
                 Log.Inform("Cross-servers code '{0}' assigned.", Log.MaskString(CenterClient.SecurityCode));
 
-                Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
+                IPAddress ip = IPAddress.Parse("127.0.0.1");
+                Listener = new TcpListener(ip, Settings.GetInt("Server/Port"));
                 Listener.Start();
                 Log.Inform("Initialized clients listener on {0}.", Listener.LocalEndpoint);
 
@@ -91,7 +92,9 @@ namespace Destiny
             while (IsAlive)
             {
                 AcceptDone.Reset();
+
                 Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
+
                 AcceptDone.WaitOne();
             }
 

@@ -67,15 +67,25 @@ namespace Destiny.Network.ServerHandler
         {
             while (IsAlive)// && IsServerAlive)
             {
-                ReceiveDone.Reset();
+                try
+                {
+                    ReceiveDone.Reset();
 
-                ByteBuffer buffer = new ByteBuffer();
+                    ByteBuffer buffer = new ByteBuffer();
 
-                Socket.BeginReceive(buffer.Array, buffer.Position, buffer.Capacity, SocketFlags.None, new AsyncCallback(OnReceive), buffer);
+                    Socket.BeginReceive(buffer.Array, buffer.Position, buffer.Capacity, SocketFlags.None, new AsyncCallback(OnReceive), buffer);
 
-                ReceiveDone.WaitOne();
+                    ReceiveDone.WaitOne();
+                }
+
+                catch (Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Error(e);
+                    Log.SkipLine();
+                    throw;
+                }
             }
-
             Dispose();
 
             StopServer();
@@ -101,16 +111,22 @@ namespace Destiny.Network.ServerHandler
                     {
                         using (Packet inPacket = new Packet(Cryptograph.Decrypt(buffer.GetContent())))
                         {
+                            // parse information from packet
+                            short packetOPCODE = inPacket.OperationCode;
+                            string packetName = Enum.GetName(typeof(TReceiveOP), packetOPCODE);
+                            byte[] packetByteArray = inPacket.Array;
+                            string currentTime = DateTime.Now.ToString("HH:mm:ss");
+
                             if (Enum.IsDefined(typeof(TReceiveOP), inPacket.OperationCode))
                             {
                                 switch (Packet.LogLevel)
                                 {
                                     case LogLevel.Name:
-                                        Log.Inform("Received {0} packet.", Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
+                                        Log.Inform("[{0}][ServerHandler]: \n Received [{1}] packet.", currentTime, packetName);
                                         break;
 
                                     case LogLevel.Full:
-                                        Log.Hex("Received {0} packet: ", inPacket.Array, Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode));
+                                        Log.Hex("Received {0} packet: ", packetByteArray, packetName);
                                         break;
 
                                     case LogLevel.None:
@@ -123,7 +139,7 @@ namespace Destiny.Network.ServerHandler
                             else
                             {
                                 Log.SkipLine();
-                                Log.Hex("Received unknown (0x{0:X2}) packet: ", inPacket.Array, inPacket.OperationCode);
+                                Log.Hex("Received unknown (0x{0:X2}) packet: ", packetByteArray, packetOPCODE);
                                 Log.SkipLine();
                             }
 
@@ -142,21 +158,26 @@ namespace Destiny.Network.ServerHandler
             }
         }
 
-        protected void Send(Packet Packet)
+        protected void Send(Packet outPacket)
         {
-            Packet.SafeFlip();
-            Socket.Send(Cryptograph.Encrypt(Packet.GetContent()));
+            short packetOPCODE = outPacket.OperationCode;
+            string packetName = Enum.GetName(typeof(TSendOP), packetOPCODE);
+            byte[] packetByteArray = outPacket.Array;
+            string currentTime = DateTime.Now.ToString("HH:mm:ss");
 
-            if (Enum.IsDefined(typeof(TSendOP), Packet.OperationCode))
+            outPacket.SafeFlip();
+            Socket.Send(Cryptograph.Encrypt(outPacket.GetContent()));
+
+            if (Enum.IsDefined(typeof(TSendOP), outPacket.OperationCode))
             {
                 switch (Packet.LogLevel)
                 {
                     case LogLevel.Name:
-                        Log.Inform("Sent {0} packet.", Enum.GetName(typeof(TSendOP), Packet.OperationCode));
+                        Log.Inform("[{0}][ServerHandler]: \n Sent [{1}] packet.", currentTime, packetName);
                         break;
 
                     case LogLevel.Full:
-                        Log.Hex("Sent {0} packet: ", Packet.GetContent(), Enum.GetName(typeof(TSendOP), Packet.OperationCode));
+                        Log.Hex("Sent {0} packet: ", outPacket.GetContent(), Enum.GetName(typeof(TSendOP), outPacket.OperationCode));
                         break;
 
                     case LogLevel.None:
@@ -168,7 +189,7 @@ namespace Destiny.Network.ServerHandler
             }
             else
             {
-                Log.Hex("Sent unknown ({0:X2}) packet: ", Packet.Array, Packet.OperationCode);
+                Log.Hex("Sent unknown ({0:X2}) packet: ", packetByteArray, packetOPCODE);
             }
         }
 

@@ -16,11 +16,13 @@ namespace Destiny.Network.ClientHandler
         protected virtual void Register() { }
         protected virtual void Unregister() { }
 
+        private ByteBuffer ReceivalBuffer { get; set; }
+
         protected ClientHandler(Socket socket, string title = "Client", params object[] args)
         {
             Title = title;
 
-            Log.Inform("Preparing {0}...", Title.ToLower());
+            Log.Inform("Preparing {0} ...", Title.ToLower());
 
             Socket = socket;
             Cryptograph = new TCryptograph();
@@ -56,54 +58,6 @@ namespace Destiny.Network.ClientHandler
 
             Dispose();
         }
-
-        private ByteBuffer ReceivalBuffer { get; set; }
-
-        private void Handle(byte[] rawPacket)
-        {
-            using (Packet inPacket = new Packet(Cryptograph.Decrypt(rawPacket)))
-            {
-                string packetName = Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode);
-                string packetLogData = string.Format("Received {0} packet from {1}.", packetName, Title);
-
-                LogEvent lEvent = new LogEvent(packetLogData, DateTime.Now);
-
-                BoundedLogEventQueue<LogEvent> que = new BoundedLogEventQueue<LogEvent>(100);
-
-                que.EnqueueLogEvent(lEvent);
-
-                bool isDuplicate = que.Contains(lEvent);
-
-                if (isDuplicate) return;
-
-                if (Enum.IsDefined(typeof(TReceiveOP), inPacket.OperationCode))
-                {
-                    switch (Packet.LogLevel)
-                    {
-                        case LogLevel.Name:
-                            Log.Inform("Received {0} packet from {1}.", packetName, Title);
-                            break;
-
-                        case LogLevel.Full:
-                            Log.Hex("Received {0} packet from {1}: ", inPacket.Array, packetName, Title);
-                            break;
-
-                        case LogLevel.None:
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-                else
-                {
-                    Log.Hex("Received unknown (0x{0:X2}) packet from {1}: ", inPacket.Array, inPacket.OperationCode, Title);
-                }
-
-                Dispatch(inPacket);
-            }
-        }
-
         private void OnReceive(IAsyncResult ar)
         {
             if (!IsAlive) return;
@@ -155,7 +109,7 @@ namespace Destiny.Network.ClientHandler
 
                             ReceivalBuffer.Position -= 4;
 
-                            Handle(ReceivalBuffer.ReadBytes(length + 4));
+                            HandleIncomingPacket(ReceivalBuffer.ReadBytes(length + 4));
 
                             processed += (length + 4);
                         }
@@ -167,7 +121,7 @@ namespace Destiny.Network.ClientHandler
 
                     else
                     {
-                        Handle(ReceivalBuffer.GetContent());
+                        HandleIncomingPacket(ReceivalBuffer.GetContent());
                         ReceivalBuffer.Limit = 0;
                         ReceivalBuffer.Position = 0;
                     }
@@ -213,25 +167,112 @@ namespace Destiny.Network.ClientHandler
             }
         }
 
-        public void Send(Packet Packet)
+        private void HandleIncomingPacket(byte[] rawPacket)
+        {
+            using (Packet inPacket = new Packet(Cryptograph.Decrypt(rawPacket)))
+            {
+                // parse information from packet
+                short packetOPCODE = inPacket.OperationCode;
+                string packetName = Enum.GetName(typeof(TReceiveOP), packetOPCODE);
+                byte[] packetByteArray = inPacket.Array;
+                string currentTime = DateTime.Now.ToString("HH:mm:ss");
+
+                // create new log event out of inPacket information
+                LogEventQue.LogEvent newLogEvent = new LogEventQue.LogEvent
+                {
+                    EventTime = currentTime,
+                    EventName = packetName,
+                    EventData = packetByteArray
+                }; 
+                              
+                // check if packet operation code is known
+                if (Enum.IsDefined(typeof(TReceiveOP), packetOPCODE))
+                {
+                    if (LogEventQue.NormalEventsLog.Count > 499)
+                    {
+                        LogEventQue.LogEvent lastLogEvent = LogEventQue.NormalEventsLog.FirstOrDefault();
+
+                        LogEventQue.NormalEventsLog.Remove(lastLogEvent);
+                        LogEventQue.NormalEventsLog.Add(newLogEvent);
+                    }
+
+                    LogEventQue.NormalEventsLog.Add(newLogEvent); 
+
+                    switch (Packet.LogLevel)
+                    {
+                        case LogLevel.Name:
+                            Log.Inform("[{0}][ClientHandler]: \n Received [{1}] packet from [{2}].", newLogEvent.EventTime, newLogEvent.EventName, Title);
+                            break;
+
+                        case LogLevel.Full:
+                            Log.Hex("[{0}] Received [{1}] packet from [{2}]: ", newLogEvent.EventData, newLogEvent.EventTime, newLogEvent.EventName, Title);
+                            break;
+
+                        case LogLevel.None:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                // else log as anomalous event
+                else
+                {
+                    Log.SkipLine();
+                    Log.Hex("Received unknown (0x{0:X2}) packet from {1}: ", packetByteArray, packetOPCODE, Title);
+                    Log.SkipLine();
+
+                    LogEventQue.AnomalousEventsLog.Add(newLogEvent);
+                }
+
+                // dispatch regardless if we know the packet
+                Dispatch(inPacket);
+            }
+        }
+
+        public void Send(Packet outPacket)
         {
             lock (this)
             {
                 if (IsAlive)
                 {
-                    Packet.SafeFlip();
-                    Socket.Send(Cryptograph.Encrypt(Packet.GetContent()));
+                    short packetOPCODE = outPacket.OperationCode;
+                    string packetName = Enum.GetName(typeof(TSendOP), packetOPCODE);
+                    byte[] packetByteArray = outPacket.Array;
+                    string currentTime = DateTime.Now.ToString("HH:mm:ss");
 
-                    if (Enum.IsDefined(typeof(TSendOP), Packet.OperationCode))
+                    // add new packet event to log que
+                    LogEventQue.LogEvent newLogEvent = new LogEventQue.LogEvent
                     {
+                        EventTime = currentTime,
+                        EventName = packetName,
+                        EventData = packetByteArray
+                    };
+
+                    outPacket.SafeFlip();
+                    Socket.Send(Cryptograph.Encrypt(outPacket.GetContent()));
+                                  
+                    if (Enum.IsDefined(typeof(TSendOP), outPacket.OperationCode))
+                    {
+                        if (LogEventQue.NormalEventsLog.Count > 499)
+                        {
+                            LogEventQue.LogEvent lastLogEvent = LogEventQue.NormalEventsLog.FirstOrDefault();
+
+                            LogEventQue.NormalEventsLog.Remove(lastLogEvent);
+                            LogEventQue.NormalEventsLog.Add(newLogEvent);
+                        }
+
+                        LogEventQue.NormalEventsLog.Add(newLogEvent);
+
                         switch (Packet.LogLevel)
                         {
                             case LogLevel.Name:
-                                Log.Inform("Sent {0} packet to {1}.", Enum.GetName(typeof(TSendOP), Packet.OperationCode), Title);
+                                Log.Inform("[{0}][ClientHandler]: \n Sent [{1}] packet to [{2}].", newLogEvent.EventTime, newLogEvent.EventName, Title);
                                 break;
 
                             case LogLevel.Full:
-                                Log.Hex("Sent {0} packet to {1}: ", Packet.GetContent(), Enum.GetName(typeof(TSendOP), Packet.OperationCode), Title);
+                                Log.Hex("Sent {0} packet to {1}: ", outPacket.GetContent(), Enum.GetName(typeof(TSendOP), outPacket.OperationCode), Title);
                                 break;
 
                             case LogLevel.None:
@@ -243,7 +284,11 @@ namespace Destiny.Network.ClientHandler
                     }
                     else
                     {
-                        Log.Hex("Sent unknown (0x{0:X2}) packet to {1}: ", Packet.Array, Packet.OperationCode, Title);
+                        Log.SkipLine();
+                        Log.Hex("Sent unknown (0x{0:X2}) packet to {1}: ", outPacket.Array, outPacket.OperationCode, Title);
+                        Log.SkipLine();
+
+                        LogEventQue.AnomalousEventsLog.Add(newLogEvent);
                     }
                 }
                 else

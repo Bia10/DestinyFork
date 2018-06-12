@@ -17,12 +17,23 @@ namespace Destiny.Network.MapleClientHandler
         {
             byte[] initialization = Cryptograph.Initialize();
 
-            Socket.Send(initialization);
+            try
+            {
+                Socket.Send(initialization);
+            }
+
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                throw;
+            }
+
+            string currentTime = DateTime.Now.ToString("HH:mm:ss");
 
             switch (Packet.LogLevel)
             {
                 case LogLevel.Name:
-                    Log.Inform("Sent Initialization packet (unencrypted).");
+                    Log.Inform("[{0}][MapleClientHandler]: \n Sent Initialization packet (unencrypted).", currentTime);
                     break;
 
                 case LogLevel.Full:

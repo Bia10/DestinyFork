@@ -29,7 +29,8 @@ namespace Destiny.IO
             {
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(' ', LabelWidth - label.Length - 3);
+                //sb.Append(' ', LabelWidth - label.Length - 3);  initial indentation
+
                 sb.Append("[");
                 sb.Append(label);
                 sb.Append("]");

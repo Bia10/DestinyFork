@@ -168,7 +168,9 @@ namespace Destiny
             if (IsAlive)
             {
                 CenterConnectionDone.Reset();
+
                 new Thread(new ThreadStart(GameToCenterServer.Main)).Start();
+
                 CenterConnectionDone.WaitOne();
 #if DEBUG
                 string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");

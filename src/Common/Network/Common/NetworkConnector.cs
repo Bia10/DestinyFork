@@ -27,7 +27,7 @@ namespace Destiny.Network.Common
 
                 if (!value)
                 {
-                    this.ReceiveDone.Set();
+                    ReceiveDone.Set();
                 }
             }
         }
@@ -36,7 +36,7 @@ namespace Destiny.Network.Common
         {
             get
             {
-                return (IPEndPoint)this.Socket.RemoteEndPoint;
+                return (IPEndPoint)Socket.RemoteEndPoint;
             }
         }
 
@@ -50,7 +50,7 @@ namespace Destiny.Network.Common
 
         public void Stop()
         {
-            this.IsAlive = false;
+            IsAlive = false;
         }
     }
 }

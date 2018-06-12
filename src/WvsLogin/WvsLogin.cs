@@ -96,7 +96,9 @@ namespace Destiny
             if (IsAlive)
             {
                 CenterConnectionDone.Reset();
+
                 new Thread(new ThreadStart(LoginToCenterServer.Main)).Start();
+
                 CenterConnectionDone.WaitOne();
             }
             else

@@ -268,6 +268,30 @@ namespace Destiny.Maple
             }
         }
 
+        public static bool IsConsumableItem(Item item)
+        {
+          return item.MapleID / 10000 >= 200 && item.MapleID / 10000 < 204;
+        }
+
+        public static readonly Action consumableAction = () => IsConsumableItemIDaction(2030002); // 2030002 - Return Scroll to Ellinia - Returns you to Ellinia.
+    
+        public static void IsConsumableItemIDaction(int itemID)
+        {
+            var b = itemID / 10000 >= 200 && itemID / 10000 < 204;
+        }
+
+        public static readonly Action consumableActionHashSet = () => IsConsumableItemIDactionHashSet(2030002); // 2030002 - Return Scroll to Ellinia - Returns you to Ellinia.
+
+        public static void IsConsumableItemIDactionHashSet(int itemID)
+        {
+            var b = ConsumableConstants.ConsumablesMapleIDs.Contains(itemID);
+        }
+
+        public static bool IsConsumableItemID(int itemID)
+        {
+            return itemID / 10000 >= 200 && itemID / 10000 < 204;
+        }
+
         public bool IsRechargeable
         {
             get
@@ -759,7 +783,7 @@ namespace Destiny.Maple
             {
                 case ItemConstants.EquipmentSlot.Bottom:
                 {
-                    if (top != null && top.IsOverall)
+                    if (top?.IsOverall == true)
                     {
                         UnequipItem(top);
                     }
@@ -777,7 +801,7 @@ namespace Destiny.Maple
 
                 case ItemConstants.EquipmentSlot.Shield:
                 {
-                    if (weapon != null && weapon.IsTwoHanded)
+                    if (weapon?.IsTwoHanded == true)
                     {
                         UnequipItem(weapon);
                     }

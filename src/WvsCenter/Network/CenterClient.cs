@@ -33,10 +33,10 @@ namespace Destiny.Network
             }
         }
 
-        /*protected override void Prepare(params object[] args)
+        protected override void Prepare(params object[] args)
         {
             base.Prepare(args);
-        }*/
+        }
 
         protected override void Register()
         {

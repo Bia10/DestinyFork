@@ -86,6 +86,7 @@
     <Compile Include="Application.cs" />
     <Compile Include="Collections\PendingKeyedQueue.cs" />
     <Compile Include="Constants\CharacterConstants.cs" />
+    <Compile Include="Constants\ConsumableConstants.cs" />
     <Compile Include="Constants\EquipmentConstants.cs" />
     <Compile Include="Constants\InteractionConstants.cs" />
     <Compile Include="Constants\ItemConstants.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Data\RowNotUniqueException.cs" />
     <Compile Include="IO\ByteBuffer.cs" />
     <Compile Include="IO\Log.cs" />
+    <Compile Include="IO\LogEvent.cs" />
     <Compile Include="IO\LogLevel.cs" />
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />

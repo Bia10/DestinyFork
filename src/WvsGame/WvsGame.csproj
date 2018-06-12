@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interoperability\GameToCenterServer.cs" />
-    <Compile Include="Maple\Account.cs" />
+    <Compile Include="Maple\GameAccount.cs" />
     <Compile Include="Maple\Attack.cs" />
     <Compile Include="Maple\Buff.cs" />
     <Compile Include="Maple\Characters\Character.cs" />
@@ -105,6 +105,7 @@
     <Compile Include="Maple\Commands\CommandFactory.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\AdminShopCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\BenchmarkCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ExpCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
@@ -183,7 +184,7 @@
     <Compile Include="Maple\Memo.cs" />
     <Compile Include="Maple\Meso.cs" />
     <Compile Include="Maple\Movements.cs" />
-    <Compile Include="Maple\NoAccountException.cs" />
+    <Compile Include="Maple\NoGameAccountException.cs" />
     <Compile Include="Maple\Point.cs" />
     <Compile Include="Maple\Quest.cs" />
     <Compile Include="Maple\Rectangle.cs" />
