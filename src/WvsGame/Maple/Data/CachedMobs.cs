@@ -1,26 +1,26 @@
-﻿using Destiny.Maple.Life;
-using System.Collections.ObjectModel;
-using Destiny.Data;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Generic;
+
+using Destiny.Maple.Life;
+using Destiny.Data;
 using Destiny.IO;
 
 namespace Destiny.Maple.Data
 {
     public sealed class CachedMobs : KeyedCollection<int, Mob>
     {
-        public CachedMobs()
-            : base()
+        public CachedMobs() : base()
         {
             using (Log.Load("Mobs"))
             {
                 foreach (Datum datum in new Datums("mob_data").Populate())
                 {
-                    this.Add(new Mob(datum));
+                    Add(new Mob(datum));
                 }
 
                 foreach (Datum datum in new Datums("mob_skills").Populate())
                 {
-                    if (this.Contains((int)datum["mobid"]))
+                    if (Contains((int)datum["mobid"]))
                     {
                         this[(int)datum["mobid"]].Skills.Add(new MobSkill(datum));
                     }
@@ -54,7 +54,7 @@ namespace Destiny.Maple.Data
 
                 foreach (Datum mobSummonDatum in new Datums("mob_summons").Populate())
                 {
-                    if (this.Contains((int)mobSummonDatum["mobid"]))
+                    if (Contains((int)mobSummonDatum["mobid"]))
                     {
                         this[(int)mobSummonDatum["mobid"]].DeathSummons.Add((int)mobSummonDatum["summonid"]);
                     }
@@ -67,7 +67,7 @@ namespace Destiny.Maple.Data
                 {
                     int dropperID = (int)datum["dropperid"];
 
-                    if (this.Contains(dropperID))
+                    if (Contains(dropperID))
                     {
                         this[dropperID].Loots.Add(new Loot(datum));
                     }

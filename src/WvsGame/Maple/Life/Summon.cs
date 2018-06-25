@@ -8,9 +8,9 @@ namespace Destiny.Maple.Life
 {
     public sealed class Summon : MapObject, ISpawnable
     {
-        public readonly SummonConstants.SummonMovementType movementType;
-        public Character summonOwner { get; set; }
-        public Skill summonSkill { get; set; }
+        public readonly SummonConstants.SummonMovementType MovementType;
+        public Character SummonOwner { get; set; }
+        public Skill SummonSkill { get; set; }
         public int health { get; set; }
         public MapleMapObjectType getType() { return MapleMapObjectType.Summon; }
         public bool spawned { get; set; }
@@ -18,12 +18,12 @@ namespace Destiny.Maple.Life
 
         public Summon(Character owner, Skill skill, Point summonPos, SummonConstants.SummonMovementType movementType)
         {
-            this.movementType = movementType;
-            this.summonOwner = owner;
-            this.Map = owner.Map;
-            this.summonSkill = skill;
-            this.summonSkill.CurrentLevel = skill.MaxLevel;
-            this.Position = summonPos;
+            MovementType = movementType;
+            SummonOwner = owner;
+            Map = owner.Map;
+            SummonSkill = skill;
+            SummonSkill.CurrentLevel = skill.MaxLevel;
+            Position = summonPos;
             spawned = false;
         }
 
@@ -36,7 +36,7 @@ namespace Destiny.Maple.Life
 
         public bool IsStationary(Summon summon)
         {
-            return GetSummonMovementType(summon.summonSkill) == SummonConstants.SummonMovementType.Stationary;
+            return GetSummonMovementType(summon.SummonSkill) == SummonConstants.SummonMovementType.Stationary;
         }
 
         public static SummonConstants.SummonMovementType GetSummonMovementType(Skill summonSkill)
@@ -237,18 +237,18 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.SummonedCreated);
 
             oPacket
-                .WriteInt(this.summonOwner.ID)
-                .WriteInt(this.ObjectID)
-                .WriteInt(this.summonSkill.MapleID)
+                .WriteInt(SummonOwner.ID)
+                .WriteInt(ObjectID)
+                .WriteInt(SummonSkill.MapleID)
                 .WriteByte(0x0A) //v83 ?? magic number :D
-                .WriteByte(this.summonSkill.CurrentLevel)
-                .WriteInt(this.summonSkill.MapleID)
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y)
+                .WriteByte(SummonSkill.CurrentLevel)
+                .WriteInt(SummonSkill.MapleID)
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y)
                 .Skip(3) // flags??
-                .WriteByte((byte)this.movementType) // summon movement flag
-                .WriteByte(IsPuppet(this.summonSkill) ? (byte)0 : (byte)1) // summon attack flag?
-                .WriteByte(this.animated ? (byte)0 : (byte)1);  // summon animation flag?
+                .WriteByte((byte) MovementType) // summon movement flag
+                .WriteByte(IsPuppet(SummonSkill) ? (byte) 0 : (byte) 1) // summon attack flag?
+                .WriteByte(animated ? (byte) 0 : (byte) 1);  // summon animation flag?
 
             return oPacket;
         }
@@ -258,9 +258,9 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.SummonedRemoved);
 
             oPacket
-                .WriteInt(this.summonOwner.ID)
-                .WriteInt(this.ObjectID)
-                .WriteByte((byte)1); //if animatedDeath then byte 4
+                .WriteInt(SummonOwner.ID)
+                .WriteInt(ObjectID)
+                .WriteByte(1); //if animatedDeath then byte 4
 
             return oPacket;
         }

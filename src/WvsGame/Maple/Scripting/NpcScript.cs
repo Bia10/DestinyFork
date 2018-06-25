@@ -1,7 +1,8 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+
+using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using Destiny.Threading;
-using System;
 using Destiny.Constants;
 using Destiny.Network.Common;
 
@@ -18,23 +19,23 @@ namespace Destiny.Maple.Scripting
         {
             mNpc = npc;
 
-            this.Expose("answer_no", 0);
-            this.Expose("answer_yes", 1);
+            Expose("answer_no", 0);
+            Expose("answer_yes", 1);
 
-            this.Expose("answer_decline", 0);
-            this.Expose("answer_accept", 1);
+            Expose("answer_decline", 0);
+            Expose("answer_accept", 1);
 
-            this.Expose("quiz_npc", 0);
-            this.Expose("quiz_mob", 1);
-            this.Expose("quiz_item", 2);
+            Expose("quiz_npc", 0);
+            Expose("quiz_mob", 1);
+            Expose("quiz_item", 2);
 
-            this.Expose("addText", new Action<string>(this.AddText));
-            this.Expose("sendOk", new Func<int>(this.SendOk));
-            this.Expose("sendNext", new Func<int>(this.SendNext));
-            this.Expose("sendBackNext", new Func<int>(this.SendBackNext));
-            this.Expose("sendBackOk", new Func<int>(this.SendBackOk));
-            this.Expose("askYesNo", new Func<int>(this.AskYesNo));
-            this.Expose("askAcceptDecline", new Func<int>(this.AskAcceptDecline));
+            Expose("addText", new Action<string>(AddText));
+            Expose("sendOk", new Func<int>(SendOk));
+            Expose("sendNext", new Func<int>(SendNext));
+            Expose("sendBackNext", new Func<int>(SendBackNext));
+            Expose("sendBackOk", new Func<int>(SendBackOk));
+            Expose("askYesNo", new Func<int>(AskYesNo));
+            Expose("askAcceptDecline", new Func<int>(AskAcceptDecline));
         }
 
         public void SetResult(int value)

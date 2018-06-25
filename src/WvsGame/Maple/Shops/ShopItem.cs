@@ -1,6 +1,7 @@
-﻿using Destiny.Data;
+﻿using System;
+
+using Destiny.Data;
 using Destiny.Maple.Data;
-using System;
 using Destiny.IO;
 
 namespace Destiny.Maple.Shops
@@ -18,7 +19,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.Items[this.MapleID].MaxPerStack;
+                return DataProvider.Items[MapleID].MaxPerStack;
             }
         }
 
@@ -26,7 +27,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.Items[this.MapleID].SalePrice;
+                return DataProvider.Items[MapleID].SalePrice;
             }
         }
 
@@ -34,7 +35,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return this.Parent.UnitPrices[this.MapleID];
+                return Parent.UnitPrices[MapleID];
             }
         }
 
@@ -42,27 +43,27 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.Items[this.MapleID].IsRechargeable;
+                return DataProvider.Items[MapleID].IsRechargeable;
             }
         }
 
         public ShopItem(Shop parent, Datum datum)
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.MapleID = (int)datum["itemid"];
-            this.Quantity = (short)datum["quantity"];
-            this.PurchasePrice = (int)datum["price"];
-            this.Sort = (int)datum["sort"];
+            MapleID = (int)datum["itemid"];
+            Quantity = (short)datum["quantity"];
+            PurchasePrice = (int)datum["price"];
+            Sort = (int)datum["sort"];
         }
 
         public ShopItem(Shop parent, int mapleID)
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.MapleID = mapleID;
-            this.Quantity = 1;
-            this.PurchasePrice = 0;
+            MapleID = mapleID;
+            Quantity = 1;
+            PurchasePrice = 0;
         }
 
         public byte[] ToByteArray()
@@ -70,25 +71,25 @@ namespace Destiny.Maple.Shops
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteInt(this.MapleID)
-                    .WriteInt(this.PurchasePrice)
+                    .WriteInt(MapleID)
+                    .WriteInt(PurchasePrice)
                     .WriteInt() // NOTE: Perfect Pitch.
                     .WriteInt() // NOTE: Time limit.
                     .WriteInt(); // NOTE: Unknown.
 
-                if (this.IsRecharageable)
+                if (IsRecharageable)
                 {
                     oPacket
                         .WriteShort()
                         .WriteInt()
-                        .WriteShort((short)(BitConverter.DoubleToInt64Bits(this.UnitPrice) >> 48))
-                        .WriteShort(this.MaxPerStack);
+                        .WriteShort((short)(BitConverter.DoubleToInt64Bits(UnitPrice) >> 48))
+                        .WriteShort(MaxPerStack);
                 }
                 else
                 {
                     oPacket
-                        .WriteShort(this.Quantity)
-                        .WriteShort(this.MaxPerStack);
+                        .WriteShort(Quantity)
+                        .WriteShort(MaxPerStack);
                 }
 
                 oPacket.Flip();

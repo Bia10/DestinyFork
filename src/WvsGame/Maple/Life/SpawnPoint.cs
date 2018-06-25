@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Destiny.Data;
 using Destiny.IO;
 
@@ -11,16 +12,16 @@ namespace Destiny.Maple.Life
         public SpawnPoint(Datum datum, bool isMob)
             : base(datum)
         {
-            this.IsMob = isMob;
+            IsMob = isMob;
         }
 
         public void Spawn()
         {
-            if (this.IsMob)
+            if (IsMob)
             {
                 try
                 {
-                    this.Map.Mobs.Add(new Mob(this));
+                    Map.Mobs.Add(new Mob(this));
                 }
                 catch (Exception e)
                 {
@@ -31,7 +32,7 @@ namespace Destiny.Maple.Life
             }
             else
             {
-                this.Map.Reactors.Add(new Reactor(this));
+                Map.Reactors.Add(new Reactor(this));
             }
         }
     }

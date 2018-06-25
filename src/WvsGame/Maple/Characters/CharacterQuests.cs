@@ -20,59 +20,63 @@ namespace Destiny.Maple.Characters
 
         public CharacterQuests(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.Started = new Dictionary<ushort, Dictionary<int, short>>();
-            this.Completed = new Dictionary<ushort, DateTime>();
+            Started = new Dictionary<ushort, Dictionary<int, short>>();
+            Completed = new Dictionary<ushort, DateTime>();
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("quests_started").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("quests_started").Populate("CharacterID = {0}", Parent.ID))
             {
-                if (!this.Started.ContainsKey((ushort)datum["QuestID"]))
+                if (!Started.ContainsKey((ushort)datum["QuestID"]))
                 {
-                    this.Started.Add((ushort)datum["QuestID"], new Dictionary<int, short>());
+                    Started.Add((ushort)datum["QuestID"], new Dictionary<int, short>());
                 }
 
                 if (datum["MobID"] != null && datum["Killed"] != null)
                 {
-                    this.Started[(ushort)datum["QuestID"]].Add((int)datum["MobID"], ((short)datum["Killed"]));
+                    Started[(ushort)datum["QuestID"]].Add((int)datum["MobID"], ((short)datum["Killed"]));
                 }
             }
         }
 
         public void Save()
         {
-            foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStarted in this.Started)
+            foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStarted in Started)
             {
                 if (loopStarted.Value == null || loopStarted.Value.Count == 0)
                 {
-                    Datum datum = new Datum("quests_started");
+                    Datum datum = new Datum("quests_started")
+                    {
+                        ["CharacterID"] = Parent.ID,
+                        ["QuestID"] = loopStarted.Key
+                    };
 
-                    datum["CharacterID"] = this.Parent.ID;
-                    datum["QuestID"] = loopStarted.Key;
-
-                    if (!Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopStarted.Key))
+                    if (!Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1}", Parent.ID, loopStarted.Key))
                     {
                         datum.Insert();
                     }
                 }
+
                 else
                 {
                     foreach (KeyValuePair<int, short> mobKills in loopStarted.Value)
                     {
-                        Datum datum = new Datum("quests_started");
-
-                        datum["CharacterID"] = this.Parent.ID;
-                        datum["QuestID"] = loopStarted.Key;
-                        datum["MobID"] = mobKills.Key;
-                        datum["Killed"] = mobKills.Value;
-
-                        if (Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1} && MobID = {2}", this.Parent.ID, loopStarted.Key, mobKills.Key))
+                        Datum datum = new Datum("quests_started")
                         {
-                            datum.Update("CharacterID = {0} && QuestID = {1} && MobID = {2}", this.Parent.ID, loopStarted.Key, mobKills.Key);
+                            ["CharacterID"] = Parent.ID,
+                            ["QuestID"] = loopStarted.Key,
+                            ["MobID"] = mobKills.Key,
+                            ["Killed"] = mobKills.Value
+                        };
+
+                        if (Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1} && MobID = {2}", Parent.ID, loopStarted.Key, mobKills.Key))
+                        {
+                            datum.Update("CharacterID = {0} && QuestID = {1} && MobID = {2}", Parent.ID, loopStarted.Key, mobKills.Key);
                         }
+
                         else
                         {
                             datum.Insert();
@@ -81,18 +85,20 @@ namespace Destiny.Maple.Characters
                 }
             }
 
-            foreach (KeyValuePair<ushort, DateTime> loopCompleted in this.Completed)
+            foreach (KeyValuePair<ushort, DateTime> loopCompleted in Completed)
             {
-                Datum datum = new Datum("quests_completed");
-
-                datum["CharacterID"] = this.Parent.ID;
-                datum["QuestID"] = loopCompleted.Key;
-                datum["CompletionTime"] = loopCompleted.Value;
-
-                if (Database.Exists("quests_completed", "CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopCompleted.Key))
+                Datum datum = new Datum("quests_completed")
                 {
-                    datum.Update("CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopCompleted.Key);
+                    ["CharacterID"] = Parent.ID,
+                    ["QuestID"] = loopCompleted.Key,
+                    ["CompletionTime"] = loopCompleted.Value
+                };
+
+                if (Database.Exists("quests_completed", "CharacterID = {0} && QuestID = {1}", Parent.ID, loopCompleted.Key))
+                {
+                    datum.Update("CharacterID = {0} && QuestID = {1}", Parent.ID, loopCompleted.Key);
                 }
+
                 else
                 {
                     datum.Insert();
@@ -102,9 +108,9 @@ namespace Destiny.Maple.Characters
 
         public void Delete(ushort questID)
         {
-            if (this.Started.ContainsKey(questID))
+            if (Started.ContainsKey(questID))
             {
-                this.Started.Remove(questID);
+                Started.Remove(questID);
             }
 
             if (Database.Exists("quests_started", "QuestID = {0}", questID))
@@ -139,11 +145,11 @@ namespace Destiny.Maple.Characters
                         int quantity = iPacket.ReadInt();
                         int itemID = iPacket.ReadInt();
 
-                        quantity -= this.Parent.Items.InventoryAvailableItemByID(itemID);
+                        quantity -= Parent.Items.InventoryAvailableItemByID(itemID);
 
                         Item item = new Item(itemID, (short)quantity);
 
-                        this.Parent.Items.AddItemToInventory(item);
+                        Parent.Items.AddItemToInventory(item);
                     }
                     break;
 
@@ -151,7 +157,7 @@ namespace Destiny.Maple.Characters
                     {
                         npcId = iPacket.ReadInt();
 
-                        this.Start(quest, npcId);
+                        Start(quest, npcId);
                     }
                     break;
 
@@ -161,13 +167,13 @@ namespace Destiny.Maple.Characters
                         iPacket.ReadInt(); // NOTE: Unknown
                         int selection = iPacket.Remaining >= 4 ? iPacket.ReadInt() : 0;
 
-                        this.Complete(quest, selection);
+                        Complete(quest, selection);
                     }
                     break;
 
                 case QuestConstants.QuestAction.Forfeit:
                     {
-                        this.Forfeit(quest.MapleID);
+                        Forfeit(quest.MapleID);
                     }
                     break;
 
@@ -178,7 +184,7 @@ namespace Destiny.Maple.Characters
 
                         Npc npc = null;
 
-                        foreach (Npc loopNpc in this.Parent.Map.Npcs)
+                        foreach (Npc loopNpc in Parent.Map.Npcs)
                         {
                             if (loopNpc.MapleID == npcId)
                             {
@@ -193,7 +199,7 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        this.Parent.Converse(npc, quest);
+                        Parent.Converse(npc, quest);
                     }
                     break;
             }
@@ -201,16 +207,16 @@ namespace Destiny.Maple.Characters
 
         public void Start(Quest quest, int npcID)
         {
-            this.Started.Add(quest.MapleID, new Dictionary<int, short>());
+            Started.Add(quest.MapleID, new Dictionary<int, short>());
 
             foreach (KeyValuePair<int, short> requiredKills in quest.PostRequiredKills)
             {
-                this.Started[quest.MapleID].Add(requiredKills.Key, 0);
+                Started[quest.MapleID].Add(requiredKills.Key, 0);
             }
 
-            this.Parent.Stats.Experience += quest.ExperienceReward[0];
-            this.Parent.Stats.Fame += (short)quest.FameReward[0];
-            this.Parent.Stats.Meso += quest.MesoReward[0] * WvsGame.MesoRate;
+            Parent.Stats.Experience += quest.ExperienceReward[0];
+            Parent.Stats.Fame += (short)quest.FameReward[0];
+            Parent.Stats.Meso += quest.MesoReward[0] * WvsGame.MesoRate;
 
             // TODO: Skill and pet rewards.
 
@@ -218,15 +224,15 @@ namespace Destiny.Maple.Characters
             {
                 if (item.Value > 0)
                 {
-                    this.Parent.Items.AddItemToInventory(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
+                    Parent.Items.AddItemToInventory(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
                 }
                 else if (item.Value < 0)
                 {
-                    this.Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
+                    Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
                 }
             }
 
-            this.Update(quest.MapleID, QuestConstants.QuestStatus.InProgress);
+            Update(quest.MapleID, QuestConstants.QuestStatus.InProgress);
 
             using (Packet oPacket = new Packet(ServerOperationCode.QuestResult))
             {
@@ -236,7 +242,7 @@ namespace Destiny.Maple.Characters
                     .WriteInt(npcID)
                     .WriteInt();
 
-                this.Parent.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
@@ -244,10 +250,10 @@ namespace Destiny.Maple.Characters
         {
             foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
             {
-                this.Parent.Items.RemoveItemFromInventoryByID(item.Key, item.Value);
+                Parent.Items.RemoveItemFromInventoryByID(item.Key, item.Value);
             }
 
-            this.Parent.Stats.Experience += quest.ExperienceReward[1];
+            Parent.Stats.Experience += quest.ExperienceReward[1];
 
             using (Packet oPacket = new Packet(ServerOperationCode.Message))
             {
@@ -266,22 +272,22 @@ namespace Destiny.Maple.Characters
                     .WriteInt() // NOTE: Rainbow Week bonus.
                     .WriteByte(); // NOTE: Unknown.
 
-                this.Parent.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
 
-            this.Parent.Stats.Fame += (short)quest.FameReward[1];
+            Parent.Stats.Fame += (short)quest.FameReward[1];
 
             // TODO: Fame gain packet in chat.
 
-            this.Parent.Stats.Meso += quest.MesoReward[1] * WvsGame.MesoRate;
+            Parent.Stats.Meso += quest.MesoReward[1] * WvsGame.MesoRate;
 
             // TODO: Meso gain packet in chat.
 
             foreach (KeyValuePair<Skill, CharacterConstants.Job> skill in quest.PostSkillRewards)
             {
-                if (this.Parent.Jobs.Job == skill.Value)
+                if (Parent.Jobs.Job == skill.Value)
                 {
-                    this.Parent.Skills.Add(skill.Key);
+                    Parent.Skills.Add(skill.Key);
 
                     // TODO: Skill update packet.
                 }
@@ -295,7 +301,7 @@ namespace Destiny.Maple.Characters
                 //{
                 //    KeyValuePair<int, short> item = quest.PostItemRewards.ElementAt(Constants.Random.Next(0, quest.PostItemRewards.Count));
 
-                //    this.Parent.Items.Add(new Item(item.Key, item.Value));
+                //    Parent.Items.Add(new Item(item.Key, item.Value));
 
                 //    using (Packet oPacket = new Packet(ServerOperationCode.Effect))
                 //    {
@@ -305,7 +311,7 @@ namespace Destiny.Maple.Characters
                 //            .WriteInt(item.Key)
                 //            .WriteInt(item.Value);
 
-                //        this.Parent.Client.Send(oPacket);
+                //        Parent.Client.Send(oPacket);
                 //    }
                 //}
                 //else
@@ -319,11 +325,11 @@ namespace Destiny.Maple.Characters
                 {
                     if (item.Value > 0)
                     {
-                        this.Parent.Items.AddItemToInventory(new Item(item.Key, item.Value));
+                        Parent.Items.AddItemToInventory(new Item(item.Key, item.Value));
                     }
                     else if (item.Value < 0)
                     {
-                        this.Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
+                        Parent.Items.RemoveItemFromInventoryByID(item.Key, Math.Abs(item.Value));
                     }
 
                     using (Packet oPacket = new Packet(ServerOperationCode.Effect))
@@ -334,26 +340,26 @@ namespace Destiny.Maple.Characters
                             .WriteInt(item.Key)
                             .WriteInt(item.Value);
 
-                        this.Parent.Client.Send(oPacket);
+                        Parent.Client.Send(oPacket);
                     }
                 }
             }
 
-            this.Update(quest.MapleID, QuestConstants.QuestStatus.Complete);
+            Update(quest.MapleID, QuestConstants.QuestStatus.Complete);
 
-            this.Delete(quest.MapleID);
+            Delete(quest.MapleID);
 
-            this.Completed.Add(quest.MapleID, DateTime.UtcNow);
+            Completed.Add(quest.MapleID, DateTime.UtcNow);
 
-            CharacterBuffs.ShowLocalUserEffect(this.Parent, CharacterConstants.UserEffect.QuestComplete);
-            CharacterBuffs.ShowRemoteUserEffect(this.Parent, CharacterConstants.UserEffect.QuestComplete, true);
+            CharacterBuffs.ShowLocalUserEffect(Parent, CharacterConstants.UserEffect.QuestComplete);
+            CharacterBuffs.ShowRemoteUserEffect(Parent, CharacterConstants.UserEffect.QuestComplete, true);
         }
 
         public void Forfeit(ushort questID)
         {
-            this.Delete(questID);
+            Delete(questID);
 
-            this.Update(questID, QuestConstants.QuestStatus.NotStarted);
+            Update(questID, QuestConstants.QuestStatus.NotStarted);
         }
 
         private void Update(ushort questID, QuestConstants.QuestStatus status, string progress = "")
@@ -374,7 +380,7 @@ namespace Destiny.Maple.Characters
                     oPacket.WriteDateTime(DateTime.Now);
                 }
 
-                this.Parent.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
@@ -384,7 +390,7 @@ namespace Destiny.Maple.Characters
 
             foreach (KeyValuePair<int, short> requiredItem in quest.PostRequiredItems)
             {
-                if (!this.Parent.Items.InventoryContainsItemByID(requiredItem.Key, requiredItem.Value))
+                if (!Parent.Items.InventoryContainsItemByID(requiredItem.Key, requiredItem.Value))
                 {
                     return false;
                 }
@@ -392,7 +398,7 @@ namespace Destiny.Maple.Characters
 
             foreach (ushort requiredQuest in quest.PostRequiredQuests)
             {
-                if (!this.Completed.ContainsKey(requiredQuest))
+                if (!Completed.ContainsKey(requiredQuest))
                 {
                     return false;
                 }
@@ -402,14 +408,14 @@ namespace Destiny.Maple.Characters
             {
                 if (onlyOnFinalKill)
                 {
-                    if (this.Started[questID][requiredKill.Key] != requiredKill.Value)
+                    if (Started[questID][requiredKill.Key] != requiredKill.Value)
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    if (this.Started[questID][requiredKill.Key] < requiredKill.Value)
+                    if (Started[questID][requiredKill.Key] < requiredKill.Value)
                     {
                         return false;
                     }
@@ -425,7 +431,7 @@ namespace Destiny.Maple.Characters
             {
                 oPacket.WriteUShort(questID);
 
-                this.Parent.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
@@ -433,9 +439,9 @@ namespace Destiny.Maple.Characters
         {
             using (ByteBuffer oPacket = new ByteBuffer())
             {
-                oPacket.WriteShort((short)this.Started.Count);
+                oPacket.WriteShort((short)Started.Count);
 
-                foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
+                foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in Started)
                 {
                     oPacket.WriteUShort(quest.Key);
 
@@ -449,9 +455,9 @@ namespace Destiny.Maple.Characters
                     oPacket.WriteString(kills);
                 }
 
-                oPacket.WriteShort((short)this.Completed.Count);
+                oPacket.WriteShort((short)Completed.Count);
 
-                foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
+                foreach (KeyValuePair<ushort, DateTime> quest in Completed)
                 {
                     oPacket
                         .WriteUShort(quest.Key)

@@ -10,7 +10,7 @@ namespace Destiny.Security
             0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00
         };
 
-        private static ICryptoTransform sTransformer;
+        private static readonly ICryptoTransform sTransformer;
 
         static AESEncryption()
         {

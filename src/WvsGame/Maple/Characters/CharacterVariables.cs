@@ -10,26 +10,26 @@ namespace Destiny.Maple.Characters
 
         public CharacterVariables(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("variables").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("variables").Populate("CharacterID = {0}", Parent.ID))
             {
-                this.Add(new Variable(datum));
+                Add(new Variable(datum));
             }
         }
 
         public void Save()
         {
-            Database.Delete("variables", "CharacterID = {0}", this.Parent.ID);
+            Database.Delete("variables", "CharacterID = {0}", Parent.ID);
 
             foreach (Variable variable in this)
             {
                 Datum datum = new Datum("variables")
                 {
-                    ["CharacterID"] = this.Parent.ID,
+                    ["CharacterID"] = Parent.ID,
                     ["Key"] = variable.Key,
                     ["Value"] = variable.Value
                 };

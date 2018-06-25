@@ -1,5 +1,6 @@
-﻿using Destiny.Data;
-using System;
+﻿using System;
+
+using Destiny.Data;
 using Destiny.Constants;
 
 namespace Destiny.Maple.Life
@@ -16,13 +17,13 @@ namespace Destiny.Maple.Life
 
         public ReactorState(Datum datum)
         {
-            this.Type = this.Timeout > 0 ? ReactorConstants.ReactorEventType.Timeout : (ReactorConstants.ReactorEventType)Enum.Parse(typeof(ReactorConstants.ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
-            this.State = (byte)(sbyte)datum["state"];
-            this.NextState = (byte)(sbyte)datum["next_state"];
-            this.Timeout = (int)datum["timeout"];
-            this.ItemId = (int)datum["itemid"];
-            this.Quantity = (short)datum["quantity"];
-            this.Boundaries = new Rectangle(new Point((short)datum["ltx"], (short)datum["lty"]), new Point((short)datum["ltx"], (short)datum["lty"]));
+            Type = Timeout > 0 ? ReactorConstants.ReactorEventType.Timeout : (ReactorConstants.ReactorEventType)Enum.Parse(typeof(ReactorConstants.ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
+            State = (byte)(sbyte)datum["state"];
+            NextState = (byte)(sbyte)datum["next_state"];
+            Timeout = (int)datum["timeout"];
+            ItemId = (int)datum["itemid"];
+            Quantity = (short)datum["quantity"];
+            Boundaries = new Rectangle(new Point((short)datum["ltx"], (short)datum["lty"]), new Point((short)datum["ltx"], (short)datum["lty"]));
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Destiny.Threading
             mAction = action;
             mPeriod = TimeSpan.FromMilliseconds(repeat);
             mNext = DateTime.Now.AddMilliseconds(timeout);
-            mTimer = new Timer(this.Callback, null, timeout, repeat);
+            mTimer = new Timer(Callback, null, timeout, repeat);
         }
 
         private void Callback(object state)

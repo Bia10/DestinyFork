@@ -102,7 +102,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return Item.GetType(this.MapleID);
+                return Item.GetType(MapleID);
             }
         }
 
@@ -110,7 +110,7 @@ namespace Destiny.Maple
         {
             get
             {
-                switch (this.MapleID / 10000 % 100)
+                switch (MapleID / 10000 % 100)
                 {
                     case 30:
                         return ItemConstants.WeaponType.Sword1H;
@@ -170,7 +170,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.Items[this.MapleID];
+                return DataProvider.Items[MapleID];
             }
         }
 
@@ -178,7 +178,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Parent.Parent;
+                return Parent.Parent;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Destiny.Maple
         {
             get
             {
-                if (this.IsRechargeable && this.Parent != null)
+                if (IsRechargeable && Parent != null)
                 {
                     return maxPerStack;
                 }
@@ -209,7 +209,7 @@ namespace Destiny.Maple
             }
             set
             {
-                if (value > this.MaxPerStack)
+                if (value > MaxPerStack)
                 {
                     throw new ArgumentException("Quantity too high.");
                 }
@@ -224,7 +224,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.Items.WizetItemIDs.Contains(this.MapleID);
+                return DataProvider.Items.WizetItemIDs.Contains(MapleID);
             }
         }
 
@@ -234,11 +234,11 @@ namespace Destiny.Maple
             {
                 byte flags = 0;
 
-                if (this.IsSealed) flags |= (byte)ItemConstants.ItemFlags.Sealed;
-                if (this.PreventsSlipping) flags |= (byte)ItemConstants.ItemFlags.AddPreventSlipping;
-                if (this.PreventsColdness) flags |= (byte)ItemConstants.ItemFlags.AddPreventColdness;
-                if (this.IsScissored) flags |= (byte)ItemConstants.ItemFlags.Scissored;
-                if (this.IsTradeBlocked) flags |= (byte)ItemConstants.ItemFlags.Untradeable;
+                if (IsSealed) flags |= (byte)ItemConstants.ItemFlags.Sealed;
+                if (PreventsSlipping) flags |= (byte)ItemConstants.ItemFlags.AddPreventSlipping;
+                if (PreventsColdness) flags |= (byte)ItemConstants.ItemFlags.AddPreventColdness;
+                if (IsScissored) flags |= (byte)ItemConstants.ItemFlags.Scissored;
+                if (IsTradeBlocked) flags |= (byte)ItemConstants.ItemFlags.Untradeable;
 
                 return flags;
             }
@@ -248,7 +248,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Slot < 0;
+                return Slot < 0;
             }
         }
 
@@ -256,7 +256,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.Slot < -100;
+                return Slot < -100;
             }
         }
 
@@ -264,7 +264,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID / 10000 >= 200 && this.MapleID / 10000 < 204;
+                return MapleID / 10000 >= 200 && MapleID / 10000 < 204;
             }
         }
 
@@ -296,7 +296,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.IsThrowingStar || this.IsBullet;
+                return IsThrowingStar || IsBullet;
             }
         }
 
@@ -304,7 +304,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID / 10000 == 207;
+                return MapleID / 10000 == 207;
             }
         }
 
@@ -312,7 +312,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID / 10000 == 233;
+                return MapleID / 10000 == 233;
             }
         }
 
@@ -320,7 +320,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.IsArrowForBow || this.IsArrowForCrossbow;
+                return IsArrowForBow || IsArrowForCrossbow;
             }
         }
 
@@ -328,7 +328,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID >= 2060000 && this.MapleID < 2061000;
+                return MapleID >= 2060000 && MapleID < 2061000;
             }
         }
 
@@ -336,7 +336,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID >= 2061000 && this.MapleID < 2062000;
+                return MapleID >= 2061000 && MapleID < 2062000;
             }
         }
 
@@ -344,7 +344,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID / 10000 == 105;
+                return MapleID / 10000 == 105;
             }
         }
 
@@ -352,7 +352,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.WeaponType != ItemConstants.WeaponType.NotAWeapon;
+                return WeaponType != ItemConstants.WeaponType.NotAWeapon;
             }
         }
 
@@ -360,7 +360,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID / 10000 % 100 == 9;
+                return MapleID / 10000 % 100 == 9;
             }
         }
 
@@ -368,7 +368,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID >= 5000000 && this.MapleID <= 5000100;
+                return MapleID >= 5000000 && MapleID <= 5000100;
             }
         }
 
@@ -376,7 +376,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.MapleID >= 2030000 && this.MapleID < 2030020;
+                return MapleID >= 2030000 && MapleID < 2030020;
             }
         }
 
@@ -384,7 +384,7 @@ namespace Destiny.Maple
         {
             get
             {
-                switch (this.WeaponType)
+                switch (WeaponType)
                 {
                     case ItemConstants.WeaponType.Sword2H:
                     case ItemConstants.WeaponType.Axe2H:
@@ -408,7 +408,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.IsCash || this.IsSealed || (this.IsTradeBlocked && !this.IsScissored);
+                return IsCash || IsSealed || (IsTradeBlocked && !IsScissored);
             }
         }
 
@@ -416,9 +416,9 @@ namespace Destiny.Maple
         {
             get
             {
-                if (this.IsEquipped)
+                if (IsEquipped)
                 {
-                    return (byte)(this.Slot * -1);
+                    return (byte)(Slot * -1);
                 }
                 else
                 {
@@ -431,17 +431,17 @@ namespace Destiny.Maple
         {
             get
             {
-                if (this.IsEquippedCash)
+                if (IsEquippedCash)
                 {
-                    return ((byte)(this.AbsoluteSlot - 100));
+                    return ((byte)(AbsoluteSlot - 100));
                 }
-                else if (this.IsEquipped)
+                else if (IsEquipped)
                 {
-                    return this.AbsoluteSlot;
+                    return AbsoluteSlot;
                 }
                 else
                 {
-                    return (byte)this.Slot;
+                    return (byte)Slot;
                 }
             }
         }
@@ -450,278 +450,278 @@ namespace Destiny.Maple
 
         public Item(int mapleID, short quantity = 1, DateTime? expiration = null, bool equipped = false)
         {
-            this.MapleID = mapleID;
-            this.MaxPerStack = this.CachedReference.MaxPerStack;
-            this.Quantity = (this.ItemType == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
-            if (equipped) this.Slot = (short)this.GetEquippedSlot();
+            MapleID = mapleID;
+            MaxPerStack = CachedReference.MaxPerStack;
+            Quantity = (ItemType == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
+            if (equipped) Slot = (short)GetEquippedSlot();
 
             if (!expiration.HasValue)
             {
                 expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
             }
 
-            this.Expiration = (DateTime)expiration;
+            Expiration = (DateTime)expiration;
 
-            this.IsCash = this.CachedReference.IsCash;
-            this.OnlyOne = this.CachedReference.OnlyOne;
-            this.IsTradeBlocked = this.CachedReference.IsTradeBlocked;
-            this.IsScissored = this.CachedReference.IsScissored;
-            this.SalePrice = this.CachedReference.SalePrice;
-            this.RequiredLevel = this.CachedReference.RequiredLevel;
-            this.Meso = this.CachedReference.Meso;
+            IsCash = CachedReference.IsCash;
+            OnlyOne = CachedReference.OnlyOne;
+            IsTradeBlocked = CachedReference.IsTradeBlocked;
+            IsScissored = CachedReference.IsScissored;
+            SalePrice = CachedReference.SalePrice;
+            RequiredLevel = CachedReference.RequiredLevel;
+            Meso = CachedReference.Meso;
 
-            if (this.ItemType == ItemConstants.ItemType.Equipment)
+            if (ItemType == ItemConstants.ItemType.Equipment)
             {
-                this.PreventsSlipping = this.CachedReference.PreventsSlipping;
-                this.PreventsColdness = this.CachedReference.PreventsColdness;
+                PreventsSlipping = CachedReference.PreventsSlipping;
+                PreventsColdness = CachedReference.PreventsColdness;
 
-                this.AttackSpeed = this.CachedReference.AttackSpeed;
-                this.RecoveryRate = this.CachedReference.RecoveryRate;
-                this.KnockBackChance = this.CachedReference.KnockBackChance;
+                AttackSpeed = CachedReference.AttackSpeed;
+                RecoveryRate = CachedReference.RecoveryRate;
+                KnockBackChance = CachedReference.KnockBackChance;
 
-                this.RequiredStrength = this.CachedReference.RequiredStrength;
-                this.RequiredDexterity = this.CachedReference.RequiredDexterity;
-                this.RequiredIntelligence = this.CachedReference.RequiredIntelligence;
-                this.RequiredLuck = this.CachedReference.RequiredLuck;
-                this.RequiredFame = this.CachedReference.RequiredFame;
-                this.RequiredJob = this.CachedReference.RequiredJob;
+                RequiredStrength = CachedReference.RequiredStrength;
+                RequiredDexterity = CachedReference.RequiredDexterity;
+                RequiredIntelligence = CachedReference.RequiredIntelligence;
+                RequiredLuck = CachedReference.RequiredLuck;
+                RequiredFame = CachedReference.RequiredFame;
+                RequiredJob = CachedReference.RequiredJob;
 
-                this.UpgradesAvailable = this.CachedReference.UpgradesAvailable;
-                this.UpgradesApplied = this.CachedReference.UpgradesApplied;
-                this.Strength = this.CachedReference.Strength;
-                this.Dexterity = this.CachedReference.Dexterity;
-                this.Intelligence = this.CachedReference.Intelligence;
-                this.Luck = this.CachedReference.Luck;
-                this.Health = this.CachedReference.Health;
-                this.Mana = this.CachedReference.Mana;
-                this.WeaponAttack = this.CachedReference.WeaponAttack;
-                this.MagicAttack = this.CachedReference.MagicAttack;
-                this.WeaponDefense = this.CachedReference.WeaponDefense;
-                this.MagicDefense = this.CachedReference.MagicDefense;
-                this.Accuracy = this.CachedReference.Accuracy;
-                this.Avoidability = this.CachedReference.Avoidability;
-                this.Agility = this.CachedReference.Agility;
-                this.Speed = this.CachedReference.Speed;
-                this.Jump = this.CachedReference.Jump;
+                UpgradesAvailable = CachedReference.UpgradesAvailable;
+                UpgradesApplied = CachedReference.UpgradesApplied;
+                Strength = CachedReference.Strength;
+                Dexterity = CachedReference.Dexterity;
+                Intelligence = CachedReference.Intelligence;
+                Luck = CachedReference.Luck;
+                Health = CachedReference.Health;
+                Mana = CachedReference.Mana;
+                WeaponAttack = CachedReference.WeaponAttack;
+                MagicAttack = CachedReference.MagicAttack;
+                WeaponDefense = CachedReference.WeaponDefense;
+                MagicDefense = CachedReference.MagicDefense;
+                Accuracy = CachedReference.Accuracy;
+                Avoidability = CachedReference.Avoidability;
+                Agility = CachedReference.Agility;
+                Speed = CachedReference.Speed;
+                Jump = CachedReference.Jump;
             }
-            else if (this.IsConsumable)
+            else if (IsConsumable)
             {
 
-                this.CFlags = this.CachedReference.CFlags;
-                this.CCureAilments = this.CachedReference.CCureAilments;
-                this.CEffect = this.CachedReference.CEffect;
-                this.CHealth = this.CachedReference.CHealth;
-                this.CMana = this.CachedReference.CMana;
-                this.CHealthPercentage = this.CachedReference.CHealthPercentage;
-                this.CManaPercentage = this.CachedReference.CManaPercentage;
-                this.CMoveTo = this.CachedReference.CMoveTo;
-                this.CProb = this.CachedReference.CProb;
-                this.CBuffTime = this.CachedReference.CBuffTime;
-                this.CWeaponAttack = this.CachedReference.CWeaponAttack;
-                this.CMagicAttack = this.CachedReference.CMagicAttack;
-                this.CWeaponDefense = this.CachedReference.CWeaponDefense;
-                this.CMagicDefense = this.CachedReference.CMagicDefense;
-                this.CAccuracy = this.CachedReference.CAccuracy;
-                this.CAvoid = this.CachedReference.CAvoid;
-                this.CSpeed = this.CachedReference.CSpeed;
-                this.CJump = this.CachedReference.CJump;
-                this.CMorph = this.CachedReference.CMorph;
+                CFlags = CachedReference.CFlags;
+                CCureAilments = CachedReference.CCureAilments;
+                CEffect = CachedReference.CEffect;
+                CHealth = CachedReference.CHealth;
+                CMana = CachedReference.CMana;
+                CHealthPercentage = CachedReference.CHealthPercentage;
+                CManaPercentage = CachedReference.CManaPercentage;
+                CMoveTo = CachedReference.CMoveTo;
+                CProb = CachedReference.CProb;
+                CBuffTime = CachedReference.CBuffTime;
+                CWeaponAttack = CachedReference.CWeaponAttack;
+                CMagicAttack = CachedReference.CMagicAttack;
+                CWeaponDefense = CachedReference.CWeaponDefense;
+                CMagicDefense = CachedReference.CMagicDefense;
+                CAccuracy = CachedReference.CAccuracy;
+                CAvoid = CachedReference.CAvoid;
+                CSpeed = CachedReference.CSpeed;
+                CJump = CachedReference.CJump;
+                CMorph = CachedReference.CMorph;
             }
 
-            this.Summons = this.CachedReference.Summons;
+            Summons = CachedReference.Summons;
         }
 
         public Item(Datum datum)
         {
             if (DataProvider.IsInitialized)
             {
-                this.ID = (int)datum["ID"];
-                this.Assigned = true;
+                ID = (int)datum["ID"];
+                Assigned = true;
 
-                this.AccountID = (int)datum["AccountID"];
-                this.MapleID = (int)datum["MapleID"];
-                this.MaxPerStack = this.CachedReference.MaxPerStack;
-                this.Quantity = (short)datum["Quantity"];
-                this.Slot = (short)datum["Slot"];
-                this.Creator = (string)datum["Creator"];
-                this.Expiration = (DateTime)datum["Expiration"];
-                this.PetID = (int?)datum["PetID"];
+                AccountID = (int)datum["AccountID"];
+                MapleID = (int)datum["MapleID"];
+                MaxPerStack = CachedReference.MaxPerStack;
+                Quantity = (short)datum["Quantity"];
+                Slot = (short)datum["Slot"];
+                Creator = (string)datum["Creator"];
+                Expiration = (DateTime)datum["Expiration"];
+                PetID = (int?)datum["PetID"];
 
-                this.IsCash = this.CachedReference.IsCash;
-                this.OnlyOne = this.CachedReference.OnlyOne;
-                this.IsTradeBlocked = this.CachedReference.IsTradeBlocked;
-                this.IsScissored = false;
-                this.IsStored = (bool)datum["IsStored"];
-                this.SalePrice = this.CachedReference.SalePrice;
-                this.RequiredLevel = this.CachedReference.RequiredLevel;
-                this.Meso = this.CachedReference.Meso;
+                IsCash = CachedReference.IsCash;
+                OnlyOne = CachedReference.OnlyOne;
+                IsTradeBlocked = CachedReference.IsTradeBlocked;
+                IsScissored = false;
+                IsStored = (bool)datum["IsStored"];
+                SalePrice = CachedReference.SalePrice;
+                RequiredLevel = CachedReference.RequiredLevel;
+                Meso = CachedReference.Meso;
 
-                if (this.ItemType == ItemConstants.ItemType.Equipment)
+                if (ItemType == ItemConstants.ItemType.Equipment)
                 {
-                    this.AttackSpeed = this.CachedReference.AttackSpeed;
-                    this.RecoveryRate = this.CachedReference.RecoveryRate;
-                    this.KnockBackChance = this.CachedReference.KnockBackChance;
+                    AttackSpeed = CachedReference.AttackSpeed;
+                    RecoveryRate = CachedReference.RecoveryRate;
+                    KnockBackChance = CachedReference.KnockBackChance;
 
-                    this.RequiredStrength = this.CachedReference.RequiredStrength;
-                    this.RequiredDexterity = this.CachedReference.RequiredDexterity;
-                    this.RequiredIntelligence = this.CachedReference.RequiredIntelligence;
-                    this.RequiredLuck = this.CachedReference.RequiredLuck;
-                    this.RequiredFame = this.CachedReference.RequiredFame;
-                    this.RequiredJob = this.CachedReference.RequiredJob;
+                    RequiredStrength = CachedReference.RequiredStrength;
+                    RequiredDexterity = CachedReference.RequiredDexterity;
+                    RequiredIntelligence = CachedReference.RequiredIntelligence;
+                    RequiredLuck = CachedReference.RequiredLuck;
+                    RequiredFame = CachedReference.RequiredFame;
+                    RequiredJob = CachedReference.RequiredJob;
 
-                    this.UpgradesAvailable = (byte)datum["UpgradesAvailable"];
-                    this.UpgradesApplied = (byte)datum["UpgradesApplied"];
-                    this.Strength = (short)datum["Strength"];
-                    this.Dexterity = (short)datum["Dexterity"];
-                    this.Intelligence = (short)datum["Intelligence"];
-                    this.Luck = (short)datum["Luck"];
-                    this.Health = (short)datum["Health"];
-                    this.Mana = (short)datum["Mana"];
-                    this.WeaponAttack = (short)datum["WeaponAttack"];
-                    this.MagicAttack = (short)datum["MagicAttack"];
-                    this.WeaponDefense = (short)datum["WeaponDefense"];
-                    this.MagicDefense = (short)datum["MagicDefense"];
-                    this.Accuracy = (short)datum["Accuracy"];
-                    this.Avoidability = (short)datum["Avoidability"];
-                    this.Agility = (short)datum["Agility"];
-                    this.Speed = (short)datum["Speed"];
-                    this.Jump = (short)datum["Jump"];
+                    UpgradesAvailable = (byte)datum["UpgradesAvailable"];
+                    UpgradesApplied = (byte)datum["UpgradesApplied"];
+                    Strength = (short)datum["Strength"];
+                    Dexterity = (short)datum["Dexterity"];
+                    Intelligence = (short)datum["Intelligence"];
+                    Luck = (short)datum["Luck"];
+                    Health = (short)datum["Health"];
+                    Mana = (short)datum["Mana"];
+                    WeaponAttack = (short)datum["WeaponAttack"];
+                    MagicAttack = (short)datum["MagicAttack"];
+                    WeaponDefense = (short)datum["WeaponDefense"];
+                    MagicDefense = (short)datum["MagicDefense"];
+                    Accuracy = (short)datum["Accuracy"];
+                    Avoidability = (short)datum["Avoidability"];
+                    Agility = (short)datum["Agility"];
+                    Speed = (short)datum["Speed"];
+                    Jump = (short)datum["Jump"];
                 }
-                else if (this.IsConsumable)
+                else if (IsConsumable)
                 {
-                    this.CFlags = this.CachedReference.CFlags;
-                    this.CCureAilments = this.CachedReference.CCureAilments;
-                    this.CEffect = this.CachedReference.CEffect;
-                    this.CHealth = this.CachedReference.CHealth;
-                    this.CMana = this.CachedReference.CMana;
-                    this.CHealthPercentage = this.CachedReference.CHealthPercentage;
-                    this.CManaPercentage = this.CachedReference.CManaPercentage;
-                    this.CMoveTo = this.CachedReference.CMoveTo;
-                    this.CProb = this.CachedReference.CProb;
-                    this.CBuffTime = this.CachedReference.CBuffTime;
-                    this.CWeaponAttack = this.CachedReference.CWeaponAttack;
-                    this.CMagicAttack = this.CachedReference.CMagicAttack;
-                    this.CWeaponDefense = this.CachedReference.CWeaponDefense;
-                    this.CMagicDefense = this.CachedReference.CMagicDefense;
-                    this.CAccuracy = this.CachedReference.CAccuracy;
-                    this.CAvoid = this.CachedReference.CAvoid;
-                    this.CSpeed = this.CachedReference.CSpeed;
-                    this.CJump = this.CachedReference.CJump;
-                    this.CMorph = this.CachedReference.CMorph;
+                    CFlags = CachedReference.CFlags;
+                    CCureAilments = CachedReference.CCureAilments;
+                    CEffect = CachedReference.CEffect;
+                    CHealth = CachedReference.CHealth;
+                    CMana = CachedReference.CMana;
+                    CHealthPercentage = CachedReference.CHealthPercentage;
+                    CManaPercentage = CachedReference.CManaPercentage;
+                    CMoveTo = CachedReference.CMoveTo;
+                    CProb = CachedReference.CProb;
+                    CBuffTime = CachedReference.CBuffTime;
+                    CWeaponAttack = CachedReference.CWeaponAttack;
+                    CMagicAttack = CachedReference.CMagicAttack;
+                    CWeaponDefense = CachedReference.CWeaponDefense;
+                    CMagicDefense = CachedReference.CMagicDefense;
+                    CAccuracy = CachedReference.CAccuracy;
+                    CAvoid = CachedReference.CAvoid;
+                    CSpeed = CachedReference.CSpeed;
+                    CJump = CachedReference.CJump;
+                    CMorph = CachedReference.CMorph;
                 }
 
-                this.Summons = this.CachedReference.Summons;
+                Summons = CachedReference.Summons;
             }
             else
             {
-                this.MapleID = (int)datum["itemid"];
-                this.MaxPerStack = (short)datum["max_slot_quantity"];
+                MapleID = (int)datum["itemid"];
+                MaxPerStack = (short)datum["max_slot_quantity"];
 
-                this.IsCash = ((string)datum["flags"]).Contains("cash_item");
-                this.OnlyOne = (sbyte)datum["max_possession_count"] > 0;
-                this.IsTradeBlocked = ((string)datum["flags"]).Contains("no_trade");
-                this.IsScissored = false;
-                this.SalePrice = (int)datum["price"];
-                this.RequiredLevel = (byte)datum["min_level"];
-                this.Meso = (int)datum["money"];
+                IsCash = ((string)datum["flags"]).Contains("cash_item");
+                OnlyOne = (sbyte)datum["max_possession_count"] > 0;
+                IsTradeBlocked = ((string)datum["flags"]).Contains("no_trade");
+                IsScissored = false;
+                SalePrice = (int)datum["price"];
+                RequiredLevel = (byte)datum["min_level"];
+                Meso = (int)datum["money"];
 
-                this.Summons = new List<Tuple<int, short>>();
+                Summons = new List<Tuple<int, short>>();
             }
         }
 
         public void LoadConsumeData(Datum datum)
         {
-            //this.CFlags = datum["flags"];
-            //this.CCureAilments = datum["cure_ailments"];
-            this.CEffect = (byte)datum["effect"];
-            this.CHealth = (short)datum["hp"];
-            this.CMana = (short)datum["mp"];
-            this.CHealthPercentage = (short)datum["hp_percentage"];
-            this.CManaPercentage = (short)datum["mp_percentage"];
-            this.CMoveTo = (int)datum["move_to"];
-            this.CProb = (byte)datum["prob"];
-            this.CBuffTime = (int)datum["buff_time"];
-            this.CWeaponAttack = (short)datum["weapon_attack"];
-            this.CMagicAttack = (short)datum["magic_attack"];
-            this.CWeaponDefense = (short)datum["weapon_defense"];
-            this.CMagicDefense = (short)datum["magic_defense"];
-            this.CAccuracy = (short)datum["accuracy"];
-            this.CAvoid = (short)datum["avoid"];
-            this.CSpeed = (short)datum["speed"];
-            this.CJump = (short)datum["jump"];
-            this.CMorph = (short)datum["morph"];
+            //CFlags = datum["flags"];
+            //CCureAilments = datum["cure_ailments"];
+            CEffect = (byte)datum["effect"];
+            CHealth = (short)datum["hp"];
+            CMana = (short)datum["mp"];
+            CHealthPercentage = (short)datum["hp_percentage"];
+            CManaPercentage = (short)datum["mp_percentage"];
+            CMoveTo = (int)datum["move_to"];
+            CProb = (byte)datum["prob"];
+            CBuffTime = (int)datum["buff_time"];
+            CWeaponAttack = (short)datum["weapon_attack"];
+            CMagicAttack = (short)datum["magic_attack"];
+            CWeaponDefense = (short)datum["weapon_defense"];
+            CMagicDefense = (short)datum["magic_defense"];
+            CAccuracy = (short)datum["accuracy"];
+            CAvoid = (short)datum["avoid"];
+            CSpeed = (short)datum["speed"];
+            CJump = (short)datum["jump"];
+            CMorph = (short)datum["morph"];
         }
 
         public void LoadEquipmentData(Datum datum)
         {
-            this.RequiredStrength = (short)datum["req_str"];
-            this.RequiredDexterity = (short)datum["req_dex"];
-            this.RequiredIntelligence = (short)datum["req_int"];
-            this.RequiredLuck = (short)datum["req_luk"];
-            this.RequiredFame = (short)datum["req_fame"];
+            RequiredStrength = (short)datum["req_str"];
+            RequiredDexterity = (short)datum["req_dex"];
+            RequiredIntelligence = (short)datum["req_int"];
+            RequiredLuck = (short)datum["req_luk"];
+            RequiredFame = (short)datum["req_fame"];
 
-            this.UpgradesAvailable = (byte)(ushort)datum["scroll_slots"];
-            this.UpgradesApplied = 0;
+            UpgradesAvailable = (byte)(ushort)datum["scroll_slots"];
+            UpgradesApplied = 0;
 
-            this.Health = (short)datum["hp"];
-            this.Mana = (short)datum["mp"];
-            this.Strength = (short)datum["strength"];
-            this.Dexterity = (short)datum["dexterity"];
-            this.Intelligence = (short)datum["intelligence"];
-            this.Luck = (short)datum["luck"];
-            this.WeaponAttack = (short)datum["weapon_attack"];
-            this.WeaponDefense = (short)datum["weapon_defense"];
-            this.MagicAttack = (short)datum["magic_attack"];
-            this.MagicDefense = (short)datum["magic_defense"];
-            this.Accuracy = (short)datum["accuracy"];
-            this.Avoidability = (short)datum["avoid"];
-            this.Speed = (short)datum["speed"];
-            this.Jump = (short)datum["jump"];
-            this.Agility = (short)datum["hands"];
+            Health = (short)datum["hp"];
+            Mana = (short)datum["mp"];
+            Strength = (short)datum["strength"];
+            Dexterity = (short)datum["dexterity"];
+            Intelligence = (short)datum["intelligence"];
+            Luck = (short)datum["luck"];
+            WeaponAttack = (short)datum["weapon_attack"];
+            WeaponDefense = (short)datum["weapon_defense"];
+            MagicAttack = (short)datum["magic_attack"];
+            MagicDefense = (short)datum["magic_defense"];
+            Accuracy = (short)datum["accuracy"];
+            Avoidability = (short)datum["avoid"];
+            Speed = (short)datum["speed"];
+            Jump = (short)datum["jump"];
+            Agility = (short)datum["hands"];
         }
 
         public void Save()
         {
             Datum datum = new Datum("items")
             {
-                ["AccountID"] = this.Character.AccountID,
-                ["CharacterID"] = this.Character.ID,
-                ["MapleID"] = this.MapleID,
-                ["Quantity"] = this.Quantity,
-                ["Slot"] = this.Slot,
-                ["Creator"] = this.Creator,
-                ["UpgradesAvailable"] = this.UpgradesAvailable,
-                ["UpgradesApplied"] = this.UpgradesApplied,
-                ["Strength"] = this.Strength,
-                ["Dexterity"] = this.Dexterity,
-                ["Intelligence"] = this.Intelligence,
-                ["Luck"] = this.Luck,
-                ["Health"] = this.Health,
-                ["Mana"] = this.Mana,
-                ["WeaponAttack"] = this.WeaponAttack,
-                ["MagicAttack"] = this.MagicAttack,
-                ["WeaponDefense"] = this.WeaponDefense,
-                ["MagicDefense"] = this.MagicDefense,
-                ["Accuracy"] = this.Accuracy,
-                ["Avoidability"] = this.Avoidability,
-                ["Agility"] = this.Agility,
-                ["Speed"] = this.Speed,
-                ["Jump"] = this.Jump,
-                ["IsScissored"] = this.IsScissored,
-                ["IsStored"] = this.IsStored,
-                ["PreventsSlipping"] = this.PreventsSlipping,
-                ["PreventsColdness"] = this.PreventsColdness
+                ["AccountID"] = Character.AccountID,
+                ["CharacterID"] = Character.ID,
+                ["MapleID"] = MapleID,
+                ["Quantity"] = Quantity,
+                ["Slot"] = Slot,
+                ["Creator"] = Creator,
+                ["UpgradesAvailable"] = UpgradesAvailable,
+                ["UpgradesApplied"] = UpgradesApplied,
+                ["Strength"] = Strength,
+                ["Dexterity"] = Dexterity,
+                ["Intelligence"] = Intelligence,
+                ["Luck"] = Luck,
+                ["Health"] = Health,
+                ["Mana"] = Mana,
+                ["WeaponAttack"] = WeaponAttack,
+                ["MagicAttack"] = MagicAttack,
+                ["WeaponDefense"] = WeaponDefense,
+                ["MagicDefense"] = MagicDefense,
+                ["Accuracy"] = Accuracy,
+                ["Avoidability"] = Avoidability,
+                ["Agility"] = Agility,
+                ["Speed"] = Speed,
+                ["Jump"] = Jump,
+                ["IsScissored"] = IsScissored,
+                ["IsStored"] = IsStored,
+                ["PreventsSlipping"] = PreventsSlipping,
+                ["PreventsColdness"] = PreventsColdness
             };
 
 
-            if (this.Assigned)
+            if (Assigned)
             {
-                datum.Update("ID = {0}", this.ID);
+                datum.Update("ID = {0}", ID);
             }
             else
             {
-                this.ID = datum.InsertAndReturnID();
-                this.Assigned = true;
+                ID = datum.InsertAndReturnID();
+                Assigned = true;
             }
         }
 
@@ -974,64 +974,64 @@ namespace Destiny.Maple
         {
             ItemConstants.EquipmentSlot slot = 0;
 
-            if (EquipmentConstants.HatsMapleIDs.Contains(this.MapleID))
+            if (EquipmentConstants.HatsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Hat;
             }
-            else if (EquipmentConstants.FaceAccMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.FaceAccMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.FaceAccessory;
             }
-            else if (EquipmentConstants.EyeAccMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.EyeAccMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.EyeAccessory;
             }
-            else if (EquipmentConstants.EarringsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.EarringsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Earrings;
             }
-            else if (EquipmentConstants.TopsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.TopsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Top;
             }
-            else if (EquipmentConstants.BottomsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.BottomsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Bottom;
             }
-            else if (EquipmentConstants.ShoesMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.ShoesMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Shoes;
             }
-            else if (EquipmentConstants.GlovesMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.GlovesMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Gloves;
             }
-            else if (EquipmentConstants.CapesMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.CapesMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Cape;
             }
-            else if (EquipmentConstants.ShieldsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.ShieldsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Shield;
             }
-            else if (EquipmentConstants.WeaponsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.WeaponsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Weapon;
             }
-            else if (EquipmentConstants.RingsMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.RingsMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Ring1;
             }
-            else if (EquipmentConstants.NecklacesMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.NecklacesMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.Necklace;
             }
-            else if (EquipmentConstants.MountsEquipMapleIDs.Contains(this.MapleID))
+            else if (EquipmentConstants.MountsEquipMapleIDs.Contains(MapleID))
             {
                 slot = ItemConstants.EquipmentSlot.MountEquip;
             }
 
-            if (this.IsCash)
+            if (IsCash)
             {
                 slot -= 100;
             }
@@ -1046,8 +1046,8 @@ namespace Destiny.Maple
             oPacket
                 .WriteByte((byte)ServerConstants.MessageType.DropPickup)
                 .WriteBool(false)
-                .WriteInt(this.MapleID)
-                .WriteInt(this.Quantity)
+                .WriteInt(MapleID)
+                .WriteInt(Quantity)
                 .WriteInt()
                 .WriteInt();
 
@@ -1065,7 +1065,7 @@ namespace Destiny.Maple
             {
                 if (!zeroPosition && !leaveOut)
                 {
-                    byte slot = this.ComputedSlot;
+                    byte slot = ComputedSlot;
 
                     if (slot < 0)
                     {
@@ -1076,7 +1076,7 @@ namespace Destiny.Maple
                         slot -= 100;
                     }
 
-                    if (this.ItemType == ItemConstants.ItemType.Equipment)
+                    if (ItemType == ItemConstants.ItemType.Equipment)
                     {
                         oPacket.WriteShort(slot);
                     }
@@ -1087,46 +1087,46 @@ namespace Destiny.Maple
                 }
 
                 oPacket
-                    .WriteByte((byte)(this.PetID != null ? 3 : this.ItemType == ItemConstants.ItemType.Equipment ? 1 : 2))
-                    .WriteInt(this.MapleID)
-                    .WriteBool(this.IsCash);
+                    .WriteByte((byte)(PetID != null ? 3 : ItemType == ItemConstants.ItemType.Equipment ? 1 : 2))
+                    .WriteInt(MapleID)
+                    .WriteBool(IsCash);
 
-                if (this.IsCash)
+                if (IsCash)
                 {
                     oPacket.WriteLong(1); // TODO: Unique ID for cash items.
                 }
 
-                oPacket.WriteDateTime(this.Expiration);
+                oPacket.WriteDateTime(Expiration);
 
-                if (this.PetID != null)
+                if (PetID != null)
                 {
 
                 }
-                else if (this.ItemType == ItemConstants.ItemType.Equipment)
+                else if (ItemType == ItemConstants.ItemType.Equipment)
                 {
                     oPacket
-                        .WriteByte(this.UpgradesAvailable)
-                        .WriteByte(this.UpgradesApplied)
-                        .WriteShort(this.Strength)
-                        .WriteShort(this.Dexterity)
-                        .WriteShort(this.Intelligence)
-                        .WriteShort(this.Luck)
-                        .WriteShort(this.Health)
-                        .WriteShort(this.Mana)
-                        .WriteShort(this.WeaponAttack)
-                        .WriteShort(this.MagicAttack)
-                        .WriteShort(this.WeaponDefense)
-                        .WriteShort(this.MagicDefense)
-                        .WriteShort(this.Accuracy)
-                        .WriteShort(this.Avoidability)
-                        .WriteShort(this.Agility)
-                        .WriteShort(this.Speed)
-                        .WriteShort(this.Jump)
-                        .WriteString(this.Creator)
-                        .WriteByte(this.Flags)
+                        .WriteByte(UpgradesAvailable)
+                        .WriteByte(UpgradesApplied)
+                        .WriteShort(Strength)
+                        .WriteShort(Dexterity)
+                        .WriteShort(Intelligence)
+                        .WriteShort(Luck)
+                        .WriteShort(Health)
+                        .WriteShort(Mana)
+                        .WriteShort(WeaponAttack)
+                        .WriteShort(MagicAttack)
+                        .WriteShort(WeaponDefense)
+                        .WriteShort(MagicDefense)
+                        .WriteShort(Accuracy)
+                        .WriteShort(Avoidability)
+                        .WriteShort(Agility)
+                        .WriteShort(Speed)
+                        .WriteShort(Jump)
+                        .WriteString(Creator)
+                        .WriteByte(Flags)
                         .WriteByte();
 
-                    if (!this.IsEquippedCash)
+                    if (!IsEquippedCash)
                     {
                         oPacket
                             .WriteByte()
@@ -1142,12 +1142,12 @@ namespace Destiny.Maple
                 else
                 {
                     oPacket
-                        .WriteShort(this.Quantity)
-                        .WriteString(this.Creator)
-                        .WriteByte(this.Flags)
+                        .WriteShort(Quantity)
+                        .WriteString(Creator)
+                        .WriteByte(Flags)
                         .WriteByte();
 
-                    if (this.IsRechargeable)
+                    if (IsRechargeable)
                     {
                         oPacket.WriteLong(); // TODO: Unique ID.
                     }

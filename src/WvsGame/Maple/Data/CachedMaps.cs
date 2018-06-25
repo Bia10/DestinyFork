@@ -13,7 +13,6 @@ namespace Destiny.Maple.Data
         {
             using (Log.Load("Maps"))
             {
-
             }
         }
 
@@ -21,50 +20,49 @@ namespace Destiny.Maple.Data
         {
             get
             {
-                if (!base.Contains(key))
+                if (base.Contains(key)) return base[key];
+
+                using (Database.TemporarySchema(Database.SchemaMCDB))
                 {
-                    using (Database.TemporarySchema(Database.SchemaMCDB))
+                    foreach (Datum datum in new Datums("map_data", Database.SchemaMCDB).Populate("mapid = {0}", key))
                     {
-                        foreach (Datum datum in new Datums("map_data", Database.SchemaMCDB).Populate("mapid = {0}", key))
+                        Add(new Map(datum));
+                    }
+
+                    foreach (Datum datum in new Datums("map_footholds", Database.SchemaMCDB).Populate("mapid = {0}", key))
+                    {
+                        this[key].Footholds.Add(new Foothold(datum));
+                    }
+
+                    foreach (Datum datum in new Datums("map_seats", Database.SchemaMCDB).Populate("mapid = {0}", key))
+                    {
+                        this[key].Seats.Add(new Seat(datum));
+                    }
+
+                    foreach (Datum datum in new Datums("map_portals", Database.SchemaMCDB).Populate("mapid = {0}", key))
+                    {
+                        this[key].Portals.Add(new Portal(datum));
+                    }
+
+                    foreach (Datum datum in new Datums("map_life", Database.SchemaMCDB).Populate("mapid = {0}", key))
+                    {
+                        switch ((string)datum["life_type"])
                         {
-                            this.Add(new Map(datum));
-                        }
+                            case "npc":
+                                this[key].Npcs.Add(new Npc(datum));
+                                break;
 
-                        foreach (Datum datum in new Datums("map_footholds", Database.SchemaMCDB).Populate("mapid = {0}", key))
-                        {
-                            this[key].Footholds.Add(new Foothold(datum));
-                        }
+                            case "mob":
+                                this[key].SpawnPoints.Add(new SpawnPoint(datum, true));
+                                break;
 
-                        foreach (Datum datum in new Datums("map_seats", Database.SchemaMCDB).Populate("mapid = {0}", key))
-                        {
-                            this[key].Seats.Add(new Seat(datum));
-                        }
-
-                        foreach (Datum datum in new Datums("map_portals", Database.SchemaMCDB).Populate("mapid = {0}", key))
-                        {
-                            this[key].Portals.Add(new Portal(datum));
-                        }
-
-                        foreach (Datum datum in new Datums("map_life", Database.SchemaMCDB).Populate("mapid = {0}", key))
-                        {
-                            switch ((string)datum["life_type"])
-                            {
-                                case "npc":
-                                    this[key].Npcs.Add(new Npc(datum));
-                                    break;
-
-                                case "mob":
-                                    this[key].SpawnPoints.Add(new SpawnPoint(datum, true));
-                                    break;
-
-                                case "reactor":
-                                    this[key].SpawnPoints.Add(new SpawnPoint(datum, false));
-                                    break;
-                            }
+                            case "reactor":
+                                this[key].SpawnPoints.Add(new SpawnPoint(datum, false));
+                                break;
                         }
                     }
-                    this[key].SpawnPoints.Spawn();
                 }
+                this[key].SpawnPoints.Spawn();
                 return base[key];
             }
         }

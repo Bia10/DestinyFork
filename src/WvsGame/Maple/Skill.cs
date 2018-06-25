@@ -84,7 +84,7 @@ namespace Destiny.Maple
 
                 if (Character.IsInitialized)
                 {
-                    Parent.UpdateSkill(this);
+                    CharacterSkills.UpdateSkill(this);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace Destiny.Maple
 
                 if (Parent != null && Character.IsInitialized)
                 {
-                    Parent.UpdateSkill(this);
+                    CharacterSkills.UpdateSkill(this);
                 }
             }
         }
@@ -727,7 +727,7 @@ namespace Destiny.Maple
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
-        //                            member.Character.Client.Send(oPacket);
+        //                            member.Character.Client.SendPacket(oPacket);
         //                        }
 
         //                        using (Packet oPacket = new Packet(ServerOperationCode.RemoteEffect))
@@ -813,7 +813,7 @@ namespace Destiny.Maple
         //                                .WriteByte(1)
         //                                .WriteByte(1);
 
-        //                            target.Client.Send(oPacket);
+        //                            target.Client.SendPacket(oPacket);
         //                        }
 
         //                        using (Packet oPacket = new Packet(ServerOperationCode.RemoteEffect))
@@ -856,7 +856,7 @@ namespace Destiny.Maple
         //            .WriteByte(1)
         //            .WriteByte(1);
 
-        //        Character.Client.Send(oPacket);
+        //        Character.Client.SendPacket(oPacket);
         //    }
 
         //    using (Packet oPacket = new Packet(ServerOperationCode.RemoteEffect))

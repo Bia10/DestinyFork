@@ -20,7 +20,7 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return this.Label == "sp";
+                return Label == "sp";
             }
         }
 
@@ -28,7 +28,7 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return DataProvider.Maps[this.DestinationMapID];
+                return DataProvider.Maps[DestinationMapID];
             }
         }
 
@@ -36,23 +36,23 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return DataProvider.Maps[this.DestinationMapID].Portals[this.DestinationLabel];
+                return DataProvider.Maps[DestinationMapID].Portals[DestinationLabel];
             }
         }
 
         public Portal(Datum datum)
         {
-            this.ID = (byte)(int)datum["id"];
-            this.Label = (string)datum["label"];
-            this.Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
-            this.DestinationMapID = (int)datum["destination"];
-            this.DestinationLabel = (string)datum["destination_label"];
-            this.Script = (string)datum["script"];
+            ID = (byte)(int)datum["id"];
+            Label = (string)datum["label"];
+            Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
+            DestinationMapID = (int)datum["destination"];
+            DestinationLabel = (string)datum["destination_label"];
+            Script = (string)datum["script"];
         }
 
         public void Enter(Character character)
         {
-            Log.Warn("'{0}' attempted to enter an unimplemented portal '{1}'.", character.Name, this.Script);
+            Log.Warn("'{0}' attempted to enter an unimplemented portal '{1}'.", character.Name, Script);
 
             using (Packet oPacket = new Packet(ServerOperationCode.TransferFieldReqInogred))
             {

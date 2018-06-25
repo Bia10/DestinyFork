@@ -47,7 +47,7 @@ namespace Destiny.Maple.Commands.Implementation
                         Skill skillToModify = caller.Skills[skillID];
                         skillToModify.CurrentLevel = (byte)skillLVL;
 
-                        caller.Skills.UpdateSkill(skillToModify);
+                        CharacterSkills.UpdateSkill(skillToModify);
                     }
 
                     // TODO: needs proper treatment
@@ -59,7 +59,7 @@ namespace Destiny.Maple.Commands.Implementation
                             MapleID = skillID
                         };
 
-                        caller.Skills.UpdateSkill(skillToAdd);
+                        CharacterSkills.UpdateSkill(skillToAdd);
                     }
                 }
                 else

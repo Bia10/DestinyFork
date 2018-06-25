@@ -30,9 +30,9 @@ namespace Destiny.Security
             0x84, 0x7F, 0x61, 0x1E, 0xCF, 0xC5, 0xD1, 0x56, 0x3D, 0xCA, 0xF4, 0x05, 0xC6, 0xE5, 0x08, 0x49
         };
 
-        private short mMajorVersion;
+        private readonly short mMajorVersion;
         private byte[] mIV;
-        private TransformDirection mDirection;
+        private readonly TransformDirection mDirection;
 
         private Action<byte[]> mTransformer;
 

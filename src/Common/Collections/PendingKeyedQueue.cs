@@ -12,7 +12,7 @@ namespace Destiny.Collections
 
         public void Enqueue(TKey key, TValue value)
         {
-            base.Add(key, value);
+            Add(key, value);
 
             QueueDone.Set();
         }

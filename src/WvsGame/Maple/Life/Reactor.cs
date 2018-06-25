@@ -20,62 +20,61 @@ namespace Destiny.Maple.Life
         {
             get
             {
-                return DataProvider.Reactors[this.MapleID];
+                return DataProvider.Reactors[MapleID];
             }
         }
 
-        public Reactor(Datum datum)
-            : base()
+        public Reactor(Datum datum) : base()
         {
-            this.MapleID = (int)datum["reactorid"];
-            this.Label = string.Empty; // TODO: Is this even relevant?
-            this.State = 0;
-            this.States = new ReactorState[(sbyte)datum["max_states"]];
+            MapleID = (int)datum["reactorid"];
+            Label = string.Empty; // TODO: Is this even relevant?
+            State = 0;
+            States = new ReactorState[(sbyte)datum["max_states"]];
         }
 
         public Reactor(int mapleID)
         {
-            this.MapleID = mapleID;
-            this.Label = this.CachedReference.Label;
-            this.State = this.CachedReference.State;
-            this.States = this.CachedReference.States;
+            MapleID = mapleID;
+            Label = CachedReference.Label;
+            State = CachedReference.State;
+            States = CachedReference.States;
         }
 
         public Reactor(SpawnPoint spawnPoint)
             : this(spawnPoint.MapleID)
         {
-            this.SpawnPoint = spawnPoint;
-            this.Position = spawnPoint.Position;
+            SpawnPoint = spawnPoint;
+            Position = spawnPoint.Position;
         }
 
         public void Hit(Character character, short actionDelay, int skillID)
         {
-            ReactorState state = this.States[this.State];
+            ReactorState state = States[State];
 
             switch (state.Type)
             {
                 case ReactorConstants.ReactorEventType.PlainAdvanceState:
                     {
-                        this.State = state.NextState;
+                        State = state.NextState;
 
-                        if (this.State == this.States.Length - 1) // TODO: Is this the correct way of doing this?
+                        if (State == States.Length - 1) // TODO: Is this the correct way of doing this?
                         {
-                            this.Map.Reactors.Remove(this);
+                            Map.Reactors.Remove(this);
                         }
                         else
                         {
                             using (Packet oPacket = new Packet(ServerOperationCode.ReactorChangeState))
                             {
                                 oPacket
-                                    .WriteInt(this.ObjectID)
-                                    .WriteByte(this.State)
-                                    .WriteShort(this.Position.X)
-                                    .WriteShort(this.Position.Y)
+                                    .WriteInt(ObjectID)
+                                    .WriteByte(State)
+                                    .WriteShort(Position.X)
+                                    .WriteShort(Position.Y)
                                     .WriteShort(actionDelay)
                                     .WriteByte() // NOTE: Event index.
                                     .WriteByte(4); // NOTE: Delay.
 
-                                this.Map.Broadcast(oPacket);
+                                Map.Broadcast(oPacket);
                             }
                         }
                     }
@@ -85,7 +84,7 @@ namespace Destiny.Maple.Life
 
         public Packet GetCreatePacket()
         {
-            return this.GetSpawnPacket();
+            return GetSpawnPacket();
         }
 
         public Packet GetSpawnPacket()
@@ -93,14 +92,14 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.ReactorEnterField);
 
             oPacket
-                .WriteInt(this.ObjectID)
-                .WriteInt(this.MapleID)
-                .WriteByte(this.State)
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y)
+                .WriteInt(ObjectID)
+                .WriteInt(MapleID)
+                .WriteByte(State)
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y)
                 .WriteShort() // NOTE: Flags (not sure).
                 .WriteBool(false) // NOTE: Unknown
-                .WriteString(this.Label);
+                .WriteString(Label);
 
             return oPacket;
         }
@@ -110,10 +109,10 @@ namespace Destiny.Maple.Life
             Packet oPacket = new Packet(ServerOperationCode.ReactorLeaveField);
 
             oPacket
-                .WriteInt(this.ObjectID)
-                .WriteByte(this.State)
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y);
+                .WriteInt(ObjectID)
+                .WriteByte(State)
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y);
 
             return oPacket;
         }

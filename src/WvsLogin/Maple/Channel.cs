@@ -10,9 +10,9 @@ namespace Destiny.Maple
 
         public Channel(Packet inPacket)
         {
-            this.ID = inPacket.ReadByte();
-            this.Port = inPacket.ReadUShort();
-            this.Population = inPacket.ReadInt();
+            ID = inPacket.ReadByte();
+            Port = inPacket.ReadUShort();
+            Population = inPacket.ReadInt();
         }
     }
 }

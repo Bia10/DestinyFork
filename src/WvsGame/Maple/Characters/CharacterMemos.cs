@@ -13,14 +13,14 @@ namespace Destiny.Maple.Characters
 
         public CharacterMemos(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("memos").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("memos").Populate("CharacterID = {0}", Parent.ID))
             {
-                this.Add(new Memo(datum));
+                Add(new Memo(datum));
             }
         }
 
@@ -50,7 +50,7 @@ namespace Destiny.Maple.Characters
                         {
                             int id = iPacket.ReadInt();
 
-                            if (!this.Contains(id))
+                            if (!Contains(id))
                             {
                                 continue;
                             }
@@ -69,14 +69,14 @@ namespace Destiny.Maple.Characters
             {
                 oPacket
                     .WriteByte((byte)ItemConstants.MemoResult.Send)
-                    .WriteByte((byte)this.Count);
+                    .WriteByte((byte)Count);
 
                 foreach (Memo memo in this)
                 {
                     oPacket.WriteBytes(memo.ToByteArray());
                 }
 
-                this.Parent.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 

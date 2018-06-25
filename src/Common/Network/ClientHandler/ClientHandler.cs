@@ -298,7 +298,7 @@ namespace Destiny.Network.ClientHandler
             }
         }
 
-        public void Dispose()
+        public void Dispose() //Routine to handle client disposal.
         {
             try
             {
@@ -322,5 +322,6 @@ namespace Destiny.Network.ClientHandler
 
             Log.Inform("{0} disposed.", Title);
         }
+
     }
 }

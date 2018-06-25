@@ -13,17 +13,16 @@ namespace Destiny.Maple.Characters
     {
         public Character Parent { get; private set; }
 
-        public CharacterSkills(Character parent)
-             : base()
+        public CharacterSkills(Character parent) : base()
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("skills").Populate("CharacterID = {0}", this.Parent.ID))
+            foreach (Datum datum in new Datums("skills").Populate("CharacterID = {0}", Parent.ID))
             {
-                this.Add(new Skill(datum));
+                Add(new Skill(datum));
             }
         }
 
@@ -50,7 +49,7 @@ namespace Destiny.Maple.Characters
 
     public void CastSkillHandler(Packet inPacket)
         {
-            inPacket.ReadInt(); // NOTE: Ticks.
+            int ticks = inPacket.ReadInt();
             int mapleID = inPacket.ReadInt();
             byte level = inPacket.ReadByte();
 
@@ -74,7 +73,7 @@ namespace Destiny.Maple.Characters
                         {
                             int targetID = inPacket.ReadInt();
 
-                            Character target = this.Parent.Map.Characters[targetID];
+                            Character target = Parent.Map.Characters[targetID];
 
                             if (!target.IsAlive)
                             {
@@ -90,7 +89,7 @@ namespace Destiny.Maple.Characters
         {
             using (ByteBuffer oPacket = new ByteBuffer())
             {
-                oPacket.WriteShort((short)this.Count);
+                oPacket.WriteShort((short)Count);
 
                 List<Skill> cooldownSkills = new List<Skill>();
 
@@ -127,7 +126,7 @@ namespace Destiny.Maple.Characters
 
         protected override void RemoveItem(int index)
         {
-            Skill item = base.Items[index];
+            Skill item = Items[index];
 
             item.Parent = null;
 
@@ -139,7 +138,7 @@ namespace Destiny.Maple.Characters
             return item.MapleID;
         }
 
-        public void UpdateSkill(Skill skill)
+        public static void UpdateSkill(Skill skill)
         {
             skill.Character.Client.Send(CharacterSkillsPackets.UpdateSkill(skill));
         }
@@ -167,13 +166,13 @@ namespace Destiny.Maple.Characters
 
                 if (!IsHiddenSkill(skillToMod.MapleID))
                 {
-                    character.Skills.UpdateSkill(skillToMod);
+                    UpdateSkill(skillToMod);
                 }
             }
             else
             {
                 character.Skills.Remove(skillToMod);
-                character.Skills.UpdateSkill(skillToMod);
+                UpdateSkill(skillToMod);
             }
         }
 

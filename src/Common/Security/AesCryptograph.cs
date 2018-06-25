@@ -43,10 +43,10 @@ namespace Destiny.Security
 
         public AesCryptograph(byte[] iv, short version)
         {
-            this.IV = iv;
-            this.CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00));
+            IV = iv;
+            CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00));
 
-            this.Aes = new AesManaged()
+            Aes = new AesManaged()
             {
                 KeySize = 256,
                 Key = AesCryptograph.UserKey,
@@ -97,7 +97,7 @@ namespace Destiny.Security
         public void Crypt(byte[] data)
         {
             MemoryStream memoryStream = new MemoryStream();
-            CryptoStream cryptoStream = new CryptoStream(memoryStream, this.Aes.CreateEncryptor(), CryptoStreamMode.Write);
+            CryptoStream cryptoStream = new CryptoStream(memoryStream, Aes.CreateEncryptor(), CryptoStreamMode.Write);
 
             int remaining = data.Length;
             int length = 0x5B0;
@@ -105,7 +105,7 @@ namespace Destiny.Security
 
             while (remaining > 0)
             {
-                byte[] iv = BitTools.MultiplyBytes(this.IV, 4, 4);
+                byte[] iv = BitTools.MultiplyBytes(IV, 4, 4);
 
                 if (remaining < length)
                 {
@@ -133,7 +133,7 @@ namespace Destiny.Security
             cryptoStream.Dispose();
             memoryStream.Dispose();
 
-            this.UpdateIV();
+            UpdateIV();
         }
 
         public void UpdateIV()
@@ -142,18 +142,18 @@ namespace Destiny.Security
 
             for (int i = 0; i < 4; i++)
             {
-                AesCryptograph.Shuffle(this.IV[i], newIV);
+                AesCryptograph.Shuffle(IV[i], newIV);
             }
 
-            this.IV = newIV;
+            IV = newIV;
         }
 
         public byte[] GenerateHeader(int length)
         {
-            int alpha = this.IV[3];
-            alpha |= (this.IV[2] << 8);
+            int alpha = IV[3];
+            alpha |= (IV[2] << 8);
 
-            alpha ^= this.CryptedMapleVersion;
+            alpha ^= CryptedMapleVersion;
             int mLength = (length << 8) | (int)((uint)length >> 8);
             int beta = alpha ^ mLength;
 
@@ -182,7 +182,7 @@ namespace Destiny.Security
         {
             try
             {
-                return ((((packet[0] ^ this.IV[2]) & 0xFF) == ((this.CryptedMapleVersion >> 8) & 0xFF)) && (((packet[1] ^ this.IV[3]) & 0xFF) == (this.CryptedMapleVersion & 0xFF)));
+                return ((((packet[0] ^ IV[2]) & 0xFF) == ((CryptedMapleVersion >> 8) & 0xFF)) && (((packet[1] ^ IV[3]) & 0xFF) == (CryptedMapleVersion & 0xFF)));
             }
             catch
             {
@@ -192,7 +192,7 @@ namespace Destiny.Security
 
         public void Dispose()
         {
-            this.Aes.Dispose();
+            Aes.Dispose();
         }
     }
 }

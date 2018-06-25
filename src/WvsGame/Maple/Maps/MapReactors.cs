@@ -20,7 +20,7 @@ namespace Destiny.Maple.Maps
 
                 using (Packet oPacket = item.GetCreatePacket())
                 {
-                    this.Map.Broadcast(oPacket);
+                    Map.Broadcast(oPacket);
                 }
             }
         }
@@ -35,7 +35,7 @@ namespace Destiny.Maple.Maps
                 {
                     using (Packet oPacket = item.GetDestroyPacket())
                     {
-                        this.Map.Broadcast(oPacket);
+                        Map.Broadcast(oPacket);
                     }
                 }
 
@@ -52,7 +52,7 @@ namespace Destiny.Maple.Maps
         {
             int objectID = iPacket.ReadInt();
 
-            if (!this.Contains(objectID))
+            if (!Contains(objectID))
             {
                 return;
             }
@@ -62,7 +62,7 @@ namespace Destiny.Maple.Maps
             iPacket.ReadInt(); // NOTE: Unknown
             int skillID = iPacket.ReadInt();
 
-            Reactor reactor = this.Map.Reactors[objectID];
+            Reactor reactor = Map.Reactors[objectID];
 
             bool valid = true; // TODO: Validate position between attacker and reactor.
 

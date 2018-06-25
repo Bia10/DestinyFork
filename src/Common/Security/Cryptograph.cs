@@ -11,7 +11,7 @@ namespace Destiny.Security
 
         public void Dispose()
         {
-            this.CustomDispose();
+            CustomDispose();
         }
     }
 }

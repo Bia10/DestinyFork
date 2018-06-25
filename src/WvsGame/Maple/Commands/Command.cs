@@ -10,7 +10,7 @@ namespace Destiny.Maple.Commands
 
         public abstract void Execute(Character caller, string[] args);
 
-        public string CombineArgs(string[] args, int start = 0)
+        protected static string CombineArgs(string[] args, int start = 0)
         {
             string result = string.Empty;
 
@@ -34,9 +34,9 @@ namespace Destiny.Maple.Commands
             return result.Trim();
         }
 
-        public void ShowSyntax(Character caller)
+        protected void ShowSyntax(Character caller)
         {
-            Character.Notify(caller, string.Format("[Syntax] {0}{1} {2}", Application.CommandIndicator, this.Name, this.Parameters.ClearFormatters()));
+            Character.Notify(caller, string.Format("[Syntax] {0}{1} {2}", Application.CommandIndicator, Name, Parameters.ClearFormatters()));
         }
     }
 }

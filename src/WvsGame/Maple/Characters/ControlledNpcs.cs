@@ -12,7 +12,7 @@ namespace Destiny.Maple.Characters
 
         public ControlledNpcs(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public void Move(Packet iPacket)
@@ -37,15 +37,15 @@ namespace Destiny.Maple.Characters
         {
             lock (this)
             {
-                if (this.Parent.Client.IsAlive)
+                if (Parent.Client.IsAlive)
                 {
-                    item.Controller = this.Parent;
+                    item.Controller = Parent;
 
                     base.InsertItem(index, item);
 
                     using (Packet oPacket = item.GetControlRequestPacket())
                     {
-                        this.Parent.Client.Send(oPacket);
+                        Parent.Client.Send(oPacket);
                     }
                 }
                 else
@@ -61,11 +61,11 @@ namespace Destiny.Maple.Characters
             {
                 Npc item = base.Items[index];
 
-                if (this.Parent.Client.IsAlive)
+                if (Parent.Client.IsAlive)
                 {
                     using (Packet oPacket = item.GetControlCancelPacket())
                     {
-                        this.Parent.Client.Send(oPacket);
+                        Parent.Client.Send(oPacket);
                     }
                 }
 
@@ -88,7 +88,7 @@ namespace Destiny.Maple.Characters
 
                 foreach (Npc npc in toRemove)
                 {
-                    this.Remove(npc);
+                    Remove(npc);
                 }
             }
         }

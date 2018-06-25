@@ -32,11 +32,11 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length < 1)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {
-                string message = this.CombineArgs(args);
+                string message = CombineArgs(args);
 
                 //caller.Client.World.Notify(string.Format("{0}: {1}", caller.Name, message));
             }

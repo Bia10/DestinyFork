@@ -1,8 +1,9 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using System.Collections.Generic;
+
+using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
-using System;
-using System.Collections.Generic;
 using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Network.Common;
@@ -19,23 +20,22 @@ namespace Destiny.Maple.Maps
         {
             base.InsertItem(index, item);
 
-            if (DataProvider.IsInitialized)
-            {
-                using (Packet oPacket = item.GetCreatePacket())
-                {
-                    this.Map.Broadcast(oPacket);
-                }
+            if (!DataProvider.IsInitialized) return;
 
-                try
-                {
-                    item.AssignController();
-                }
-                catch (Exception e)
-                {
-                    Log.SkipLine();
-                    Log.Inform("ERROR: MapMobs-InsertItem() failed to AssignController to mobObject item: {0}! \n Exception occurred: {1}", item.ObjectID, e);
-                    Log.SkipLine();
-                }
+            using (Packet oPacket = item.GetCreatePacket())
+            {
+                Map.Broadcast(oPacket);
+            }
+
+            try
+            {
+                item.AssignController();
+            }
+            catch (Exception e)
+            {
+                Log.SkipLine();
+                Log.Inform("ERROR: MapMobs-InsertItem() failed to AssignController to mobObject item: {0}! \n Exception occurred: {1}", item.ObjectID, e);
+                Log.SkipLine();
             }
         }
 
@@ -49,18 +49,17 @@ namespace Destiny.Maple.Maps
 
             foreach (KeyValuePair<Character, uint> attacker in item.Attackers)
             {
-                if (attacker.Key.Map == this.Map)
+                if (attacker.Key.Map != Map) continue;
+
+                if (attacker.Value > mostDamage)
                 {
-                    if (attacker.Value > mostDamage)
-                    {
-                        owner = attacker.Key;
-                    }
-                    //TODO: more conditioning, exps buffs, exps debuffs
-                    attacker.Key.Stats.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * WvsGame.ExperienceRate;
-                    int expGained = (int)item.Experience * WvsGame.ExperienceRate;
-                    Packet ExpGainOnMobDeath = Experience.GetShowExpGainPacket(true, expGained, false, 0, 0);
-                    owner.Client.Send(ExpGainOnMobDeath);
+                    owner = attacker.Key;
                 }
+                //TODO: more conditioning, exps buffs, exps debuffs
+                attacker.Key.Stats.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * WvsGame.ExperienceRate;
+                int expGained = (int)item.Experience * WvsGame.ExperienceRate;
+                Packet ExpGainOnMobDeath = Experience.GetShowExpGainPacket(true, expGained, false, 0, 0);
+                owner.Client.Send(ExpGainOnMobDeath);
             }
 
             item.Attackers.Clear();
@@ -71,24 +70,24 @@ namespace Destiny.Maple.Maps
 
                 foreach (Loot loopLoot in item.Loots)
                 {
-                    if ((Application.Random.Next(1000000) / WvsGame.DropRate) <= loopLoot.Chance)
+                    if (Application.Random.Next(1000000) / WvsGame.DropRate > loopLoot.Chance) continue;
+
+                    if (loopLoot.IsMeso)
                     {
-                        if (loopLoot.IsMeso)
+                        drops.Add(new Meso((short)(Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * WvsGame.MesoRate))
                         {
-                            drops.Add(new Meso((short)(Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * WvsGame.MesoRate))
-                            {
-                                Dropper = item,
-                                Owner = owner
-                            });
-                        }
-                        else
+                            Dropper = item,
+                            Owner = owner
+                        });
+                    }
+
+                    else
+                    {
+                        drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
                         {
-                            drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
-                            {
-                                Dropper = item,
-                                Owner = owner
-                            });
-                        }
+                            Dropper = item,
+                            Owner = owner
+                        });
                     }
                 }
 
@@ -96,7 +95,7 @@ namespace Destiny.Maple.Maps
                 {
                     // TODO: Space out drops.
 
-                    this.Map.Drops.Add(loopDrop);
+                    Map.Drops.Add(loopDrop);
                 }
             }
 
@@ -104,38 +103,37 @@ namespace Destiny.Maple.Maps
             {
                 foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStarted in owner.Quests.Started)
                 {
-                    if (loopStarted.Value.ContainsKey(item.MapleID))
+                    if (!loopStarted.Value.ContainsKey(item.MapleID)) continue;
+
+                    if (loopStarted.Value[item.MapleID] >= 
+                        DataProvider.Quests[loopStarted.Key].PostRequiredKills[item.MapleID]) continue;
+
+                    loopStarted.Value[item.MapleID]++;
+
+                    using (Packet oPacket = new Packet(ServerOperationCode.Message))
                     {
-                        if (loopStarted.Value[item.MapleID] < DataProvider.Quests[loopStarted.Key].PostRequiredKills[item.MapleID])
+                        oPacket
+                            .WriteByte((byte)ServerConstants.MessageType.QuestRecord)
+                            .WriteUShort(loopStarted.Key)
+                            .WriteByte(1);
+
+                        string kills = string.Empty;
+
+                        foreach (int kill in loopStarted.Value.Values)
                         {
-                            loopStarted.Value[item.MapleID]++;
+                            kills += kill.ToString().PadLeft(3, '0');
+                        }
 
-                            using (Packet oPacket = new Packet(ServerOperationCode.Message))
-                            {
-                                oPacket
-                                    .WriteByte((byte)ServerConstants.MessageType.QuestRecord)
-                                    .WriteUShort(loopStarted.Key)
-                                    .WriteByte(1);
+                        oPacket
+                            .WriteString(kills)
+                            .WriteInt()
+                            .WriteInt();
 
-                                string kills = string.Empty;
+                        owner.Client.Send(oPacket);
 
-                                foreach (int kill in loopStarted.Value.Values)
-                                {
-                                    kills += kill.ToString().PadLeft(3, '0');
-                                }
-
-                                oPacket
-                                    .WriteString(kills)
-                                    .WriteInt()
-                                    .WriteInt();
-
-                                owner.Client.Send(oPacket);
-
-                                if (owner.Quests.CanComplete(loopStarted.Key, true))
-                                {
-                                    owner.Quests.NotifyComplete(loopStarted.Key);
-                                }
-                            }
+                        if (owner.Quests.CanComplete(loopStarted.Key, true))
+                        {
+                            owner.Quests.NotifyComplete(loopStarted.Key);
                         }
                     }
                 }
@@ -160,7 +158,7 @@ namespace Destiny.Maple.Maps
 
                 using (Packet oPacket = item.GetDestroyPacket((Mob.DeathEffects)item.DeathEffect))
                 {
-                    this.Map.Broadcast(oPacket);
+                    Map.Broadcast(oPacket);
                 }
             }
 
@@ -173,7 +171,7 @@ namespace Destiny.Maple.Maps
 
             foreach (int summonID in item.DeathSummons)
             {
-                this.Map.Mobs.Add(new Mob(summonID)
+                Map.Mobs.Add(new Mob(summonID)
                 {
                     Position = item.Position // TODO: Set owner as well.
                 });

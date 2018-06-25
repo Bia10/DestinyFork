@@ -35,20 +35,13 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length == 0)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {
                 string query;
 
-                if (args[0].StartsWith("-", StringComparison.Ordinal))
-                {
-                    query = this.CombineArgs(args, 1).ToLower();
-                }
-                else
-                {
-                    query = this.CombineArgs(args).ToLower();
-                }
+                query = args[0].StartsWith("-", StringComparison.Ordinal) ? CombineArgs(args, 1).ToLower() : CombineArgs(args).ToLower();
 
                 if (query.Length < 2)
                 {

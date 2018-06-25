@@ -32,11 +32,11 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length < 2)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {
-                string message = this.CombineArgs(args, 1);
+                string message = CombineArgs(args, 1);
 
                 switch (args[0].ToLower())
                 {
@@ -53,7 +53,7 @@ namespace Destiny.Maple.Commands.Implementation
                         break;
 
                     default:
-                        this.ShowSyntax(caller);
+                        ShowSyntax(caller);
                         break;
                 }
             }

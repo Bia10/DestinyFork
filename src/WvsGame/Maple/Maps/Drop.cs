@@ -26,8 +26,8 @@ namespace Destiny.Maple.Maps
             {
                 mDropper = value;
 
-                this.Origin = mDropper.Position;
-                this.Position = mDropper.Map.Footholds.FindFloor(mDropper.Position);
+                Origin = mDropper.Position;
+                Position = mDropper.Map.Footholds.FindFloor(mDropper.Position);
             }
         }
 
@@ -35,22 +35,22 @@ namespace Destiny.Maple.Maps
 
         public Packet GetCreatePacket()
         {
-            return this.GetInternalPacket(true, null);
+            return GetInternalPacket(true, null);
         }
 
         public Packet GetCreatePacket(Character temporaryOwner)
         {
-            return this.GetInternalPacket(true, temporaryOwner);
+            return GetInternalPacket(true, temporaryOwner);
         }
 
         public Packet GetSpawnPacket()
         {
-            return this.GetInternalPacket(false, null);
+            return GetInternalPacket(false, null);
         }
 
         public Packet GetSpawnPacket(Character temporaryOwner)
         {
-            return this.GetInternalPacket(false, temporaryOwner);
+            return GetInternalPacket(false, temporaryOwner);
         }
 
         private Packet GetInternalPacket(bool dropped, Character temporaryOwner)
@@ -59,30 +59,37 @@ namespace Destiny.Maple.Maps
 
             oPacket
                 .WriteByte((byte)(dropped ? 1 : 2)) // TODO: Other types; 3 = disappearing, and 0 probably is something as well.
-                .WriteInt(this.ObjectID)
+                .WriteInt(ObjectID)
                 .WriteBool(this is Meso);
 
-            if (this is Meso)
+            var meso = this as Meso;
+
+            if (meso != null)
             {
-                oPacket.WriteInt(((Meso)this).Amount);
+                oPacket.WriteInt(meso.Amount);
             }
-            else if (this is Item)
+            else
             {
-                oPacket.WriteInt(((Item)this).MapleID);
+                var item = this as Item;
+
+                if (item != null)
+                {
+                    oPacket.WriteInt(item.MapleID);
+                }
             }
 
             oPacket
-                .WriteInt(this.Owner != null ? this.Owner.ID : temporaryOwner.ID)
+                .WriteInt(Owner?.ID ?? temporaryOwner.ID)
                 .WriteByte() // TODO: Type implementation (0 - normal, 1 - party, 2 - FFA, 3 - explosive)
-                .WriteShort(this.Position.X)
-                .WriteShort(this.Position.Y)
-                .WriteInt(this.Dropper.ObjectID);
+                .WriteShort(Position.X)
+                .WriteShort(Position.Y)
+                .WriteInt(Dropper.ObjectID);
 
             if (dropped)
             {
                 oPacket
-                    .WriteShort(this.Origin.X)
-                    .WriteShort(this.Origin.Y)
+                    .WriteShort(Origin.X)
+                    .WriteShort(Origin.Y)
                     .WriteShort(); // NOTE: Foothold, probably.
             }
 
@@ -101,9 +108,9 @@ namespace Destiny.Maple.Maps
             Packet oPacket = new Packet(ServerOperationCode.DropLeaveField);
 
             oPacket
-                .WriteByte((byte)(this.Picker == null ? 0 : 2))
-                .WriteInt(this.ObjectID)
-                .WriteInt(this.Picker != null ? this.Picker.ID : 0);
+                .WriteByte((byte)(Picker == null ? 0 : 2))
+                .WriteInt(ObjectID)
+                .WriteInt(Picker?.ID ?? 0);
 
             return oPacket;
         }

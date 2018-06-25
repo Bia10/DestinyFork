@@ -14,17 +14,17 @@ namespace Destiny.Maple.Data
 
         public AvailableStyles()
         {
-            this.Skins = new List<byte>();
-            this.MaleHairs = new List<int>();
-            this.FemaleHairs = new List<int>();
-            this.MaleFaces = new List<int>();
-            this.FemaleFaces = new List<int>();
+            Skins = new List<byte>();
+            MaleHairs = new List<int>();
+            FemaleHairs = new List<int>();
+            MaleFaces = new List<int>();
+            FemaleFaces = new List<int>();
 
             using (Log.Load("Styles"))
             {
                 foreach (Datum datum in new Datums("character_skin_data", Database.SchemaMCDB).Populate())
                 {
-                    this.Skins.Add((byte)(sbyte)datum["skinid"]);
+                    Skins.Add((byte)(sbyte)datum["skinid"]);
                 }
 
                 foreach (Datum datum in new Datums("character_hair_data", Database.SchemaMCDB).Populate())
@@ -32,11 +32,11 @@ namespace Destiny.Maple.Data
                     switch ((string)datum["gender"])
                     {
                         case "male":
-                            this.MaleHairs.Add((int)datum["hairid"]);
+                            MaleHairs.Add((int)datum["hairid"]);
                             break;
 
                         case "female":
-                            this.FemaleHairs.Add((int)datum["hairid"]);
+                            FemaleHairs.Add((int)datum["hairid"]);
                             break;
                     }
                 }
@@ -46,11 +46,11 @@ namespace Destiny.Maple.Data
                     switch ((string)datum["gender"])
                     {
                         case "male":
-                            this.MaleFaces.Add((int)datum["faceid"]);
+                            MaleFaces.Add((int)datum["faceid"]);
                             break;
 
                         case "female":
-                            this.FemaleFaces.Add((int)datum["faceid"]);
+                            FemaleFaces.Add((int)datum["faceid"]);
                             break;
                     }
                 }

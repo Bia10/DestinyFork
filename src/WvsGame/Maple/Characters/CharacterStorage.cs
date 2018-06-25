@@ -23,13 +23,13 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return this.Items.Count == this.Slots;
+                return Items.Count == Slots;
             }
         }
 
         public CharacterStorage(Character parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public void Load()
@@ -38,25 +38,25 @@ namespace Destiny.Maple.Characters
 
             try
             {
-                datum.Populate("AccountID = {0}", this.Parent.AccountID);
+                datum.Populate("AccountID = {0}", Parent.AccountID);
             }
             catch
             {
-                datum["AccountID"] = this.Parent.AccountID;
+                datum["AccountID"] = Parent.AccountID;
                 datum["Slots"] = (byte)4;
                 datum["Meso"] = 0;
 
                 datum.Insert();
             }
 
-            this.Slots = (byte)datum["Slots"];
-            this.Meso = (int)datum["Meso"];
+            Slots = (byte)datum["Slots"];
+            Meso = (int)datum["Meso"];
 
-            this.Items = new List<Item>();
+            Items = new List<Item>();
 
-            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = {0} AND IsStored = True", this.Parent.AccountID))
+            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = {0} AND IsStored = True", Parent.AccountID))
             {
-                this.Items.Add(new Item(itemDatum));
+                Items.Add(new Item(itemDatum));
             }
         }
 
@@ -64,13 +64,13 @@ namespace Destiny.Maple.Characters
         {
             Datum datum = new Datum("storages")
             {
-                ["Slots"] = this.Slots,
-                ["Meso"] = this.Meso
+                ["Slots"] = Slots,
+                ["Meso"] = Meso
             };
 
-            datum.Update("AccountID = {0}", this.Parent.AccountID);
+            datum.Update("AccountID = {0}", Parent.AccountID);
 
-            foreach (Item item in this.Items)
+            foreach (Item item in Items)
             {
                 item.Save();
             }
@@ -78,11 +78,11 @@ namespace Destiny.Maple.Characters
 
         public void Show(Npc npc)
         {
-            this.Npc = npc;
+            Npc = npc;
 
-            this.Load();
+            Load();
 
-            this.Parent.Client.Send(CharacterPackets.StorageOpen(npc, this));
+            Parent.Client.Send(CharacterPackets.StorageOpen(npc, this));
         }
 
         public void CharStorageHandler(Packet inPacket)
@@ -98,14 +98,14 @@ namespace Destiny.Maple.Characters
                         byte itemSlot = inPacket.ReadByte();
 
                         // First seek slot to find the item to withdraw in
-                        if (itemSlot < 0 || itemSlot > this.Slots)
+                        if (itemSlot < 0 || itemSlot > Slots)
                         {
                             return;
                             // TODO: storage exceptions on wrongly received/read data from packet, CharacterStorageExceptions.WrongSlotRecieved 
                         }
 
                         // Slot is valid thus seek an item on its position
-                        Item item = this.Items[itemSlot];
+                        Item item = Items[itemSlot];
                         if (item == null)
                         {
                             return;
@@ -113,27 +113,27 @@ namespace Destiny.Maple.Characters
                         }
 
                         // Do i actually have free inventory slot to place withdrawn item in?
-                        if (this.Parent.Items.IsInventoryFull(item.ItemType))
+                        if (Parent.Items.IsInventoryFull(item.ItemType))
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorPlayerInventoryFull));
+                            Parent.Client.Send(CharacterPackets.StorageErrorPacket(Parent, NPCsConstants.StoragePacketType.ErrorPlayerInventoryFull));
                             return;
                         }
 
                         // Even if i do, still i may not have enough mesos to demand this payed service :(
                         int costToWithdraw = 1000; // TODO: how is the cost actually calculated?
-                        if (this.Parent.Stats.Meso < costToWithdraw)
+                        if (Parent.Stats.Meso < costToWithdraw)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
+                            Parent.Client.Send(CharacterPackets.StorageErrorPacket(Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
-                        if (this.Parent.Stats.Meso >= costToWithdraw)
+                        if (Parent.Stats.Meso >= costToWithdraw)
                         {
                             // Devour character mesos   
-                            Maple.Meso.giveMesos(this.Parent, costToWithdraw);     
+                            Maple.Meso.giveMesos(Parent, costToWithdraw);     
 
                             // Remove item from storage
-                            this.Items.Remove(item); 
+                            Items.Remove(item); 
 
                             // Delete item from Database
                             Item.DeleteItemFromDB(item); 
@@ -142,11 +142,11 @@ namespace Destiny.Maple.Characters
                             item.IsStored = false; 
 
                             // Add item to char. items
-                            this.Parent.Items.AddItemToInventory(item, forceGetSlot: true); 
+                            Parent.Items.AddItemToInventory(item, forceGetSlot: true); 
 
                             // routine to get count of items of same type
                             List<Item> itemsByType = new List<Item>();
-                            foreach (Item loopItem in this.Items)
+                            foreach (Item loopItem in Items)
                             {
                                 if (loopItem.Type == item.Type)
                                 {
@@ -154,7 +154,7 @@ namespace Destiny.Maple.Characters
                                 }
                             }
 
-                            this.Parent.Client.Send(CharacterPackets.StorageRemoveItem(this.Parent, item, itemsByType));
+                            Parent.Client.Send(CharacterPackets.StorageRemoveItem(Parent, item, itemsByType));
                         }
                     }
                     break;
@@ -168,45 +168,45 @@ namespace Destiny.Maple.Characters
 
                         // TODO: slot validation, quantity validation
                         // try to get item to deposit from slot in char. inventory
-                        Item item = this.Parent.Items[itemID, slot];
+                        Item item = Parent.Items[itemID, slot];
 
                         // storage full cant deposit
-                        if (this.IsFull)
+                        if (IsFull)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorStorageInventoryFull));
+                            Parent.Client.Send(CharacterPackets.StorageErrorPacket(Parent, NPCsConstants.StoragePacketType.ErrorStorageInventoryFull));
                             return;
                         }
 
                         // not enough mesos to pay for deposit
-                        if (this.Parent.Stats.Meso <= this.Npc.StorageCost)
+                        if (Parent.Stats.Meso <= Npc.StorageCost)
                         {
-                            this.Parent.Client.Send(CharacterPackets.StorageErrorPacket(this.Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
+                            Parent.Client.Send(CharacterPackets.StorageErrorPacket(Parent, NPCsConstants.StoragePacketType.ErrorNotEnoughMesos));
                             return;
                         }
 
-                        if (this.Parent.Stats.Meso >= this.Npc.StorageCost)
+                        if (Parent.Stats.Meso >= Npc.StorageCost)
                         {
                             //devour character mesos
-                            this.Parent.Stats.Meso -= this.Npc.StorageCost; 
+                            Parent.Stats.Meso -= Npc.StorageCost; 
 
                             // remove item form inventory
-                            this.Parent.Items.RemoveItemFromInventory(item, true);
+                            Parent.Items.RemoveItemFromInventory(item, true);
 
                             // NOTE: This is needed because when we remove the item is sets parent to none.
-                            item.Parent = this.Parent.Items;
+                            item.Parent = Parent.Items;
 
                             // slot in storage is maxCount of items in it
-                            item.Slot = (short)this.Items.Count;
+                            item.Slot = (short)Items.Count;
 
                             // set flag on item
                             item.IsStored = true;
 
                             // add item to storage
-                            this.Items.Add(item); 
+                            Items.Add(item); 
 
                             // routine to get count of items of same type
                             List<Item> itemsByType = new List<Item>();
-                            foreach (Item loopItem in this.Items)
+                            foreach (Item loopItem in Items)
                             {
                                 if (loopItem.Type == item.Type)
                                 {
@@ -214,14 +214,14 @@ namespace Destiny.Maple.Characters
                                 }
                             }
 
-                            this.Parent.Client.Send(CharacterPackets.StorageAddItem(this.Parent, item, itemsByType));
+                            Parent.Client.Send(CharacterPackets.StorageAddItem(Parent, item, itemsByType));
                         }
                     }
                     break;
 
                 case NPCsConstants.StorageAction.ArrangeItem:
                     {
-                        this.Parent.Client.Send(CharacterPackets.StorageArrangeItems(this.Parent));
+                        Parent.Client.Send(CharacterPackets.StorageArrangeItems(Parent));
                     }
                     break;
 
@@ -238,16 +238,16 @@ namespace Destiny.Maple.Characters
                             // TODO: Meso checks.
                         }
 
-                        this.Meso -= meso;
-                        this.Parent.Stats.Meso += meso;
+                        Meso -= meso;
+                        Parent.Stats.Meso += meso;
 
-                        this.Parent.Client.Send(CharacterPackets.StorageChangeMesos(this.Parent));
+                        Parent.Client.Send(CharacterPackets.StorageChangeMesos(Parent));
                     }
                     break;
 
                 case NPCsConstants.StorageAction.CloseStorage:
                     {
-                        this.Save();
+                        Save();
                     }
                     break;
 

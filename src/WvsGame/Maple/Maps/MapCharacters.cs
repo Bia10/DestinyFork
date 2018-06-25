@@ -40,7 +40,7 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            item.Position = this.Map.Portals.Count > 0 ? this.Map.Portals[item.SpawnPoint].Position : new Point(0, 0);
+            item.Position = Map.Portals.Count > 0 ? Map.Portals[item.SpawnPoint].Position : new Point(0, 0);
 
             try
             {
@@ -53,9 +53,9 @@ namespace Destiny.Maple.Maps
                 Log.SkipLine();
             }
           
-            lock (this.Map.Drops)
+            lock (Map.Drops)
             {
-                foreach (Drop drop in this.Map.Drops)
+                foreach (Drop drop in Map.Drops)
                 {
                     if (drop.Owner == null)
                     {
@@ -74,9 +74,9 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            lock (this.Map.Mobs)
+            lock (Map.Mobs)
             {
-                foreach (Mob mob in this.Map.Mobs)
+                foreach (Mob mob in Map.Mobs)
                 {
                     using (Packet oPacket = mob.GetSpawnPacket())
                     {
@@ -85,9 +85,9 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            lock (this.Map.Npcs)
+            lock (Map.Npcs)
             {
-                foreach (Npc npc in this.Map.Npcs)
+                foreach (Npc npc in Map.Npcs)
                 {
                     using (Packet oPacket = npc.GetSpawnPacket())
                     {
@@ -96,9 +96,9 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            lock (this.Map.Reactors)
+            lock (Map.Reactors)
             {
-                foreach (Reactor reactor in this.Map.Reactors)
+                foreach (Reactor reactor in Map.Reactors)
                 {
                     using (Packet oPacket = reactor.GetSpawnPacket())
                     {
@@ -107,17 +107,17 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            lock (this.Map.Mobs)
+            lock (Map.Mobs)
             {
-                foreach (Mob mob in this.Map.Mobs)
+                foreach (Mob mob in Map.Mobs)
                 {
                     mob.AssignController();
                 }
             }
 
-            lock (this.Map.Npcs)
+            lock (Map.Npcs)
             {
-                foreach (Npc npc in this.Map.Npcs)
+                foreach (Npc npc in Map.Npcs)
                 {
                     npc.AssignController();
                 }
@@ -125,7 +125,7 @@ namespace Destiny.Maple.Maps
 
             using (Packet oPacket = item.GetCreatePacket())
             {
-                this.Map.Broadcast(oPacket, item);
+                Map.Broadcast(oPacket, item);
             }
         }
 
@@ -140,23 +140,23 @@ namespace Destiny.Maple.Maps
 
                 using (Packet oPacket = item.GetDestroyPacket())
                 {
-                    this.Map.Broadcast(oPacket, item);
+                    Map.Broadcast(oPacket, item);
                 }
             }
 
             base.RemoveItem(index);
 
-            lock (this.Map.Mobs)
+            lock (Map.Mobs)
             {
-                foreach (Mob mob in this.Map.Mobs)
+                foreach (Mob mob in Map.Mobs)
                 {
                     mob.AssignController();
                 }
             }
 
-            lock (this.Map.Npcs)
+            lock (Map.Npcs)
             {
-                foreach (Npc npc in this.Map.Npcs)
+                foreach (Npc npc in Map.Npcs)
                 {
                     npc.AssignController();
                 }

@@ -13,12 +13,12 @@ namespace Destiny.Maple.Life
 
         public Loot(Datum datum)
         {
-            this.MapleID = (int)datum["itemid"];
-            this.MinimumQuantity = (int)datum["minimum_quantity"];
-            this.MaximumQuantity = (int)datum["maximum_quantity"];
-            this.QuestID = (int)datum["questid"];
-            this.Chance = (int)datum["chance"];
-            this.IsMeso = ((string)datum["flags"]).Contains("is_mesos");
+            MapleID = (int)datum["itemid"];
+            MinimumQuantity = (int)datum["minimum_quantity"];
+            MaximumQuantity = (int)datum["maximum_quantity"];
+            QuestID = (int)datum["questid"];
+            Chance = (int)datum["chance"];
+            IsMeso = ((string)datum["flags"]).Contains("is_mesos");
         }
     }
 }

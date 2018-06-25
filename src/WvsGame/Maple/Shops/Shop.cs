@@ -13,17 +13,15 @@ namespace Destiny.Maple.Shops
     {
         public static void LoadRechargeTiers()
         {
-            Shop.RechargeTiers = new Dictionary<byte, Dictionary<int, double>>();
-            // TODO: fix
+            RechargeTiers = new Dictionary<byte, Dictionary<int, double>>();
+
             foreach (Datum datum in new Datums("shop_recharge_data").Populate())
             {
-                if (!Shop.RechargeTiers.ContainsKey((byte)(int)datum["tierid"]))
+                if (!RechargeTiers.ContainsKey((byte)(int)datum["tierid"]))
                 {
-                    // o.o this cast looks like possible System.InvalidCastException
-                    Shop.RechargeTiers.Add((byte)(int)datum["tierid"], new Dictionary<int, double>());
+                    RechargeTiers.Add((byte)(int)datum["tierid"], new Dictionary<int, double>());
                 }
-                // o.o this cast looks like possible System.InvalidCastException
-                Shop.RechargeTiers[(byte)(int)datum["tierid"]].Add((int)datum["itemid"], (double)datum["price"]);
+                RechargeTiers[(byte)(int)datum["tierid"]].Add((int)datum["itemid"], (double)datum["price"]);
             }
         }
 
@@ -38,30 +36,29 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return Shop.RechargeTiers[this.RechargeTierID];
+                return RechargeTiers[RechargeTierID];
             }
         }
 
         public Shop(Npc parent, Datum datum)
         {
-            this.Parent = parent;
+            Parent = parent;
 
-            this.ID = (int)datum["shopid"];
-            this.RechargeTierID = (byte)(int)datum["recharge_tier"];
+            ID = (int)datum["shopid"];
+            RechargeTierID = (byte)(int)datum["recharge_tier"];
 
-            this.Items = new List<ShopItem>();
+            Items = new List<ShopItem>();
 
-            foreach (Datum itemDatum in new Datums("shop_items").Populate("shopid = {0} ORDER BY sort DESC", this.ID))
+            foreach (Datum itemDatum in new Datums("shop_items").Populate("shopid = {0} ORDER BY sort DESC", ID))
             {
-                this.Items.Add(new ShopItem(this, itemDatum));
+                Items.Add(new ShopItem(this, itemDatum));
             }
 
-            if (this.RechargeTierID > 0)
+            if (RechargeTierID <= 0) return;
+
+            foreach (KeyValuePair<int, double> rechargeable in UnitPrices)
             {
-                foreach (KeyValuePair<int, double> rechargeable in this.UnitPrices)
-                {
-                    this.Items.Add(new ShopItem(this, rechargeable.Key));
-                }
+                Items.Add(new ShopItem(this, rechargeable.Key));
             }
         }
 
@@ -70,10 +67,10 @@ namespace Destiny.Maple.Shops
             using (Packet oPacket = new Packet(ServerOperationCode.OpenNpcShop))
             {
                 oPacket
-                    .WriteInt(this.ID)
-                    .WriteShort((short)this.Items.Count);
+                    .WriteInt(ID)
+                    .WriteShort((short)Items.Count);
 
-                foreach (ShopItem loopShopItem in this.Items)
+                foreach (ShopItem loopShopItem in Items)
                 {
                     oPacket.WriteBytes(loopShopItem.ToByteArray());
                 }
@@ -94,7 +91,7 @@ namespace Destiny.Maple.Shops
                         int mapleID = iPacket.ReadInt();
                         short quantity = iPacket.ReadShort();
 
-                        ShopItem item = this.Items[index];
+                        ShopItem item = Items[index];
 
                         if (customer.Stats.Meso < item.PurchasePrice * quantity)
                         {
@@ -168,7 +165,7 @@ namespace Destiny.Maple.Shops
 
                         if (item.IsRechargeable)
                         {
-                            customer.Stats.Meso += item.SalePrice + (int)(this.UnitPrices[item.MapleID] * item.Quantity);
+                            customer.Stats.Meso += item.SalePrice + (int)(UnitPrices[item.MapleID] * item.Quantity);
                         }
                         else
                         {
@@ -190,7 +187,7 @@ namespace Destiny.Maple.Shops
 
                         Item item = customer.Items[ItemConstants.ItemType.Usable, slot];
 
-                        int price = (int)(this.UnitPrices[item.MapleID] * (item.MaxPerStack - item.Quantity));
+                        int price = (int)(UnitPrices[item.MapleID] * (item.MaxPerStack - item.Quantity));
 
                         if (customer.Stats.Meso < price)
                         {

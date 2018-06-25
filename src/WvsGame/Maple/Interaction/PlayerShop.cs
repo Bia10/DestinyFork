@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using Destiny.Maple.Maps;
 using Destiny.Maple.Characters;
@@ -19,26 +20,15 @@ namespace Destiny.Maple.Interaction
         public bool IsFull
         {
             get
-            {
-                for (int i = 0; i < this.Visitors.Length; i++)
-                {
-                    if (this.Visitors[i] == null)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
+            { return Visitors.All(curVisitor => curVisitor != null); }
         }
-
         public PlayerShop(Character owner, string description)
         {
-            this.Owner = owner;
-            this.Description = description;
-            this.Visitors = new Character[3];
-            this.Items = new List<PlayerShopItem>();
-            this.Opened = false;
+            Owner = owner;
+            Description = description;
+            Visitors = new Character[3];
+            Items = new List<PlayerShopItem>();
+            Opened = false;
 
             using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
             {
@@ -48,14 +38,14 @@ namespace Destiny.Maple.Interaction
                     .WriteByte(4)
                     .WriteByte(0)
                     .WriteByte(0)
-                    .WriteBytes(this.Owner.AppearanceToByteArray())
-                    .WriteString(this.Owner.Name)
+                    .WriteBytes(Owner.AppearanceToByteArray())
+                    .WriteString(Owner.Name)
                     .WriteByte(byte.MaxValue)
-                    .WriteString(this.Description)
+                    .WriteString(Description)
                     .WriteByte(16)
                     .WriteByte(0);
 
-                this.Owner.Client.Send(oPacket);
+                Owner.Client.Send(oPacket);
             }
         }
 
@@ -65,9 +55,9 @@ namespace Destiny.Maple.Interaction
             {
                 case InteractionConstants.InteractionCode.OpenStore:
                     {
-                        this.Owner.Map.PlayerShops.Add(this);
+                        Owner.Map.PlayerShops.Add(this);
 
-                        this.Opened = true;
+                        Opened = true;
                     }
                     break;
 
@@ -109,19 +99,19 @@ namespace Destiny.Maple.Interaction
 
                         PlayerShopItem shopItem = new PlayerShopItem(item.MapleID, bundles, quantity, price);
 
-                        this.Items.Add(shopItem);
+                        Items.Add(shopItem);
 
-                        this.UpdateItems();
+                        UpdateItems();
                     }
                     break;
 
                 case InteractionConstants.InteractionCode.RemoveItem:
                     {
-                        if (character == this.Owner)
+                        if (character == Owner)
                         {
                             short slot = iPacket.ReadShort();
 
-                            PlayerShopItem shopItem = this.Items[slot];
+                            PlayerShopItem shopItem = Items[slot];
 
                             if (shopItem == null)
                             {
@@ -130,25 +120,25 @@ namespace Destiny.Maple.Interaction
 
                             if (shopItem.Quantity > 0)
                             {
-                                this.Owner.Items.AddItemToInventory(new Item(shopItem.MapleID, shopItem.Quantity));
+                                Owner.Items.AddItemToInventory(new Item(shopItem.MapleID, shopItem.Quantity));
                             }
 
-                            this.Items.Remove(shopItem);
+                            Items.Remove(shopItem);
 
-                            this.UpdateItems();
+                            UpdateItems();
                         }
                     }
                     break;
 
                 case InteractionConstants.InteractionCode.Exit:
                     {
-                        if (character == this.Owner)
+                        if (character == Owner)
                         {
-                            this.Close();
+                            Close();
                         }
                         else
                         {
-                            this.RemoveVisitor(character);
+                            RemoveVisitor(character);
                         }
                     }
                     break;
@@ -158,14 +148,14 @@ namespace Destiny.Maple.Interaction
                         short slot = iPacket.ReadByte();
                         short quantity = iPacket.ReadShort();
 
-                        PlayerShopItem shopItem = this.Items[slot];
+                        PlayerShopItem shopItem = Items[slot];
 
                         if (shopItem == null)
                         {
                             return;
                         }
 
-                        if (character == this.Owner)
+                        if (character == Owner)
                         {
                             return;
                         }
@@ -183,22 +173,20 @@ namespace Destiny.Maple.Interaction
                         shopItem.Quantity -= quantity;
 
                         character.Stats.Meso -= shopItem.MerchantPrice * quantity;
-                        this.Owner.Stats.Meso += shopItem.MerchantPrice * quantity;
+                        Owner.Stats.Meso += shopItem.MerchantPrice * quantity;
 
                         character.Items.AddItemToInventory(new Item(shopItem.MapleID, quantity));
 
-                        this.UpdateItems(); // TODO: This doesn't mark the item as sold.
+                        UpdateItems(); // TODO: This doesn't mark the item as sold.
 
                         bool noItemLeft = true;
 
-                        foreach (PlayerShopItem loopShopItem in this.Items)
+                        foreach (PlayerShopItem loopShopItem in Items)
                         {
-                            if (loopShopItem.Quantity > 0)
-                            {
-                                noItemLeft = false;
+                            if (loopShopItem.Quantity <= 0) continue;
 
-                                break;
-                            }
+                            noItemLeft = false;
+                            break;
                         }
 
                         if (noItemLeft)
@@ -206,7 +194,7 @@ namespace Destiny.Maple.Interaction
                             // TODO: Close the owner's shop.
                             // TODO: Notify  the owner the shop has been closed due to items being sold out.
 
-                            this.Close();
+                            Close();
                         }
                     }
                     break;
@@ -223,9 +211,9 @@ namespace Destiny.Maple.Interaction
 
                             byte sender = 0;
 
-                            for (int i = 0; i < this.Visitors.Length; i++)
+                            for (int i = 0; i < Visitors.Length; i++)
                             {
-                                if (this.Visitors[i] == character)
+                                if (Visitors[i] == character)
                                 {
                                     sender = (byte)(i + 1);
                                 }
@@ -235,7 +223,7 @@ namespace Destiny.Maple.Interaction
                                 .WriteByte(sender)
                                 .WriteString("{0} : {1}", character.Name, text);
 
-                            this.Broadcast(oPacket);
+                            Broadcast(oPacket);
                         }
                     }
                     break;
@@ -244,38 +232,35 @@ namespace Destiny.Maple.Interaction
 
         public void Close()
         {
-            foreach (PlayerShopItem loopShopItem in this.Items)
+            foreach (PlayerShopItem loopShopItem in Items)
             {
                 if (loopShopItem.Quantity > 0)
                 {
-                    this.Owner.Items.AddItemToInventory(new Item(loopShopItem.MapleID, loopShopItem.Quantity));
+                    Owner.Items.AddItemToInventory(new Item(loopShopItem.MapleID, loopShopItem.Quantity));
                 }
             }
 
-            if (this.Opened)
+            if (Opened)
             {
-                this.Map.PlayerShops.Remove(this);
+                Map.PlayerShops.Remove(this);
 
-                for (int i = 0; i < this.Visitors.Length; i++)
+                foreach (var curVisitor in Visitors.Where(curVisitor => curVisitor != null))
                 {
-                    if (this.Visitors[i] != null)
+                    using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                     {
-                        using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
-                        {
-                            oPacket
-                                .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
-                                .WriteByte(1)
-                                .WriteByte(10);
+                        oPacket
+                            .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
+                            .WriteByte(1)
+                            .WriteByte(10);
 
-                            this.Visitors[i].Client.Send(oPacket);
-                        }
-
-                        this.Visitors[i].PlayerShop = null;
+                        curVisitor.Client.Send(oPacket);
                     }
+
+                    curVisitor.PlayerShop = null;
                 }
             }
 
-            this.Owner.PlayerShop = null;
+            Owner.PlayerShop = null;
         }
 
         public void UpdateItems()
@@ -284,9 +269,9 @@ namespace Destiny.Maple.Interaction
             {
                 oPacket
                     .WriteByte((byte)InteractionConstants.InteractionCode.UpdateItems)
-                    .WriteByte((byte)this.Items.Count);
+                    .WriteByte((byte)Items.Count);
 
-                foreach (PlayerShopItem loopShopItem in this.Items)
+                foreach (PlayerShopItem loopShopItem in Items)
                 {
                     oPacket
                         .WriteShort(loopShopItem.Bundles)
@@ -295,7 +280,7 @@ namespace Destiny.Maple.Interaction
                         .WriteBytes(loopShopItem.ToByteArray(true, true));
                 }
 
-                this.Broadcast(oPacket);
+                Broadcast(oPacket);
             }
         }
 
@@ -303,121 +288,116 @@ namespace Destiny.Maple.Interaction
         {
             if (includeOwner)
             {
-                this.Owner.Client.Send(oPacket);
+                Owner.Client.Send(oPacket);
             }
 
-            for (int i = 0; i < this.Visitors.Length; i++)
+            foreach (var curVisitor in Visitors)
             {
-                if (this.Visitors[i] != null)
-                {
-                    this.Visitors[i].Client.Send(oPacket);
-                }
+                curVisitor?.Client.Send(oPacket);
             }
         }
 
         public void AddVisitor(Character visitor)
         {
-            for (int i = 0; i < this.Visitors.Length; i++)
+            for (int i = 0; i < Visitors.Length; i++)
             {
-                if (this.Visitors[i] == null)
+                if (Visitors[i] != null) continue;
+
+                using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                 {
-                    using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
+                    oPacket
+                        .WriteByte((byte)InteractionConstants.InteractionCode.Visit)
+                        .WriteByte((byte)(i + 1))
+                        .WriteBytes(visitor.AppearanceToByteArray())
+                        .WriteString(visitor.Name);
+
+                    Broadcast(oPacket);
+                }
+
+                visitor.PlayerShop = this;
+                Visitors[i] = visitor;
+
+                using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
+                {
+                    oPacket
+                        .WriteByte((byte)InteractionConstants.InteractionCode.Room)
+                        .WriteByte(4)
+                        .WriteByte(4)
+                        .WriteBool(true)
+                        .WriteByte(0)
+                        .WriteBytes(Owner.AppearanceToByteArray())
+                        .WriteString(Owner.Name);
+
+                    for (int slot = 0; slot < 3; slot++)
                     {
-                        oPacket
-                            .WriteByte((byte)InteractionConstants.InteractionCode.Visit)
-                            .WriteByte((byte)(i + 1))
-                            .WriteBytes(visitor.AppearanceToByteArray())
-                            .WriteString(visitor.Name);
-
-                        this.Broadcast(oPacket);
-                    }
-
-                    visitor.PlayerShop = this;
-                    this.Visitors[i] = visitor;
-
-                    using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
-                    {
-                        oPacket
-                            .WriteByte((byte)InteractionConstants.InteractionCode.Room)
-                            .WriteByte(4)
-                            .WriteByte(4)
-                            .WriteBool(true)
-                            .WriteByte(0)
-                            .WriteBytes(this.Owner.AppearanceToByteArray())
-                            .WriteString(this.Owner.Name);
-
-                        for (int slot = 0; slot < 3; slot++)
-                        {
-                            if (this.Visitors[slot] != null)
-                            {
-                                oPacket
-                                    .WriteByte((byte)(slot + 1))
-                                    .WriteBytes(this.Visitors[slot].AppearanceToByteArray())
-                                    .WriteString(this.Visitors[slot].Name);
-                            }
-                        }
-
-                        oPacket
-                            .WriteByte(byte.MaxValue)
-                            .WriteString(this.Description)
-                            .WriteByte(0x10)
-                            .WriteByte((byte)this.Items.Count);
-
-                        foreach (PlayerShopItem loopShopItem in this.Items)
+                        if (Visitors[slot] != null)
                         {
                             oPacket
-                                .WriteShort(loopShopItem.Bundles)
-                                .WriteShort(loopShopItem.Quantity)
-                                .WriteInt(loopShopItem.MerchantPrice)
-                                .WriteBytes(loopShopItem.ToByteArray(true, true));
+                                .WriteByte((byte)(slot + 1))
+                                .WriteBytes(Visitors[slot].AppearanceToByteArray())
+                                .WriteString(Visitors[slot].Name);
                         }
-
-                        visitor.Client.Send(oPacket);
                     }
 
-                    break;
+                    oPacket
+                        .WriteByte(byte.MaxValue)
+                        .WriteString(Description)
+                        .WriteByte(0x10)
+                        .WriteByte((byte)Items.Count);
+
+                    foreach (PlayerShopItem loopShopItem in Items)
+                    {
+                        oPacket
+                            .WriteShort(loopShopItem.Bundles)
+                            .WriteShort(loopShopItem.Quantity)
+                            .WriteInt(loopShopItem.MerchantPrice)
+                            .WriteBytes(loopShopItem.ToByteArray(true, true));
+                    }
+
+                    visitor.Client.Send(oPacket);
                 }
+
+                break;
             }
         }
 
         public void RemoveVisitor(Character visitor)
         {
-            for (int i = 0; i < this.Visitors.Length; i++)
+            for (int i = 0; i < Visitors.Length; i++)
             {
-                if (this.Visitors[i] == visitor)
+                if (Visitors[i] != visitor) continue;
+
+                visitor.PlayerShop = null;
+                Visitors[i] = null;
+
+                using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
                 {
-                    visitor.PlayerShop = null;
-                    this.Visitors[i] = null;
+                    oPacket.WriteByte((byte)InteractionConstants.InteractionCode.Exit);
 
-                    using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
+                    if (i > 0)
                     {
-                        oPacket.WriteByte((byte)InteractionConstants.InteractionCode.Exit);
-
-                        if (i > 0)
-                        {
-                            oPacket.WriteByte((byte)(i + 1));
-                        }
-
-                        this.Broadcast(oPacket, false);
+                        oPacket.WriteByte((byte)(i + 1));
                     }
 
-                    using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
-                    {
-                        oPacket
-                            .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
-                            .WriteByte((byte)(i + 1));
-
-                        this.Owner.Client.Send(oPacket);
-                    }
-
-                    break;
+                    Broadcast(oPacket, false);
                 }
+
+                using (Packet oPacket = new Packet(ServerOperationCode.PlayerInteraction))
+                {
+                    oPacket
+                        .WriteByte((byte)InteractionConstants.InteractionCode.Exit)
+                        .WriteByte((byte)(i + 1));
+
+                    Owner.Client.Send(oPacket);
+                }
+
+                break;
             }
         }
 
         public Packet GetCreatePacket()
         {
-            return this.GetSpawnPacket();
+            return GetSpawnPacket();
         }
 
         public Packet GetSpawnPacket()
@@ -425,10 +405,10 @@ namespace Destiny.Maple.Interaction
             Packet oPacket = new Packet(ServerOperationCode.AnnounceBox);
 
             oPacket
-                .WriteInt(this.Owner.ID)
+                .WriteInt(Owner.ID)
                 .WriteByte(4)
-                .WriteInt(this.ObjectID)
-                .WriteString(this.Description)
+                .WriteInt(ObjectID)
+                .WriteString(Description)
                 .WriteByte(0)
                 .WriteByte(0)
                 .WriteByte(1)
@@ -443,7 +423,7 @@ namespace Destiny.Maple.Interaction
             Packet oPacket = new Packet(ServerOperationCode.AnnounceBox);
 
             oPacket
-                .WriteInt(this.Owner.ID)
+                .WriteInt(Owner.ID)
                 .WriteByte(0);
 
             return oPacket;

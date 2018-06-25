@@ -1,8 +1,9 @@
-﻿using Destiny.IO;
-using Destiny.Maple.Characters;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+
+using Destiny.IO;
+using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Commands
 {
