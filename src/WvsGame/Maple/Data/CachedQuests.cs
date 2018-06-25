@@ -1,25 +1,25 @@
-﻿using Destiny.Data;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.Data;
 using Destiny.IO;
-using System.Collections.ObjectModel;
 using Destiny.Constants;
 
 namespace Destiny.Maple.Data
 {
     public sealed class CachedQuests : KeyedCollection<ushort, Quest>
     {
-        public CachedQuests()
-            : base()
+        public CachedQuests(): base()
         {
             using (Log.Load("Quests"))
             {
                 foreach (Datum datum in new Datums("quest_data").Populate())
                 {
-                    this.Add(new Quest(datum));
+                    Add(new Quest(datum));
                 }
 
                 foreach (Datum datum in new Datums("quest_requests").Populate())
                 {
-                    if (!this.Contains((ushort)(int)datum["questid"]))
+                    if (!Contains((ushort)(int)datum["questid"]))
                     {
                         continue;
                     }
@@ -63,7 +63,6 @@ namespace Destiny.Maple.Data
                             break;
                     }
                 }
-
 
                 foreach (Datum datum in new Datums("quest_rewards").Populate())
                 {

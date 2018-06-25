@@ -48,7 +48,7 @@ namespace Destiny.Maple.Commands.Implementation
                     }
                     else
                     {
-                        this.ShowSyntax(caller);
+                        ShowSyntax(caller);
 
                         return;
                     }

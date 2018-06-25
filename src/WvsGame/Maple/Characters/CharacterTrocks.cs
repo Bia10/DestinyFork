@@ -133,7 +133,7 @@ namespace Destiny.Maple.Characters
                     {
                         int mapID = TrockParent.Map.MapleID;
 
-                        if (this.TrockParent.Map.FieldLimit != (int)MapConstants.FieldLimit.CannotUseVIPTrock)
+                        if (TrockParent.Map.FieldLimit != (int)MapConstants.FieldLimit.CannotUseVIPTrock)
                         {
                             switch (type)
                             {

@@ -33,7 +33,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length < 1)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {

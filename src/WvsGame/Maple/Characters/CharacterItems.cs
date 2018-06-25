@@ -1130,17 +1130,15 @@ namespace Destiny.Maple.Characters
         {
             if (item.Quantity < 0) return 0;
 
-            if (InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
-            {
-                foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
-                {
-                    return loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack ? 0 : 1;
-                }
+            if (InventoryAvailableItemByID(item.MapleID) % item.MaxPerStack == 0 || !autoMerge) return 1;
 
-                return 1;
+            foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
+            {
+                return loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack ? 0 : 1;
             }
 
             return 1;
+
         }
 
         public bool CouldReceiveItems(IEnumerable<Item> items, bool autoMerge = true)

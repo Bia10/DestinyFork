@@ -1,20 +1,20 @@
-﻿using Destiny.Data;
+﻿using System.Collections.ObjectModel;
+
+using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple.Life;
-using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Data
 {
     public sealed class CachedReactors : KeyedCollection<int, Reactor>
     {
-        public CachedReactors()
-            : base()
+        public CachedReactors() : base()
         {
             using (Log.Load("Reactors"))
             {
                 foreach (Datum datum in new Datums("reactor_data").Populate())
                 {
-                    this.Add(new Reactor(datum));
+                    Add(new Reactor(datum));
                 }
 
                 foreach (Datum datum in new Datums("reactor_events").Populate())

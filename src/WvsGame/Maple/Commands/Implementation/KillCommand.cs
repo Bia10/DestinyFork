@@ -33,7 +33,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length < 1)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace Destiny.Maple.Commands.Implementation
                         {
                             if (args.Length == 1)
                             {
-                                this.ShowSyntax(caller);
+                                ShowSyntax(caller);
 
                                 return;
                             }
@@ -80,7 +80,7 @@ namespace Destiny.Maple.Commands.Implementation
                         break;
 
                     default:
-                        this.ShowSyntax(caller);
+                        ShowSyntax(caller);
                         break;
                 }
             }

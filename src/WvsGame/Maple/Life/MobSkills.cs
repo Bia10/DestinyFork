@@ -7,17 +7,16 @@ namespace Destiny.Maple.Life
     {
         public Mob Parent { get; private set; }
 
-        public MobSkills(Mob parent)
-            : base()
+        public MobSkills(Mob parent) : base()
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public MobSkill Random
         {
             get
             {
-                return base[Application.Random.Next(this.Count - 1)];
+                return base[Application.Random.Next(Count - 1)];
             }
         }
 

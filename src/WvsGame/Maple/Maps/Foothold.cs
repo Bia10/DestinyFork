@@ -11,10 +11,10 @@ namespace Destiny.Maple.Maps
 
         public Foothold(Datum datum)
         {
-            this.ID = (short)(int)datum["id"];
-            this.Line = new Line(new Point((short)datum["x1"], (short)datum["y1"]), new Point((short)datum["x2"], (short)datum["y2"]));
-            this.DragForce = (short)datum["drag_force"];
-            this.ForbidDownwardJump = ((string)datum["flags"]).Contains("forbid_downward_jump");
+            ID = (short)(int)datum["id"];
+            Line = new Line(new Point((short)datum["x1"], (short)datum["y1"]), new Point((short)datum["x2"], (short)datum["y2"]));
+            DragForce = (short)datum["drag_force"];
+            ForbidDownwardJump = ((string)datum["flags"]).Contains("forbid_downward_jump");
         }
     }
 }

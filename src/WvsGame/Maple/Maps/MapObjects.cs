@@ -34,11 +34,11 @@ namespace Destiny.Maple.Maps
 
         protected override void InsertItem(int index, T item)
         {
-            item.Map = this.Map;
+            item.Map = Map;
 
             if (!(item is Character)  && !(item is Portal))
             {
-                item.ObjectID = this.Map.AssignObjectID();
+                item.ObjectID = Map.AssignObjectID();
             }
 
             try

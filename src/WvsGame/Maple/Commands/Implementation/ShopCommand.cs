@@ -32,7 +32,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             if (args.Length != 1)
             {
-                this.ShowSyntax(caller);
+                ShowSyntax(caller);
             }
             else
             {
@@ -49,7 +49,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                 if (shopID == -1)
                 {
-                    this.ShowSyntax(caller);
+                    ShowSyntax(caller);
                 }
 
                 // TODO: Shop the desired shop.
