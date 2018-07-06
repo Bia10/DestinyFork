@@ -6,7 +6,7 @@ namespace Destiny.Data
 {
     public static class Meta
     {
-        public static Dictionary<string, Dictionary<string, Column>> Tables { get; private set; }
+        private static Dictionary<string, Dictionary<string, Column>> Tables { get; set; }
 
         public static void Initialize(bool mcdb)
         {
@@ -59,9 +59,9 @@ namespace Destiny.Data
 
     public sealed class Column
     {
-        public string Name { get; }
-        public bool IsPrimaryKey { get; }
-        public bool IsUniqueKey { get; }
+        private string Name { get; }
+        private bool IsPrimaryKey { get; }
+        private bool IsUniqueKey { get; }
         public string ColumnType { get; }
 
         public Column(Datum datum)

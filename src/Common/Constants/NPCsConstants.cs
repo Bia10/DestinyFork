@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Destiny.Constants
 {
-    public class NPCsConstants
+    public static class NPCsConstants
     {
         #region NPCs
         public enum NpcMessageType : byte

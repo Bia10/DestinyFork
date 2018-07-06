@@ -18,7 +18,7 @@ namespace Destiny.Maple.Life
             return MapleMapObjectType.Mist;
         }
 
-        public enum MistType : int
+        public enum MistType
         {
             mobMist = 0,
             playerPoisonMist = 1,

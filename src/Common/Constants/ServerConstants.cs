@@ -15,6 +15,9 @@
                 case ServerRegsitrationResponse.Full:
                     return "Cannot register as all the spots are occupied.";
 
+                case ServerRegsitrationResponse.Valid:
+                    return "ALL OK!";
+
                 default:
                     return null;
             }
@@ -29,7 +32,7 @@
         Full
     }
 
-    public class ServerConstants
+    public static class ServerConstants
     {
         #region Server
         public enum AccountLevel : byte

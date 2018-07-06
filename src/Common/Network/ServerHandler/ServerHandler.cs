@@ -11,7 +11,7 @@ namespace Destiny.Network.ServerHandler
 {
     public abstract class ServerHandler<TReceiveOP, TSendOP, TCryptograph> : NetworkConnector<TReceiveOP, TSendOP, TCryptograph>, IDisposable where TCryptograph : Cryptograph, new()
     {
-        protected string Title { get; }
+        private string Title { get; }
 
         protected abstract void StopServer();
         protected virtual void Initialize(params object[] args) { }
@@ -91,7 +91,7 @@ namespace Destiny.Network.ServerHandler
             StopServer();
         }
 
-        protected void OnReceive(IAsyncResult ar)
+        private void OnReceive(IAsyncResult ar)
         {
             if (!IsAlive) return;
 

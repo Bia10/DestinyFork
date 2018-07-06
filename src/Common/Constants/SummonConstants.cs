@@ -1,8 +1,8 @@
 ﻿namespace Destiny.Constants
 {
-    public class SummonConstants
+    public static class SummonConstants
     {
-        public enum SummonMovementType : int
+        public enum SummonMovementType
         {
             Stationary, // octopus
             Follow, // regular summons

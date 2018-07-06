@@ -34,7 +34,7 @@ namespace Destiny.Maple.Life
         {
             MapleID = (byte)(int)datum["skillid"];
             Level = (byte)(short)datum["skill_level"];
-            EffectDelay = (short)(short)datum["effect_delay"];
+            EffectDelay = (short)datum["effect_delay"];
         }
 
         public void Load(Datum datum)
@@ -165,7 +165,7 @@ namespace Destiny.Maple.Life
 
                 case MobConstants.MobSkillName.Summon:
 
-                    foreach (int mobId in MobSkill.Summons[Level])
+                    foreach (int mobId in Summons[Level])
                     {
                         Mob summon = new Mob(mobId)
                         {

@@ -23,7 +23,7 @@ namespace Destiny.IO
             return new string(mask, input.Length);
         }
 
-        public static void WriteItem(string label, ConsoleColor labelColor, string value, params object[] args)
+        private static void WriteItem(string label, ConsoleColor labelColor, string value, params object[] args)
         {
             lock (typeof(Log))
             {
@@ -47,7 +47,7 @@ namespace Destiny.IO
 
                 foreach (string s in value.Split('\n'))
                 {
-                    string[] lines = new string[(int) Math.Ceiling((float)s.Length / (float)(Console.BufferWidth - LabelWidth))];
+                    string[] lines = new string[(int) Math.Ceiling(s.Length / (float)(Console.BufferWidth - LabelWidth))];
 
                     for (int i = 0; i < lines.Length; i++)
                     {
@@ -178,7 +178,7 @@ namespace Destiny.IO
                 {
                     WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
                     Console.Write(label);
-                    result = Console.ReadLine().ToLower();
+                    result = Console.ReadLine()?.ToLower();
                 }
                 while (!(result == "yes" || result == "no" || result == "y" || result == "n"));
 
@@ -196,15 +196,14 @@ namespace Destiny.IO
                 {
                     WriteItem("Yes/No", ConsoleColor.Cyan, string.Empty);
                     Console.Write(label);
-                    result = Console.ReadLine().ToLower();
+                    result = Console.ReadLine()?.ToLower();
 
-                    if (result == string.Empty)
-                    {
-                        result = defaultValue ? "yes" : "no";
-                        Console.CursorTop--;
-                        Console.CursorLeft = Margin.Length + label.Length;
-                        Console.WriteLine(defaultValue ? "Yes" : "No");
-                    }
+                    if (result != string.Empty) continue;
+
+                    result = defaultValue ? "yes" : "no";
+                    Console.CursorTop--;
+                    Console.CursorLeft = Margin.Length + label.Length;
+                    Console.WriteLine(defaultValue ? "Yes" : "No");
                 }
                 while (!(result == "yes" || result == "no" || result == "y" || result == "n"));
 
@@ -252,7 +251,7 @@ namespace Destiny.IO
             WriteToFile(value, args);
         }
 
-        public static bool ShowStackTrace { get; set; }
+        public static bool ShowStackTrace { private get; set; }
 
         public static void Error(Exception exception)
         {
@@ -337,7 +336,7 @@ namespace Destiny.IO
 
     public class LoadingIndicator : IDisposable
     {
-        public static bool ShowTime { get; set; }
+        public static bool ShowTime { private get; set; }
 
         private readonly Stopwatch mWatch;
 

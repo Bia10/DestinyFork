@@ -935,7 +935,7 @@ namespace Destiny.Maple.Characters
                         Meso mesoDrop = (Meso) drop;
 
                         // get total mesos
-                        long myPlusDropMesos = (long)(Parent.Stats.Meso + mesoDrop.Amount);
+                        long myPlusDropMesos = Parent.Stats.Meso + mesoDrop.Amount;
 
                         // if int32 overflow reset to limit
                         if (myPlusDropMesos > Meso.mesoLimit)

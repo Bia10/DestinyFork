@@ -17,7 +17,7 @@ namespace Destiny.Interoperability
 {
     public class GameToCenterServer : ServerHandler<InteroperabilityOperationCode, InteroperabilityOperationCode, BlankCryptograph>
     {
-        public GameToCenterServer(IPEndPoint remoteEP, string code) 
+        private GameToCenterServer(IPEndPoint remoteEP, string code) 
             : base(remoteEP, "Center server", new object[] { code }) { }
 
         protected override bool IsServerAlive
@@ -211,7 +211,7 @@ namespace Destiny.Interoperability
             }
         }
 
-        public bool ValidCharacterName(string charName)
+        private bool ValidCharacterName(string charName)
         {
             // exception charName too short!
             if(charName.Length < 4) return true;
@@ -284,7 +284,6 @@ namespace Destiny.Interoperability
                         break;
 
                     default:
-                        error = false;
                         break;
                 }
             }

@@ -2,7 +2,7 @@
 
 namespace Destiny.Constants
 {
-    public class ReactorConstants
+    public static class ReactorConstants
     {
         #region Reactors
         public enum ReactorEventType

@@ -19,7 +19,7 @@ namespace Destiny.Maple
 
         public static void giveMesos(Character character, int mesosGiven)
         {
-            long myPlusGiven = (long)character.Stats.Meso + (long)mesosGiven;  
+            long myPlusGiven = (long)character.Stats.Meso + mesosGiven;  
 
             if (myPlusGiven > mesoLimit)
             {

@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Constants
 {
-    public class SocialConstants
+    public static class SocialConstants
     {
         #region Social
         public enum MessengerAction : byte

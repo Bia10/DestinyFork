@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Destiny.IO
 {
-    public class Tracer
+    public static class Tracer
     {
         #region traceError
         public static void TraceErrorMessage(string message,

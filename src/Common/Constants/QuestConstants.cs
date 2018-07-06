@@ -2,7 +2,7 @@
 
 namespace Destiny.Constants
 {
-    public class QuestConstants
+    public static class QuestConstants
     {
         #region Quests
         public enum QuestAction : byte

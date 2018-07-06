@@ -16,12 +16,12 @@ namespace Destiny.Network
     {
         public static string SecurityCode { get; set; }
 
-        public ServerConstants.ServerType Type { get; private set; }
+        private ServerConstants.ServerType Type { get; set; }
 
         public World World { get; private set; }
         public byte ID { get; set; }
         public ushort Port { get; set; }
-        public int Population { get; private set; }
+        private int Population { get; set; }
 
         public CenterClient(Socket socket) : base(socket) { }
 
@@ -178,7 +178,7 @@ namespace Destiny.Network
 
                     valid = false;
                 }
-                else if (securityCode != CenterClient.SecurityCode)
+                else if (securityCode != SecurityCode)
                 {
                     Packet.WriteByte((byte)ServerRegsitrationResponse.InvalidCode);
 

@@ -2,7 +2,7 @@
 
 namespace Destiny.Constants
 {
-    public class CharacterConstants
+    public static class CharacterConstants
     {
         public static class ExperienceTables
         {
@@ -160,7 +160,7 @@ namespace Destiny.Constants
         }
 
         [Flags]
-        public enum StatisticType : int
+        public enum StatisticType
         {
             None = 0x0,
 
@@ -273,12 +273,12 @@ namespace Destiny.Constants
 
         public static class SkillNames
         {
-            public enum All : int
+            public enum All
             {
                 RegularAttack = 0
             }
 
-            public enum Beginner : int
+            public enum Beginner
             {
                 FollowTheLead = 8,
                 BlessingOfTheFairy = 12,
@@ -298,7 +298,7 @@ namespace Destiny.Constants
                 //TODO: other temporary skills
             }
 
-            public enum Swordsman : int
+            public enum Swordsman
             {
                 ImprovedHPRecovery = 1000000,
                 ImprovedMaxHpIncrease = 1000001,
@@ -308,7 +308,7 @@ namespace Destiny.Constants
                 SlashBlast = 1001005,
             }
 
-            public enum Fighter : int
+            public enum Fighter
             {
                 SwordMastery = 1100000,
                 AxeMastery = 1100001,
@@ -320,7 +320,7 @@ namespace Destiny.Constants
                 PowerGuard = 1101007
             }
 
-            public enum Crusader : int
+            public enum Crusader
             {
                 ShieldMastery = 1111001,
                 ComboAttack = 1111002,
@@ -332,7 +332,7 @@ namespace Destiny.Constants
                 Shout = 1111008
             }
 
-            public enum Hero : int
+            public enum Hero
             {
                 AdvancedComboAttack = 1120003,
                 Achilles = 1120004,
@@ -346,7 +346,7 @@ namespace Destiny.Constants
                 HerosWill = 1121011,
             }
 
-            public enum Page : int
+            public enum Page
             {
                 SwordMastery = 1200000,
                 BWMastery = 1200001,
@@ -358,7 +358,7 @@ namespace Destiny.Constants
                 PowerGuard = 1201007
             }
 
-            public enum WhiteKnight : int
+            public enum WhiteKnight
             {
                 ImprovingMPRecovery = 1210000,
                 ShieldMastery = 1210001,
@@ -372,7 +372,7 @@ namespace Destiny.Constants
                 MagicCrash = 1211009
             }
 
-            public enum Paladin : int
+            public enum Paladin
             {
                 Achilles = 1220005,
                 Guardian = 1220006,
@@ -388,7 +388,7 @@ namespace Destiny.Constants
                 HerosWill = 1221012
             }
 
-            public enum Spearman : int
+            public enum Spearman
             {
                 SpearMastery = 1300000,
                 PoleArmMastery = 1300001,
@@ -400,7 +400,7 @@ namespace Destiny.Constants
                 HyperBody = 1301007
             }
 
-            public enum DragonKnight : int
+            public enum DragonKnight
             {
                 ElementalResistance = 1310000,
                 SpearCrusher = 1310001,
@@ -413,7 +413,7 @@ namespace Destiny.Constants
                 DragonBlood = 1311008
             }
 
-            public enum DarkKnight : int
+            public enum DarkKnight
             {
                 Achilles = 1320005,
                 Berserk = 1320006,
@@ -427,7 +427,7 @@ namespace Destiny.Constants
                 HerosWill = 1321010
             }
 
-            public enum Magician : int
+            public enum Magician
             {
                 ImprovedMPRecovery = 2000000,
                 ImprovedMaxMpIncrease = 2000001,
@@ -437,7 +437,7 @@ namespace Destiny.Constants
                 MagicClaw = 2001005
             }
 
-            public enum FirePoisonWizard : int
+            public enum FirePoisonWizard
             {
                 MpEater = 2100000,
                 Meditation = 2101001,
@@ -447,7 +447,7 @@ namespace Destiny.Constants
                 PoisonBreath = 2101005
             }
 
-            public enum FirePoisonMage : int
+            public enum FirePoisonMage
             {
                 PartialResistance = 2110000,
                 ElementAmplification = 2110001,
@@ -458,7 +458,7 @@ namespace Destiny.Constants
                 ElementComposition = 2111006
             }
 
-            public enum FirePoisonArchMage : int
+            public enum FirePoisonArchMage
             {
                 MapleWarrior = 2121000,
                 BigBang = 2121001,
@@ -471,7 +471,7 @@ namespace Destiny.Constants
                 HerosWill = 2121008
             }
 
-            public enum IceLightningWizard : int
+            public enum IceLightningWizard
             {
                 MpEater = 2200000,
                 Meditation = 2201001,
@@ -481,7 +481,7 @@ namespace Destiny.Constants
                 ThunderBolt = 2201005
             }
 
-            public enum IceLightningMage : int
+            public enum IceLightningMage
             {
                 PartialResistance = 2210000,
                 ElementAmplification = 2210001,
@@ -492,7 +492,7 @@ namespace Destiny.Constants
                 ElementComposition = 2211006
             }
 
-            public enum IceLightningArchMage : int
+            public enum IceLightningArchMage
             {
                 MapleWarrior = 2221000,
                 BigBang = 2221001,
@@ -505,7 +505,7 @@ namespace Destiny.Constants
                 HerosWill = 2221008
             }
 
-            public enum Cleric : int
+            public enum Cleric
             {
                 MpEater = 2300000,
                 Teleport = 2300001,
@@ -515,7 +515,7 @@ namespace Destiny.Constants
                 HolyArrow = 2301005
             }
 
-            public enum Priest : int
+            public enum Priest
             {
                 ElementalResistance = 2310000,
                 Dispel = 2311001,
@@ -526,7 +526,7 @@ namespace Destiny.Constants
                 SummonDragon = 2311006
             }
 
-            public enum Bishop : int
+            public enum Bishop
             {
                 MapleWarrior = 2321000,
                 BigBang = 2321001,
@@ -540,7 +540,7 @@ namespace Destiny.Constants
                 HerosWill = 2321009
             }
 
-            public enum Archer : int
+            public enum Archer
             {
                 TheBlessingofAmazon = 3000000,
                 CriticalShot = 3000001,
@@ -550,7 +550,7 @@ namespace Destiny.Constants
                 DoubleShot = 3001005
             }
 
-            public enum Hunter : int
+            public enum Hunter
             {
                 BowMastery = 3100000,
                 FinalAttackBow = 3100001,
@@ -560,7 +560,7 @@ namespace Destiny.Constants
                 ArrowBombBow = 3101005
             }
 
-            public enum Ranger : int
+            public enum Ranger
             {
                 Thrust = 3110000,
                 MortalBlow = 3110001,
@@ -571,7 +571,7 @@ namespace Destiny.Constants
                 Strafe = 3111006
             }
 
-            public enum Bowmaster : int
+            public enum Bowmaster
             {
                 BowExpert = 3120005,
                 MapleWarrior = 3121000,
@@ -584,7 +584,7 @@ namespace Destiny.Constants
                 HerosWill = 3121009
             }
 
-            public enum Crossbowman : int
+            public enum Crossbowman
             {
                 CrossbowMastery = 3200000,
                 FinalAttackCrossbow = 3200001,
@@ -594,7 +594,7 @@ namespace Destiny.Constants
                 IronArrowCrossbow = 3201005
             }
 
-            public enum Sniper : int
+            public enum Sniper
             {
                 Thurst = 3210000,
                 MortalBlow = 3210001,
@@ -605,7 +605,7 @@ namespace Destiny.Constants
                 Strafe = 3211006
             }
 
-            public enum Marksman : int
+            public enum Marksman
             {
                 MarksmanBoost = 3220004,
                 MapleWarrior = 3221000,
@@ -618,7 +618,7 @@ namespace Destiny.Constants
                 HerosWill = 3221008
             }
 
-            public enum Rogue : int
+            public enum Rogue
             {
                 NimbleBody = 4000000,
                 KeenEyes = 4000001,
@@ -628,7 +628,7 @@ namespace Destiny.Constants
                 LuckySeven = 4001344
             }
 
-            public enum Assassin : int
+            public enum Assassin
             {
                 ClawMastery = 4100000,
                 CriticalThrow = 4100001,
@@ -638,7 +638,7 @@ namespace Destiny.Constants
                 Drain = 4101005
             }
 
-            public enum Hermit : int
+            public enum Hermit
             {
                 Alchemist = 4110000,
                 MesoUp = 4111001,
@@ -649,7 +649,7 @@ namespace Destiny.Constants
                 FlashJump = 4111006
             }
 
-            public enum NightLord : int
+            public enum NightLord
             {
                 ShadowShifter = 4120002,
                 VenomousStar = 4120005,
@@ -662,7 +662,7 @@ namespace Destiny.Constants
                 HerosWill = 4121009
             }
 
-            public enum Bandit : int
+            public enum Bandit
             {
                 DaggerMastery = 4200000,
                 Endure = 4201001,
@@ -672,7 +672,7 @@ namespace Destiny.Constants
                 SavageBlow = 4201005
             }
 
-            public enum ChiefBandit : int
+            public enum ChiefBandit
             {
                 ShieldMastery = 4211000,
                 Chakra = 4211001,
@@ -683,7 +683,7 @@ namespace Destiny.Constants
                 MesoExplosion = 4211006
             }
 
-            public enum Shadower : int
+            public enum Shadower
             {
                 ShadowShifter = 4220002,
                 VenomousStab = 4220005,
@@ -696,7 +696,7 @@ namespace Destiny.Constants
                 HerosWill = 4221008
             }
 
-            public enum Pirate : int
+            public enum Pirate
             {
                 BulletTime = 5000000,
                 FlashFist = 5001001,
@@ -705,7 +705,7 @@ namespace Destiny.Constants
                 Dash = 5001005
             }
 
-            public enum Brawler : int
+            public enum Brawler
             {
                 ImproveMaxHp = 5100000,
                 KnucklerMastery = 5100001,
@@ -717,7 +717,7 @@ namespace Destiny.Constants
                 OakBarrel = 5101007
             }
 
-            public enum Marauder : int
+            public enum Marauder
             {
                 StunMastery = 5110000,
                 EnergyCharge = 5110001,
@@ -727,7 +727,7 @@ namespace Destiny.Constants
                 Shockwave = 5111006
             }
 
-            public enum Buccaneer : int
+            public enum Buccaneer
             {
                 MapleWarrior = 5121000,
                 DragonStrike = 5121001,
@@ -741,7 +741,7 @@ namespace Destiny.Constants
                 TimeLeap = 5121010
             }
 
-            public enum Gunslinger : int
+            public enum Gunslinger
             {
                 GunMastery = 5200000,
                 InvisibleShot = 5201001,
@@ -752,7 +752,7 @@ namespace Destiny.Constants
                 RecoilShot = 5201006
             }
 
-            public enum Outlaw : int
+            public enum Outlaw
             {
                 BurstFire = 5210000,
                 Octopus = 5211001,
@@ -762,7 +762,7 @@ namespace Destiny.Constants
                 HomingBeacon = 5211006
             }
 
-            public enum Corsair : int
+            public enum Corsair
             {
                 ElementalBoost = 5220001,
                 WrathoftheOctopi = 5220002,
@@ -777,13 +777,13 @@ namespace Destiny.Constants
                 SpeedInfusion = 5221010
             }
 
-            public enum MapleLeafBrigadier : int
+            public enum MapleLeafBrigadier
             {
                 //?????? = 8001000, //lie detector
                 //  ???? = 8001001  //teleport?
             }
 
-            public enum GM : int
+            public enum GM
             {
                 Haste = 9001000, //official name is Haste(Normal)
                 SuperDragonRoar = 9001001,
@@ -798,7 +798,7 @@ namespace Destiny.Constants
                 // ADMIN_ANTIMACRO = 9001009 //??
             }
 
-            public enum SuperGM : int
+            public enum SuperGM
             {
                 HealPlusDispel = 9101000, //official name is Heal+Dispel
                 Haste = 9101001, //official name is Haste(Super)
@@ -811,7 +811,7 @@ namespace Destiny.Constants
                 HyperBody = 9101008
             }
 
-            public enum Noblesse : int
+            public enum Noblesse
             {
                 BlessingOfTheFairy = 10000012,
                 Helper = 10000013,
@@ -832,7 +832,7 @@ namespace Destiny.Constants
                 //TODO: other temporary skills
             }
 
-            public enum DawnWarrior : int // 1st job
+            public enum DawnWarrior // 1st job
             {
                 MaxHPEnhancement = 11000000,
                 IronBody = 11001001,
@@ -841,7 +841,7 @@ namespace Destiny.Constants
                 Soul = 11001004,
             }
 
-            public enum DawnWarrior2 : int // 2nd job
+            public enum DawnWarrior2 // 2nd job
             {
                 SwordMastery = 11100000,
                 SwordBooster = 11101001,
@@ -851,7 +851,7 @@ namespace Destiny.Constants
                 SoulRush = 11101005,
             }
 
-            public enum DawnWarrior3 : int // 3rd job
+            public enum DawnWarrior3 // 3rd job
             {
                 MPRecoveryRateEnhancement = 11110000,
                 Advancedcombo = 11110005,
@@ -863,11 +863,11 @@ namespace Destiny.Constants
                 SoulCharge = 11111007
             }
 
-            public enum DawnWarrior4 : int // quest skills?
+            public enum DawnWarrior4 // quest skills?
             {
             }
 
-            public enum BlazeWizard : int
+            public enum BlazeWizard
             {
                 IncreasingMaxMP = 12000000,
                 MagicGuard = 12001001,
@@ -876,7 +876,7 @@ namespace Destiny.Constants
                 Flame = 12001004
             }
 
-            public enum BlazeWizard2 : int
+            public enum BlazeWizard2
             {
                 Meditation = 12101000,
                 Slow = 12101001,
@@ -887,7 +887,7 @@ namespace Destiny.Constants
                 FirePillar = 12101006
             }
 
-            public enum BlazeWizard3 : int
+            public enum BlazeWizard3
             {
                 ElementalResistance = 12110000,
                 ElementAmplification = 12110001,
@@ -898,11 +898,11 @@ namespace Destiny.Constants
                 FireStrike = 12111006
             }
 
-            public enum BlazeWizard4 : int
+            public enum BlazeWizard4
             {
             }
 
-            public enum WindArcher : int
+            public enum WindArcher
             {
                 CriticalShot = 13000000,
                 TheEyeofAmazon = 13000001,
@@ -911,7 +911,7 @@ namespace Destiny.Constants
                 Storm = 13001004
             }
 
-            public enum WindArcher2 : int
+            public enum WindArcher2
             {
                 BowMastery = 13100000,
                 Thurst = 13100004,
@@ -922,7 +922,7 @@ namespace Destiny.Constants
                 WindWalk = 13101006
             }
 
-            public enum WindArcher3 : int
+            public enum WindArcher3
             {
                 BowExpert = 13110003,
                 ArrowRain = 13111000,
@@ -934,7 +934,7 @@ namespace Destiny.Constants
                 WindShot = 13111007
             }
 
-            public enum NightWalker : int
+            public enum NightWalker
             {
                 NimbleBody = 14000000,
                 KeenEyes = 14000001,
@@ -944,7 +944,7 @@ namespace Destiny.Constants
                 Darkness = 14001005
             }
 
-            public enum NightWalker2 : int
+            public enum NightWalker2
             {
                 ClawMastery = 14100000,
                 CriticalThrow = 14100001,
@@ -955,7 +955,7 @@ namespace Destiny.Constants
                 Vampire = 14101006
             }
 
-            public enum NightWalker3 : int
+            public enum NightWalker3
             {
                 Alchemist = 14110003,
                 Venom = 14110004,
@@ -966,11 +966,11 @@ namespace Destiny.Constants
                 PoisonBomb = 14111006
             }
 
-            public enum NightWalker4 : int
+            public enum NightWalker4
             {
             }
 
-            public enum ThunderBreaker : int
+            public enum ThunderBreaker
             {
                 QuickMotion = 15000000,
                 Straight = 15001001,
@@ -979,7 +979,7 @@ namespace Destiny.Constants
                 LightningSprite = 15001004
             }
 
-            public enum ThunderBreaker2 : int
+            public enum ThunderBreaker2
             {
                 ImproveMaxHP = 15100000,
                 KnucklerMastery = 15100001,
@@ -990,7 +990,7 @@ namespace Destiny.Constants
                 LightningCharge = 15101006
             }
 
-            public enum ThunderBreaker3 : int
+            public enum ThunderBreaker3
             {
                 CriticalPunch = 15110000,
                 EnergyDrain = 15111001,
@@ -1002,16 +1002,16 @@ namespace Destiny.Constants
                 SharkWave = 15111007,
             }
 
-            public enum ThunderBreaker4 : int
+            public enum ThunderBreaker4
             {
             }
 
-            public enum Legend : int
+            public enum Legend
             {
                 //uninplemented 
             }
 
-            public enum Aran : int //beginner aran
+            public enum Aran //beginner aran
             {
                 BlessingoftheFairy = 20000012,
                 FollowtheLead = 20000024,
@@ -1030,7 +1030,7 @@ namespace Destiny.Constants
                 MeteoShower = 20001011,
             }
 
-            public enum Aran1 : int //1st job
+            public enum Aran1 //1st job
             {
                 ComboAbility = 21000000,
                 DoubleSwing = 21000002,
@@ -1038,7 +1038,7 @@ namespace Destiny.Constants
                 PolearmBooster = 21001003,
             }
 
-            public enum Aran2 : int //2nd job
+            public enum Aran2 //2nd job
             {
                 PolearmMastery = 21100000,
                 TripleSwing = 21100001,

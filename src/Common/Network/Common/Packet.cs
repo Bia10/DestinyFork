@@ -14,8 +14,7 @@ namespace Destiny.Network.Common
            OperationCode = ReadShort();
         }
 
-        public Packet(short operationCode) 
-            : base()
+        private Packet(short operationCode)  : base()
         {
             OperationCode = operationCode;
 

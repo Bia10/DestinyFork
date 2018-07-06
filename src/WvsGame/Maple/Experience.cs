@@ -22,7 +22,7 @@ namespace Destiny.Maple
 
         public static void giveExp(Character character, int exp)
         {
-            long myPlusGivenExp = (long)character.Stats.Experience + (long)exp;
+            long myPlusGivenExp = character.Stats.Experience + (long)exp;
 
             if (myPlusGivenExp > GivenExpLimit)
             {

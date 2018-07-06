@@ -42,7 +42,7 @@ namespace Destiny.Maple.Maps
         //TODO: remake as MobDied(int index, bool isBoss)
         protected override void RemoveItem(int index) // NOTE: Equivalent of mob death.
         {
-            Mob item = base.Items[index];
+            Mob item = Items[index];
 
             int mostDamage = 0;
             Character owner = null;
@@ -59,7 +59,8 @@ namespace Destiny.Maple.Maps
                 attacker.Key.Stats.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * WvsGame.ExperienceRate;
                 int expGained = (int)item.Experience * WvsGame.ExperienceRate;
                 Packet ExpGainOnMobDeath = Experience.GetShowExpGainPacket(true, expGained, false, 0, 0);
-                owner.Client.Send(ExpGainOnMobDeath);
+
+                if (owner != null) owner.Client.Send(ExpGainOnMobDeath);                 
             }
 
             item.Attackers.Clear();

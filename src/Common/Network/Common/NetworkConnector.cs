@@ -9,7 +9,7 @@ namespace Destiny.Network.Common
 {
     public abstract class NetworkConnector<TReceiveOP, TSendOP, TCryptograph> : MarshalByRefObject where TCryptograph : Cryptograph, new()
     {
-        protected bool isAlive;
+        private bool isAlive;
         protected readonly ManualResetEvent ReceiveDone = new ManualResetEvent(false);
 
         protected Socket Socket { get; set; }

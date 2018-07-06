@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Constants
 {
-    public class KeyMapConstants
+    public static class KeyMapConstants
     {
         #region Keymap
         public enum KeymapType : byte
@@ -15,7 +15,7 @@
             Effect = 7
         }
 
-        public enum KeymapAction : int
+        public enum KeymapAction
         {
             EquipmentMenu = 0,
             ItemMenu = 1,
@@ -61,7 +61,7 @@
             Annoyed = 106
         }
 
-        public enum KeymapKey : int
+        public enum KeymapKey
         {
             None = 0,
             Escape = 1,

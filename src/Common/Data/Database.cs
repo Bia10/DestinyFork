@@ -280,9 +280,8 @@ namespace Destiny.Data
         {
             if (namePrefix == null) return string.Empty;
             if (commandText == null) return string.Empty;
-            if (args == null) return string.Empty;
 
-            return string.Format(commandText, args.Select((v, i) => "@" + namePrefix + i).ToArray()); 
+            return args == null ? string.Empty : string.Format(commandText, args.Select((v, i) => "@" + namePrefix + i).ToArray());
         }
 
         public static MySqlParameter[] ConstraintsToParameters(string namePrefix, string constraints, params object[] args)

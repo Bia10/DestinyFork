@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Constants
 {
-    public class MapConstants
+    public static class MapConstants
     {
         #region Map
         public enum MovementType : byte
@@ -28,7 +28,7 @@
             Aran = 20,
         }
 
-        public enum FieldLimit : int
+        public enum FieldLimit
         {
             CannotJump = 0x01,
             CannotUseMovementSkills = 0x02,

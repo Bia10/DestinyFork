@@ -2,11 +2,11 @@
 
 namespace Destiny.Constants
 {
-    public class MobConstants
+    public static class MobConstants
     {
         #region Mobs
         [Flags]
-        public enum MobStatus : int
+        public enum MobStatus
         {
             None,
 
@@ -49,7 +49,7 @@ namespace Destiny.Constants
             MagicDamageReflect = 0x40000000
         }
 
-        public enum MobSkillName : int
+        public enum MobSkillName
         {
             WeaponAttackUp = 100,
             MagicAttackUp = 101,

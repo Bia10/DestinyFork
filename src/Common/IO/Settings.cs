@@ -12,7 +12,7 @@ namespace Destiny.IO
     {
         private static Dictionary<string, string> Dictionary { get; set; }
 
-        public static string Path { get; private set; }
+        private static string Path { get; set; }
 
         public static void Initialize(string path = null, bool showRefresh = false)
         {
@@ -75,7 +75,9 @@ namespace Destiny.IO
             }
 
             catch
-            { }
+            {
+                // ignored
+            }
 
             Database.Username = GetString("Database/Username");
             Database.Password = GetString("Database/Password");

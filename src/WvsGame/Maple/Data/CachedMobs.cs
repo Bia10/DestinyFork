@@ -32,7 +32,7 @@ namespace Destiny.Maple.Data
                     {
                         foreach (MobSkill loopMobSkill in loopMob.Skills)
                         {
-                            if (loopMobSkill.MapleID == (int)(short)datum["skillid"] && loopMobSkill.Level == (byte)(short)datum["skill_level"])
+                            if (loopMobSkill.MapleID == (short)datum["skillid"] && loopMobSkill.Level == (byte)(short)datum["skill_level"])
                             {
                                 loopMobSkill.Load(datum);
                             }

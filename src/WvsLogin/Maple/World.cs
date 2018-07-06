@@ -93,7 +93,7 @@ namespace Destiny.Maple
 
         protected override void RemoveItem(int index)
         {
-            Channel item = base.Items[index];
+            Channel item = Items[index];
 
             base.RemoveItem(index);
 

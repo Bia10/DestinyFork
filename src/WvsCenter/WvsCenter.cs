@@ -21,7 +21,7 @@ namespace Destiny
         public static Worlds Worlds { get; private set; }
         public static Migrations Migrations { get; private set; }
 
-        public static TcpListener Listener { get; private set; }
+        private static TcpListener Listener { get; set; }
         public static List<CenterClient> Clients { get; private set; }
 
         public static bool IsAlive
@@ -30,7 +30,7 @@ namespace Destiny
             {
                 return isAlive;
             }
-            set
+            private set
             {
                 isAlive = value;
 

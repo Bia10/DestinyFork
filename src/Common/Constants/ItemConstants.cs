@@ -2,7 +2,7 @@
 
 namespace Destiny.Constants
 {
-    public class ItemConstants
+    public static class ItemConstants
     {
         #region ItemFlags
         [Flags]
@@ -105,7 +105,7 @@ namespace Destiny.Constants
         #endregion
 
         #region UsableCashItems
-        public enum UsableCashItems : int
+        public enum UsableCashItems
         {
             TeleportRock = 5040000,
             CokeTeleportRock,
@@ -234,7 +234,7 @@ namespace Destiny.Constants
         #endregion
 
         #region DropType
-        public enum DropType : int
+        public enum DropType
         {
             normalDrop,
             partyDrop,

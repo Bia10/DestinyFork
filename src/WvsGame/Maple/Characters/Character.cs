@@ -84,6 +84,7 @@ namespace Destiny.Maple.Characters
         public Npc LastNpc
         {
             get { return lastNpc; }
+
             set
             {
                 if (value == null)
@@ -539,11 +540,12 @@ namespace Destiny.Maple.Characters
                 case CharacterConstants.AttackType.Melee:
                     using (Packet oPacket = new Packet(ServerOperationCode.CloseRangeAttack))
                     {
-                        oPacket
-                            .WriteInt(ID)
-                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte(0x5B) // NOTE: Unknown.
-                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                        if (skill != null)
+                            oPacket
+                                .WriteInt(ID)
+                                .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
+                                .WriteByte(0x5B) // NOTE: Unknown.
+                                .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -578,11 +580,12 @@ namespace Destiny.Maple.Characters
                 case CharacterConstants.AttackType.Magic:
                     using (Packet oPacket = new Packet(ServerOperationCode.MagicAttack))
                     {
-                        oPacket
-                            .WriteInt(ID)
-                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte(0x5B) // NOTE: Unknown.
-                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                        if (skill != null)
+                            oPacket
+                                .WriteInt(ID)
+                                .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
+                                .WriteByte(0x5B) // NOTE: Unknown.
+                                .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -617,11 +620,12 @@ namespace Destiny.Maple.Characters
                 case CharacterConstants.AttackType.Range:
                     using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
                     {
-                        oPacket
-                            .WriteInt(ID)
-                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
-                            .WriteByte(0x5B) // NOTE: Unknown.
-                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+                        if (skill != null)
+                            oPacket
+                                .WriteInt(ID)
+                                .WriteByte((byte) ((attack.Targets * 0x10) + attack.Hits))
+                                .WriteByte(0x5B) // NOTE: Unknown.
+                                .WriteByte((byte) (attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                         if (attack.SkillID > 0)
                         {
@@ -802,7 +806,7 @@ namespace Destiny.Maple.Characters
 
                     if (mpBurn > 0)
                     {
-                        Stats.Mana -= (short)mpBurn;
+                        Stats.Mana -= mpBurn;
                     }
                 }
 
@@ -1796,7 +1800,7 @@ namespace Destiny.Maple.Characters
                 .WriteBytes(AppearanceToByteArray())
                 .WriteInt(Items.InventoryAvailableItemByID(5110000))
                 .WriteInt() // NOTE: Item effect.
-                .WriteInt((int)(Item.GetType(Chair) == ItemConstants.ItemType.Setup ? Chair : 0))
+                .WriteInt(Item.GetType(Chair) == ItemConstants.ItemType.Setup ? Chair : 0)
                 .WriteShort(Position.X)
                 .WriteShort(Position.Y)
                 .WriteByte(Stance)

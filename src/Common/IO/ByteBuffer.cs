@@ -217,10 +217,7 @@ namespace Destiny.IO
         {
             item = item ?? string.Empty;
 
-            if (item != null)
-            {
-                item = string.Format(item, args);
-            }
+            item = string.Format(item, args);
 
             Writer.Write((short)item.Length);
 

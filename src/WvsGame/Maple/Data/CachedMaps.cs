@@ -20,7 +20,7 @@ namespace Destiny.Maple.Data
         {
             get
             {
-                if (base.Contains(key)) return base[key];
+                if (Contains(key)) return base[key];
 
                 using (Database.TemporarySchema(Database.SchemaMCDB))
                 {

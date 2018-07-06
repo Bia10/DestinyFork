@@ -133,7 +133,7 @@ namespace Destiny.Maple.Maps
         {
             lock (this)
             {
-                Character item = base.Items[index];
+                Character item = Items[index];
 
                 item.ControlledMobs.Clear();
                 item.ControlledNpcs.Clear();

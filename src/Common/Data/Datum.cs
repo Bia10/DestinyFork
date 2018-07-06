@@ -104,8 +104,8 @@ namespace Destiny.Data
 
     public sealed class Datum
     {
-        public string Table { get; }
-        public Dictionary<string, Object> Dictionary { get; }
+        private string Table { get; }
+        public Dictionary<string, object> Dictionary { get; }
         private string ConnectionString { get; }
 
         public object this[string name]

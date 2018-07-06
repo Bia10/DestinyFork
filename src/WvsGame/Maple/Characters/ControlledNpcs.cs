@@ -59,7 +59,7 @@ namespace Destiny.Maple.Characters
         {
             lock (this)
             {
-                Npc item = base.Items[index];
+                Npc item = Items[index];
 
                 if (Parent.Client.IsAlive)
                 {

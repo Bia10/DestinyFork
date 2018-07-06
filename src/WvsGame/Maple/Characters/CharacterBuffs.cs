@@ -150,7 +150,7 @@ namespace Destiny.Maple.Characters
 
         public void ShowRemoteBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
         {
-            character.Map.Broadcast(CharacterBuffsPackets.ShowRemoteBuffEffect(character, effect, skill, direction), null);
+            character.Map.Broadcast(CharacterBuffsPackets.ShowRemoteBuffEffect(character, effect, skill, direction));
         }
 
         public static void ShowLocalUserEffect(Character character, CharacterConstants.UserEffect effect)

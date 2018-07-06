@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Constants
 {
-    public class LoginConstants
+    public static class LoginConstants
     {
         #region Login
         public enum CharacterDeletionResult : byte
@@ -9,7 +9,7 @@
             InvalidPic = 20
         }
 
-        public enum LoginResult : int
+        public enum LoginResult
         {
             Valid = 0,
             Banned = 3,

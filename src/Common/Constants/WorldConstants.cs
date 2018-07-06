@@ -2,7 +2,7 @@
 
 namespace Destiny.Constants
 {
-    public class WorldConstants
+    public static class WorldConstants
     {
         #region World
         public enum WorldFlag : byte
@@ -47,12 +47,13 @@ namespace Destiny.Constants
 
         public static class WorldNameResolver
         {
-            public static byte GetID(string name)
+            private static byte GetID(string name)
             {
                 try
                 {
                     return (byte)Enum.Parse(typeof(WorldNames), name.ToCamel());
                 }
+
                 catch
                 {
                     throw new ArgumentException("The specified World name is invalid.");
@@ -80,7 +81,7 @@ namespace Destiny.Constants
             {
                 try
                 {
-                    WorldNameResolver.GetID(name);
+                    GetID(name);
                     return true;
                 }
                 catch (ArgumentException)

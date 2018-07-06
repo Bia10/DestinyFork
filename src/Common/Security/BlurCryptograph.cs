@@ -49,7 +49,7 @@
             {
                 byte remember = 0;
                 byte length = (byte)data.Length;
-                byte nextRemember = 0;
+                byte nextRemember;
 
                 if (j % 2 == 0)
                 {

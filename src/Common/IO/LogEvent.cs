@@ -8,10 +8,10 @@ namespace Destiny.IO
     public static class LogEventQue
     {
         // A prioritized que of resolved communication events
-        public static List<LogEvent> NormalEventsLog { get; set; } = new List<LogEvent>();
+        public static List<LogEvent> NormalEventsLog { get; } = new List<LogEvent>();
 
         // A prioritized que of unresolved communication events
-        public static List<LogEvent> AnomalousEventsLog { get; set; } = new List<LogEvent>();
+        public static List<LogEvent> AnomalousEventsLog { get; } = new List<LogEvent>();
 
         public class LogEvent
         {
@@ -47,6 +47,8 @@ namespace Destiny.IO
 
             public static implicit operator List<object>(LogEvent v)
             {
+                if (v == null) throw new ArgumentNullException(nameof(v));
+
                 throw new NotImplementedException();
             }
         }
@@ -56,14 +58,19 @@ namespace Destiny.IO
         /// </summary>
         public static void SortLogEventsByPriority(List<LogEvent> logQueToSort)
         {
+            if (logQueToSort == null) throw new ArgumentNullException(nameof(logQueToSort));
+
             logQueToSort.Sort((le1, le2) => le1.EventPriority.CompareTo(le2.EventPriority));
         }
 
         /// <summary>
         /// Check for duplicate of LogEvent in logQue
         /// </summary>
-        public static bool IsDuplicate(List<LogEvent> logQueToCheck, LogEvent eventToCheck)
+        public static bool IsDuplicate(IEnumerable<LogEvent> logQueToCheck, LogEvent eventToCheck)
         {
+            if (logQueToCheck == null) throw new ArgumentNullException(nameof(logQueToCheck));
+            if (eventToCheck == null) throw new ArgumentNullException(nameof(eventToCheck));
+
             string firstName = eventToCheck.EventName;
 
             return logQueToCheck.Any(logEvent => logEvent.EventName == firstName);

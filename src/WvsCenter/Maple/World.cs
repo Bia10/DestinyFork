@@ -9,9 +9,9 @@ namespace Destiny.Maple
     {
         public byte ID { get;  }
         public string Name { get;  }
-        public ushort Port { get;  }
-        public ushort ShopPort { get;  }
-        public byte Channels { get;  }
+        private ushort Port { get;  }
+        private ushort ShopPort { get;  }
+        private byte Channels { get;  }
         public string TickerMessage { get;  }
         public bool AllowMultiLeveling { get;  }
         public int ExperienceRate { get;  }
@@ -24,7 +24,7 @@ namespace Destiny.Maple
 
         public CenterClient Shop
         {
-            get
+            private get
             {
                 return shop;
             }
@@ -63,7 +63,7 @@ namespace Destiny.Maple
             }
         }
 
-        internal World() : base() { }
+        private World() : base() { }
 
         internal World(Packet inPacket) : this()
         {

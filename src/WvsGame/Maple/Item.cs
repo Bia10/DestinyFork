@@ -102,7 +102,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return Item.GetType(MapleID);
+                return GetType(MapleID);
             }
         }
 

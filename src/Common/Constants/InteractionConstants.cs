@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Constants
 {
-    public class InteractionConstants
+    public static class InteractionConstants
     {
         #region Interaction
         public enum InteractionCode : byte

@@ -29,7 +29,7 @@ namespace Destiny.Maple.Maps
         {
             lock (this)
             {
-                Reactor item = base.Items[index];
+                Reactor item = Items[index];
 
                 if (DataProvider.IsInitialized)
                 {

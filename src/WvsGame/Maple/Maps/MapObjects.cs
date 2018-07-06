@@ -57,7 +57,7 @@ namespace Destiny.Maple.Maps
         {
             if (index >= 0 && index < int.MaxValue)
             {
-                if (base.Items.Count < index)
+                if (Items.Count < index)
                 {
                     Log.SkipLine();
                     Tracer.TraceErrorMessage("Failed to remove item, there is less items in base then index points to!");
@@ -65,9 +65,9 @@ namespace Destiny.Maple.Maps
                     //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Theres less items then index points to: {1}", index, base.Items.Count);
                 }
 
-                else if (base.Items.Count >= index)
+                else if (Items.Count >= index)
                 {
-                    T item = base.Items[index];
+                    T item = Items[index];
                     item.Map = null;
 
                     if (!(item is Character) && !(item is Portal))
